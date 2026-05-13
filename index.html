@@ -1,0 +1,2638 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
+<title>スマートタイムテーブル</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#fff;--bg2:#f8f8f8;--bg3:#f0f0f0;--bg-info:#EFF6FF;--border:#e2e2e2;--border2:#d0d0d0;--border-info:#BFDBFE;--text:#1a1a1a;--text2:#666;--text3:#999;--text-info:#1D4ED8;--accent:#4F46E5}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;--bg-info:#1e3a5f;--border:#3a3a3a;--border2:#4a4a4a;--border-info:#2563EB;--text:#e8e8e8;--text2:#aaa;--text3:#666;--text-info:#93C5FD;--accent:#6366F1}}
+body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
+.top-bar{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;background:var(--bg)}
+.logo{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;white-space:nowrap;color:var(--text)}
+.spacer{flex:1}
+.view-tabs{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden}
+.vtab{font-size:11px;padding:3px 10px;border:none;background:transparent;cursor:pointer;color:var(--text2)}
+.vtab.on{background:var(--bg-info);color:var(--text-info);font-weight:600}
+.tb{height:25px;min-width:25px;padding:0 6px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:11px;gap:3px;white-space:nowrap}
+.tb:hover{background:var(--bg2)}
+.tb:disabled{opacity:.35;cursor:default}
+.tb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tb.danger:hover{background:#FCEBEB;color:#A32D2D;border-color:#F7C1C1}
+.tb.ai{background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;border:none;font-weight:600;padding:0 10px}
+.sep{width:1px;height:14px;background:var(--border);margin:0 2px;flex-shrink:0}
+.body{display:flex;flex:1;overflow:hidden}
+.left{width:278px;flex-shrink:0;border-right:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden;background:var(--bg)}
+.ph{padding:5px 8px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
+.ib{width:18px;height:18px;border:none;background:transparent;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;border-radius:3px}
+.ib:hover{background:var(--bg2);color:var(--text)}
+.ib svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.ei{padding:7px 8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px;flex-shrink:0}
+.ei input{width:100%;font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text)}
+.r2{display:flex;gap:2px}.r2 input{flex:1}
+.mnb{padding:3px 8px;font-size:10px;color:var(--text2);border-bottom:1px solid var(--border);font-style:italic;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bl{flex:1;overflow-y:auto;padding:3px}
+.bi{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:3px;margin-bottom:2px;cursor:grab;user-select:none}
+.bi:hover{background:var(--bg2)}
+.bd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.bn{font-size:11px;font-weight:600;flex:1;color:var(--text)}
+.bdu{font-size:10px;font-weight:600;color:var(--text2)}
+.bi.any{border-top:1px solid var(--border);margin-top:2px;padding-top:5px}
+.cr{flex:1;display:flex;overflow:hidden}
+.tlv{flex:1;display:flex;overflow:hidden}
+.tlp{flex:6;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.frp{flex:4;min-width:0;border-left:1px solid var(--border);display:flex;flex-direction:column;overflow:hidden}
+.ch{font-size:11px;font-weight:700;color:var(--text2);padding:4px 7px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
+.db{font-size:9px;font-weight:600;padding:2px 5px;border-radius:999px}
+.ok{background:#EAF3DE;color:#27500A}.ov{background:#FCEBEB;color:#A32D2D}.un{background:#FAEEDA;color:#633806}
+.tls{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.tls::-webkit-scrollbar{display:none}
+.frs{flex:1;overflow-y:auto;position:relative}
+.tlb{display:grid;grid-template-columns:38px 1fr;position:relative}
+.tc{border-right:1px solid var(--border);position:relative}
+.tt{position:absolute;right:0;width:100%;display:flex;align-items:flex-start;justify-content:flex-end;padding-right:3px;font-size:8px;color:var(--text3);pointer-events:none}
+.tl{position:absolute;border-top:1px solid var(--border);pointer-events:none}
+.tl.fw{left:0;right:0}.tl.mj{border-top-color:var(--border2)}
+.sc{position:relative}
+/* Session blocks - handles use data attributes, NO inline onmousedown */
+.sb{position:absolute;left:2px;right:2px;border-radius:6px;border:none;overflow:visible;z-index:2;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.sb.dg{opacity:.3;filter:grayscale(0.3)}
+.sh{position:absolute;left:0;right:0;height:12px;cursor:ns-resize;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .15s}
+.sh.t{top:-6px;z-index:10}.sh.b{bottom:-6px;z-index:9}
+.sb:hover .sh,.sh.act{opacity:1}
+.sp{width:22px;height:3px;border-radius:2px;background:currentColor;opacity:.5}
+.si{flex:1;padding:4px 6px;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+.shr{display:flex;align-items:flex-start;gap:2px;flex-shrink:0}
+.stm{font-size:10px;font-weight:600;white-space:nowrap;flex-shrink:0}
+.snm{font-size:11px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sdr{font-size:10px;white-space:nowrap;flex-shrink:0}
+.sdl{font-size:12px;cursor:pointer;opacity:.35;flex-shrink:0}.sdl:hover{opacity:1}
+.scm{font-size:9px;line-height:1.3;margin-top:1px;opacity:.7;overflow:hidden;word-break:break-all;flex:1}
+.il{position:absolute;left:2px;right:2px;height:2px;border-radius:1px;background:#7F77DD;z-index:12;pointer-events:none;display:none}
+.now-line{position:absolute;left:0;right:0;height:1px;background:#E53E3E;z-index:15;pointer-events:none}
+
+.now-time{position:absolute;left:2px;top:-9px;font-size:9px;font-weight:700;color:#E53E3E;white-space:nowrap;pointer-events:none}
+.fc{position:relative}
+.fb{position:absolute;border-radius:6px;border:none;overflow:visible;z-index:2;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
+.fb.dg{opacity:.3;filter:grayscale(0.3)}
+.fh{position:absolute;left:0;right:0;height:10px;cursor:ns-resize;display:flex;align-items:center;justify-content:center;z-index:8;opacity:0;transition:opacity .15s}
+.fh.t{top:-5px}.fh.b{bottom:-5px}
+.fb:hover .fh,.fh.act{opacity:1}
+.fp{width:16px;height:3px;border-radius:2px;background:currentColor;opacity:.5}
+.fi{flex:1;padding:4px 5px;overflow:hidden;display:flex;flex-direction:column;min-height:0}
+.fn{font-size:11px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.fc2{font-size:9px;opacity:.7;overflow:hidden;word-break:break-all;flex:1;margin-top:1px}
+.fdl{position:absolute;top:1px;right:2px;font-size:9px;cursor:pointer;opacity:0;z-index:9}
+.fb:hover .fdl{opacity:.55}.fdl:hover{opacity:1}
+.fdl2{position:absolute;left:0;right:0;height:2px;background:#7F77DD;z-index:20;pointer-events:none;display:none}
+.fov{position:absolute;inset:0;z-index:15;pointer-events:none;border:2px dashed transparent;border-radius:3px}
+.fov.act{}
+.tbv{flex:1;overflow-y:auto;display:none;flex-direction:column}
+.thdr{padding:4px 9px;border-bottom:1px solid var(--border2);font-size:10px;font-weight:700;color:var(--text2);position:sticky;top:0;background:var(--bg);z-index:5;display:flex;align-items:center;gap:5px}
+.tadb{width:18px;height:18px;border:1px dashed var(--border);border-radius:3px;background:transparent;cursor:pointer;color:var(--text3);font-size:14px;display:flex;align-items:center;justify-content:center}
+.tadb:hover{background:var(--bg2)}
+table{width:100%;border-collapse:collapse;font-size:12px}
+table.nb td,table.nb th{border:none}
+thead th{padding:3px 7px;text-align:left;font-size:10px;font-weight:600;color:var(--text2);border:none;border-bottom:1px solid var(--border)}
+tbody td{padding:3px 7px;border-bottom:1px solid var(--border);vertical-align:top;color:var(--text)}
+tbody tr:hover td{background:var(--bg2)}
+.cd{width:7px;height:7px;border-radius:50%;display:inline-block}
+.ed{cursor:pointer;border-radius:2px;padding:1px 2px}
+.ed:hover{background:var(--bg2);outline:1px solid var(--border)}
+.cc{white-space:pre-wrap;word-break:break-all;font-size:12px;color:var(--text2)}
+.tdiv{height:5px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.dz{padding:3px 9px;font-size:10px;color:var(--text3);border-bottom:1px solid var(--border);min-height:22px}
+.dz.dov{background:var(--bg-info);color:var(--text-info)}
+.drgt td{border-top:2px solid #7F77DD!important}
+.tooltip{position:fixed;background:#1A1A18;color:#fff;font-size:10px;padding:3px 7px;border-radius:4px;pointer-events:none;z-index:500;white-space:nowrap;display:none;transform:translateX(-50%)}
+.mbg{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;display:flex;align-items:center;justify-content:center}
+.mc{background:var(--bg);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;max-height:90vh;box-shadow:0 8px 32px rgba(0,0,0,.2)}
+.mh{display:flex;align-items:center;gap:6px;padding:9px 12px;border-bottom:1px solid var(--border);flex-shrink:0}
+.mh h3{font-size:12px;font-weight:700;flex:1;color:var(--text)}
+.mx{background:none;border:none;cursor:pointer;font-size:15px;color:var(--text2);line-height:1}
+.mb{padding:10px 12px;display:flex;flex-direction:column;gap:8px;overflow-y:auto;flex:1}
+.mr{display:flex;flex-direction:column;gap:2px}
+.ml{font-size:10px;color:var(--text2);font-weight:500}
+.mi{font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);width:100%}
+.mi:focus{border-color:var(--accent);outline:none}
+.cr2{display:flex;gap:3px;flex-wrap:wrap}
+.csw{width:15px;height:15px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.csw:hover{transform:scale(1.1)}.csw.sel{border-color:var(--text)}
+.mta{width:100%;height:55px;font-size:11px;padding:4px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);resize:none;font-family:inherit;line-height:1.5;outline:none}
+.mft{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-top:1px solid var(--border);flex-shrink:0}
+.mbtns{display:flex;gap:4px}
+.btn{font-size:11px;padding:3px 10px;border:1px solid var(--border);border-radius:3px;background:transparent;color:var(--text);cursor:pointer}
+.btn:hover{background:var(--bg2)}
+.btn.p{background:var(--bg-info);color:var(--text-info);border-color:var(--border-info)}
+.btn.d{color:#A32D2D;border-color:#F7C1C1}.btn.d:hover{background:#FCEBEB}
+.trr{display:flex;align-items:center;gap:4px}
+.tin{width:63px;font-size:11px;padding:3px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text)}
+.din{width:52px;font-size:12px;font-weight:600;padding:3px 4px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);text-align:center}
+.stm2{width:490px}
+.str{display:flex;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid var(--border);cursor:grab}
+.str.dg{opacity:.3}
+.sdh{font-size:12px;color:var(--text3);cursor:grab;flex-shrink:0}
+.sdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid transparent}
+.sdot:hover{border-color:var(--border2)}
+.snin{font-size:11px;flex:1;border:1px solid var(--border);border-radius:3px;padding:2px 5px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
+.snin:focus{border-color:var(--accent)}
+.sdin{width:40px;font-size:11px;text-align:center;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);padding:2px}
+.sdel{font-size:11px;cursor:pointer;opacity:.35;padding:0 2px}.sdel:hover{opacity:.9}
+.icp{display:flex;gap:3px;flex-wrap:wrap;padding:2px 0 3px 16px}
+.isw{width:13px;height:13px;border-radius:3px;cursor:pointer;border:2px solid transparent}.isw.on{border-color:var(--text)}
+/* ========== MOBILE VIEW ========== */
+.mv{display:none;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg)}
+.mv-header{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
+.mv-title{font-size:16px;font-weight:700;color:var(--text)}
+.mv-meta{font-size:12px;color:var(--text2);margin-top:2px}
+.mv-progress{height:3px;background:var(--bg3);margin-top:10px;border-radius:2px;overflow:hidden}
+.mv-progress-bar{height:100%;background:var(--accent);border-radius:2px;transition:width .5s}
+.mv-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
+.mv-tab{flex:1;padding:10px;text-align:center;font-size:12px;font-weight:600;color:var(--text2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent}
+.mv-tab.on{color:var(--accent);border-bottom-color:var(--accent)}
+.mv-body{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;-webkit-user-select:none;user-select:none;align-content:flex-start}
+.mv-now{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:11px;color:#1D4ED8;display:flex;align-items:center;gap:6px;flex-shrink:0}
+.mv-card{border-radius:8px;overflow:hidden;display:flex;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.08);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .15s,opacity .15s;flex-shrink:0}
+.mv-card-bar{width:5px;flex-shrink:0}
+.mv-card-body{flex:1;padding:10px 12px;background:var(--bg)}
+.mv-card.active .mv-card-body{background:var(--bg-info)}
+.mv-card-name{font-size:14px;font-weight:700;color:var(--text)}
+.mv-card-time{font-size:12px;color:var(--text2);margin-top:2px}
+.mv-card-remain{font-size:11px;font-weight:600;margin-top:4px}
+.mv-card-comment{font-size:11px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:none}
+.mv-card.open .mv-card-comment{display:block}
+.mv-done{opacity:.45}
+.mv-clock{font-size:28px;font-weight:700;color:var(--text);text-align:center;padding:16px 0 8px;flex-shrink:0}
+@media(max-width:600px){
+  .body,.top-bar{display:none!important}
+  .mv{display:flex}
+}
+/* Mobile modal */
+.mv-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.mv-modal{background:var(--bg);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:0 0 env(safe-area-inset-bottom,16px);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
+.mv-modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 8px}
+.mv-modal-title{font-size:15px;font-weight:700;padding:0 16px 12px;color:var(--text)}
+.mv-modal-body{padding:0 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px}
+.mv-modal-label{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px}
+.mv-modal-input{width:100%;font-size:15px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
+.mv-modal-input:focus{border-color:var(--accent)}
+.mv-modal-textarea{width:100%;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:none;min-height:80px}
+.mv-dur-row{display:flex;align-items:center;gap:12px}
+.mv-dur-btn{width:44px;height:44px;border:1px solid var(--border);border-radius:22px;background:var(--bg2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0}
+.mv-dur-val{flex:1;text-align:center;font-size:22px;font-weight:700;color:var(--text)}
+.mv-dur-sub{font-size:11px;color:var(--text2);text-align:center}
+.mv-modal-footer{display:flex;gap:8px;padding:12px 16px 4px}
+.mv-btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer}
+.mv-btn.primary{background:var(--accent);color:#fff}
+.mv-btn.danger{background:#FCEBEB;color:#A32D2D}
+.mv-btn.cancel{background:var(--bg2);color:var(--text)}
+.mv-card-chevron{font-size:12px;color:var(--text3);flex-shrink:0;transition:transform .2s}
+.mv-card.open .mv-card-chevron{transform:rotate(90deg)}
+.mv-card-drag{opacity:.5;transform:scale(0.97);transition:all .1s}
+.mv-drag-ghost{position:fixed;left:12px;right:12px;border-radius:8px;opacity:.85;pointer-events:none;z-index:150;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.mv-drop-line{height:0;display:none;margin:0}
+.mv-drop-line.show{display:block;height:48px;background:rgba(79,70,229,.06);border:2px solid rgba(79,70,229,.3);border-radius:8px;margin:3px 0}
+.mv-time-row{display:flex;gap:8px}
+.mv-time-input{flex:1;font-size:16px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);text-align:center;font-family:inherit;outline:none}
+/* Table row with color bar */
+.tbl-row{border:none;border-bottom:1px solid var(--border)}
+.tbl-row td{border:none;padding:6px 8px;vertical-align:middle}
+.tbl-row:hover td{background:var(--bg2)}
+.color-bar{width:4px;border-radius:2px;min-height:32px;flex-shrink:0}
+.tbl-name-cell{font-weight:600;font-size:11px}
+.tbl-sub{font-size:10px;color:var(--text2)}
+.aidz{border:2px dashed var(--border);border-radius:5px;padding:12px;text-align:center;cursor:pointer;color:var(--text3);font-size:11px}
+.aidz:hover{border-color:#7F77DD;color:#7F77DD}
+.aifi{display:flex;align-items:center;gap:4px;font-size:10px;padding:2px 3px;background:var(--bg2);border-radius:3px;margin-top:2px}
+.aisi{display:flex;align-items:center;gap:5px;padding:3px 5px;border:1px solid var(--border);border-radius:3px;font-size:11px;margin-top:2px}
+.eli{display:flex;align-items:center;gap:5px;padding:4px 6px;border:1px solid var(--border);border-radius:3px;margin-bottom:2px}
+.eli:hover{background:var(--bg2)}
+.csta{width:100%;height:100px;font-size:10px;font-family:monospace;padding:5px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);resize:vertical}
+</style>
+</head>
+<body>
+<div id="pw-screen" style="position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:flex;align-items:center;justify-content:center">
+  <div style="background:#fff;border-radius:16px;padding:40px 36px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
+    <svg width="48" height="48" viewBox="0 0 32 32" fill="none" style="margin-bottom:16px"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
+    <div style="font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:6px">スマートタイムテーブル</div>
+    <div style="font-size:13px;color:#666;margin-bottom:24px">パスワードを入力してください</div>
+    <input type="password" id="pw-input" placeholder="Password"
+      style="width:100%;padding:12px 14px;border:1.5px solid #e2e2e2;border-radius:10px;font-size:15px;outline:none;margin-bottom:8px;box-sizing:border-box"
+      onkeydown="if(event.key==='Enter')pwCheck()"
+      oninput="document.getElementById('pw-error').style.display='none'"/>
+    <div id="pw-error" style="display:none;font-size:12px;color:#A32D2D;margin-bottom:8px">パスワードが違います</div>
+    <button onclick="pwCheck()"
+      style="width:100%;padding:13px;background:#4F46E5;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">
+      ログイン
+    </button>
+  </div>
+</div>
+<script>
+function pwCheck(){
+  const v=document.getElementById('pw-input').value;
+  if(v==='areyousmart?'){
+    document.getElementById('pw-screen').style.display='none';
+    sessionStorage.setItem('st-auth','1');
+    setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); }, 300);
+  } else {
+    document.getElementById('pw-error').style.display='block';
+    document.getElementById('pw-input').value='';
+    document.getElementById('pw-input').focus();
+  }
+}
+// セッション中は再入力不要
+if(sessionStorage.getItem('st-auth')==='1'){
+  document.addEventListener('DOMContentLoaded',()=>{
+    document.getElementById('pw-screen').style.display='none';
+  });
+}
+</script>
+<div class="top-bar">
+  <div class="logo">
+    <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
+    スマートタイムテーブル
+  </div>
+  <div class="sep"></div>
+  <div class="view-tabs">
+    <button class="vtab on" id="tab-tl" onclick="sv('tl')">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>タイムライン
+    </button>
+    <button class="vtab" id="tab-tb" onclick="sv('tb')">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>テーブル
+    </button>
+  </div>
+  <div class="spacer"></div>
+  <button class="tb ai" onclick="openAI()">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
+  </button>
+  <button class="tb" onclick="openHelp()" title="操作ガイド">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+  </button>
+  <div class="sep"></div>
+  <button class="tb" onclick="newEV()" title="新規">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>新規
+  </button>
+  <button class="tb" onclick="quickSaveEV()" title="保存">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>保存
+  </button>
+  <button class="tb" onclick="openEV()" title="開く">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
+  </button>
+  <button class="tb" onclick="openExport()">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し
+  </button>
+  <div class="sep"></div>
+  <button class="tb" id="bundo" onclick="undo()" title="元に戻す">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+  </button>
+  <button class="tb" id="bredo" onclick="redo()" title="やり直す">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>
+  </button>
+  <div class="sep"></div>
+  <button class="tb" onclick="cz(-1)" title="縮小">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="tb" onclick="cz(1)" title="拡大">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+  </button>
+  <button class="tb" onclick="fitz()" title="全体表示">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="3" x2="20" y2="3"/><line x1="4" y1="21" x2="20" y2="21"/><line x1="12" y1="7" x2="12" y2="17"/><polyline points="7 7 12 3 17 7"/><polyline points="7 17 12 21 17 17"/></svg>
+  </button>
+  <div class="sep"></div>
+  <button class="tb danger" onclick="resetAll()" title="全削除">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+  </button>
+  <span style="font-size:10px;font-weight:600;white-space:nowrap;color:var(--text)" id="trl">13:00〜17:00</span>
+  <span id="fb-status" style="font-size:10px;white-space:nowrap;cursor:pointer" onclick="fbShowRoom()" title="ルームIDをクリックして共有">⚪ 未接続</span>
+  <span class="db ok" id="dbd">ぴったり！</span>
+</div>
+<div class="body">
+  <div class="left">
+    <div class="ph">
+      <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">セッションメニュー</span>
+      <button class="ib" onclick="openST()" title="セッションテンプレート設定">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+    </div>
+    <div class="ei">
+      <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル"/>
+      <div style="display:flex;align-items:center;gap:4px">
+        <input type="date" id="evd" value="2026-05-13" style="flex:1" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine()"/>
+        <span id="dow-label" style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap;min-width:24px;text-align:center"></span>
+      </div>
+      <div class="r2">
+        <div style="display:flex;align-items:center;gap:3px;flex:1">
+          <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
+          <input type="time" id="evs" value="13:00" style="flex:1" onchange="render()"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:3px;flex:1">
+          <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
+          <input type="time" id="eve" value="17:00" style="flex:1" onchange="render()"/>
+        </div>
+      </div>
+    </div>
+    <div class="mnb" id="mnb">テンプレート：標準テンプレート</div>
+    <div class="bl" id="bl"></div>
+  </div>
+  <div class="cr">
+    <div class="tlv" id="vtl">
+      <div class="tlp">
+        <div class="ch"><span>シリアルセッション</span><button class="ib" onclick="addAnyEvent()" style="font-size:15px;width:18px;height:18px" title="任意のセッションを追加">+</button></div>
+        <div class="tls" id="tls" onscroll="syncScroll('tls')">
+          <div class="tlb" id="tlb">
+            <div class="tc" id="tc"></div>
+            <div class="sc" id="sc"><div class="il" id="il"></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="frp">
+        <div class="ch">
+          <span>フリーセッション</span>
+          <button class="ib" onclick="openFE(null)" style="font-size:15px;width:18px;height:18px">+</button>
+        </div>
+        <div class="frs" id="frs" onscroll="syncScroll('frs')">
+          <div class="fc" id="fcan">
+            <div class="fov" id="fov"></div>
+            <div class="fdl2" id="fdl"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tbv" id="vtb">
+      <div class="thdr"><span>シリアルセッション</span><button class="tadb" onclick="addST()">+</button></div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse"><thead><tr><th style="width:6px;padding:0"></th><th style="width:22px"></th><th style="width:22px;color:var(--text3)">#</th><th style="width:200px">セッション名</th><th style="width:55px">開始</th><th style="width:48px">時間</th><th>コメント</th><th style="width:22px"></th></tr></thead>
+        <tbody id="stb"></tbody></table>
+        <div class="dz" id="sdz">← セッションメニューからドラッグして末尾に追加（行にドロップで挿入）</div>
+      </div>
+      <div class="tdiv"></div>
+      <div class="thdr"><span>フリーセッション</span><button class="tadb" onclick="openFE(null)">+</button></div>
+      <div style="overflow-x:auto">
+        <table style="border-collapse:collapse"><thead><tr><th style="width:6px;padding:0"></th><th style="width:200px">セッション名</th><th style="width:55px">開始</th><th style="width:55px">終了</th><th style="width:48px">時間</th><th>コメント</th><th style="width:22px"></th></tr></thead>
+        <tbody id="ftb"></tbody></table>
+        <div class="dz" id="fdz">← セッションメニューからドラッグして追加</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Session modal -->
+<div class="mbg" id="sm" style="display:none">
+  <div class="mc" style="width:315px" onclick="event.stopPropagation()">
+    <div class="mh"><div id="scp" style="width:13px;height:13px;border-radius:3px;flex-shrink:0"></div><h3 id="slbl">セッション編集</h3><button class="mx" onclick="closeSM()">×</button></div>
+    <div class="mb">
+      <div class="mr"><div class="ml">名前</div><input class="mi" id="sname" maxlength="40" placeholder="セッション名"/></div>
+      <div class="mr"><div class="ml">色</div><div class="cr2" id="scolors"></div></div>
+      <div class="mr"><div class="ml">時間（分）</div><input type="number" class="mi din" id="sdur" min="1" max="480"/></div>
+      <div class="mr"><div class="ml">コメント</div><textarea class="mta" id="scmt" maxlength="100"></textarea></div>
+    </div>
+    <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="scc">0</span>/100</span>
+      <div class="mbtns"><button class="btn d" id="sdel" onclick="delSM()">削除</button><button class="btn" onclick="closeSM()">キャンセル</button><button class="btn p" onclick="saveSM()">保存</button></div>
+    </div>
+  </div>
+</div>
+<!-- Free modal -->
+<div class="mbg" id="fm" style="display:none">
+  <div class="mc" style="width:315px" onclick="event.stopPropagation()">
+    <div class="mh"><div id="fcp" style="width:13px;height:13px;border-radius:3px;flex-shrink:0"></div><h3 id="flbl">フリーセッション</h3><button class="mx" onclick="closeFM()">×</button></div>
+    <div class="mb">
+      <div class="mr"><div class="ml">名前</div><input class="mi" id="fname" maxlength="40" placeholder="イベント名"/></div>
+      <div class="mr"><div class="ml">色</div><div class="cr2" id="fcolors"></div></div>
+      <div class="mr"><div class="ml">時間帯</div><div class="trr"><input class="tin" id="ffrom" type="time"/><span style="font-size:11px;color:var(--text2)">〜</span><input class="tin" id="fto" type="time"/></div></div>
+      <div class="mr"><div class="ml">コメント</div><textarea class="mta" id="fcmt" maxlength="100"></textarea></div>
+    </div>
+    <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="fcc">0</span>/100</span>
+      <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
+    </div>
+  </div>
+</div>
+<!-- ST modal -->
+<div class="mbg" id="stm" style="display:none">
+  <div class="mc stm2" onclick="event.stopPropagation()">
+    <div class="mh"><h3>セッションテンプレート設定</h3><button class="mx" onclick="closeST()">×</button></div>
+    <div class="mb">
+      <div class="mr"><div class="ml">セッションテンプレート名</div><input class="mi" id="stname" maxlength="30" placeholder="テンプレート名"/></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">
+        <span style="font-size:10px;font-weight:600;color:var(--text2)">セッション一覧</span>
+        <button class="btn" style="padding:2px 7px;font-size:10px" onclick="stAdd()">+ 追加</button>
+      </div>
+      <div id="strows" style="display:flex;flex-direction:column"></div>
+      <div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:4px">
+        <button class="btn" onclick="stSave()">テンプレートとして保存</button>
+        <button class="btn" onclick="stImport()">現在のシリアルセッションを取り込む</button>
+        <button class="btn" onclick="stNew()">新規テンプレート作成</button>
+      </div>
+      <div><div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">保存済みテンプレート</div>
+        <div id="stlist" style="max-height:120px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"></div>
+      </div>
+    </div>
+    <div class="mft"><div></div><div class="mbtns"><button class="btn" onclick="closeST()">キャンセル</button><button class="btn p" onclick="applyST()">適用</button></div></div>
+  </div>
+</div>
+<!-- AI modal -->
+<div class="mbg" id="aim" style="display:none">
+  <div class="mc" style="width:460px" onclick="event.stopPropagation()">
+    <div class="mh"><h3>✨ AI セッション生成</h3><button class="mx" onclick="closeAI()">×</button></div>
+    <div class="mb">
+      <div class="mr">
+        <div class="ml">AIプロバイダー</div>
+        <div style="display:flex;gap:6px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:5px 10px;border:1px solid var(--border);border-radius:6px;flex:1">
+            <input type="radio" name="ai-provider" value="anthropic" id="ai-prov-anthropic" checked onchange="aiProviderChange()"/>
+            <span>Claude (Anthropic)</span>
+          </label>
+          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:5px 10px;border:1px solid var(--border);border-radius:6px;flex:1">
+            <input type="radio" name="ai-provider" value="gemini" id="ai-prov-gemini" onchange="aiProviderChange()"/>
+            <span>Gemini Flash <span style="font-size:9px;background:#EAF3DE;color:#27500A;padding:1px 4px;border-radius:3px">無料枠あり</span></span>
+          </label>
+        </div>
+      </div>
+      <div class="mr" id="ai-key-block">
+        <div class="ml" style="display:flex;align-items:center;gap:5px">
+          <span id="ai-key-label">APIキー</span>
+          <span style="font-size:9px;background:#EAF3DE;color:#27500A;padding:1px 5px;border-radius:3px">セッション中のみ保持</span>
+        </div>
+        <input class="mi" id="ai-apikey" type="password" placeholder="sk-ant-... または AIzaSy..." style="font-family:monospace" oninput="document.getElementById('ai-key-guide').style.display=this.value?'none':'block'"/>
+        <div id="ai-key-guide" style="margin-top:8px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+          <div style="background:var(--bg2);padding:8px 10px;font-size:11px;font-weight:600;color:var(--text2)">🔑 APIキーをお持ちでない方</div>
+          <div style="padding:10px;display:flex;flex-direction:column;gap:6px">
+            <a href="https://console.anthropic.com/settings/keys" target="_blank"
+              style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#4F46E5;color:#fff;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600">
+              <span>🤖 Claude (Anthropic) — 新規$5無料</span>
+              <span style="opacity:.8;font-size:11px">開く →</span>
+            </a>
+            <a href="https://aistudio.google.com/app/apikey" target="_blank"
+              style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;background:#1A73E8;color:#fff;border-radius:8px;text-decoration:none;font-size:12px;font-weight:600">
+              <span>✨ Gemini Flash (Google) — 無料枠大</span>
+              <span style="opacity:.8;font-size:11px">開く →</span>
+            </a>
+            <div style="font-size:10px;color:var(--text3);padding:4px 2px">① リンクでAPIキーを発行 → ② ここに貼り付け → ③ 生成！</div>
+          </div>
+        </div>
+      </div>
+      <div class="mr">
+        <div class="ml">生成モード</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label id="ai-mode-fit-label" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--accent);border-radius:8px;cursor:pointer;background:var(--bg2)">
+            <input type="radio" name="ai-mode" value="fit" checked onchange="aiModeChange()" style="margin-top:2px;flex-shrink:0"/>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text)">設定時間にぴったり合わせる</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:2px">メイン画面の開始〜終了時刻に合わせてセッションを作成</div>
+            </div>
+          </label>
+          <label id="ai-mode-free-label" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer">
+            <input type="radio" name="ai-mode" value="free" onchange="aiModeChange()" style="margin-top:2px;flex-shrink:0"/>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text)">ファイルまたはテキストに最適化する</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:2px">ファイルの内容・時間に合わせた最適なセッション構成を作成</div>
+            </div>
+          </label>
+          <label id="ai-mode-audio-label" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer">
+            <input type="radio" name="ai-mode" value="audio" onchange="aiModeChange()" style="margin-top:2px;flex-shrink:0"/>
+            <div>
+              <div style="font-size:12px;font-weight:600;color:var(--text)">🎤 音声ファイルを時間どおりに再現する</div>
+              <div style="font-size:10px;color:var(--text2);margin-top:2px">音声を文字起こしし、実際の発言・時間をそのままセッションとして再現（Gemini専用）</div>
+            </div>
+          </label>
+        </div>
+      </div>
+      <div class="mr"><div class="ml">どのようなイベントを実施しますか？</div>
+        <textarea class="mta" id="aiprompt" style="height:70px" placeholder="イベントの概要や目的をお知らせください。例：リーダーシップ研修。" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+      <div class="mr"><div class="ml" style="display:flex;align-items:center;justify-content:space-between">
+          <span>ファイルをアップロード（PDF・画像・PPT・Word・TXT・音声）</span>
+          <span style="font-size:9px;background:#FEF9C3;color:#713F12;padding:1px 6px;border-radius:3px">生成後に自動削除</span>
+        </div>
+        <div class="aidz" onclick="document.getElementById('aifile').click()">ここをクリックまたはドラッグ&amp;ドロップ<input type="file" id="aifile" multiple accept=".pdf,.png,.jpg,.jpeg,.ppt,.pptx,.doc,.docx,.txt,.mp3,.m4a,.wav,.aac,.ogg,.webm" style="display:none" onchange="aiFC(event)"/></div>
+        <div id="aifl"></div>
+      </div>
+      <div id="airw" style="display:none">
+        <div class="ml" style="margin-bottom:3px">生成されたセッション（チェックして取り込む）</div>
+        <div id="aisp" style="display:flex;flex-direction:column;gap:2px;max-height:160px;overflow-y:auto"></div>
+      </div>
+    </div>
+    <div class="mft">
+      <button class="btn p" id="aibtn" onclick="runAI()">🚀 生成</button>
+      <div class="mbtns"><button class="btn" onclick="closeAI()">キャンセル</button><button class="btn p" id="aiimport" style="display:none" onclick="importAI()">取り込む</button></div>
+    </div>
+  </div>
+</div>
+<!-- EV modal -->
+<div class="mbg" id="evm" style="display:none">
+  <div class="mc" style="width:360px" onclick="event.stopPropagation()">
+    <div class="mh"><h3>イベントを開く</h3><button class="mx" onclick="closeEV()">×</button></div>
+    <div class="mb">
+      <div style="display:flex;gap:4px;margin-bottom:5px">
+        <input class="mi" id="evname" placeholder="別名で保存（空白=タイトル名）" style="flex:1"/>
+        <button class="btn p" onclick="saveEV()">別名保存</button>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">ファイルから開く</div>
+      <div style="display:flex;gap:4px;margin-bottom:8px">
+        <label style="flex:1;padding:6px 10px;border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-size:11px;color:var(--text2);text-align:center;display:flex;align-items:center;justify-content:center;gap:5px">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          .sttファイルを開く
+          <input type="file" accept=".stt,.json" style="display:none" onchange="loadSTTFile(event)"/>
+        </label>
+      </div>
+      <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">保存済みイベント</div>
+      <div id="evlist" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"></div>
+    </div>
+    <div class="mft"><div></div><button class="btn" onclick="closeEV()">閉じる</button></div>
+  </div>
+</div>
+<!-- Export modal -->
+<div class="mbg" id="expm" style="display:none">
+  <div class="mc" style="width:380px" onclick="event.stopPropagation()">
+    <div class="mh"><h3>書き出し</h3><button class="mx" onclick="closeExport()">×</button></div>
+    <div class="mb" style="gap:10px">
+      <div style="font-size:11px;color:var(--text2)">書き出し形式を選択してください</div>
+      <button class="btn p" style="padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-start" onclick="exportPDF()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <div style="text-align:left"><div style="font-weight:700">PDF で書き出し</div><div style="font-size:10px;opacity:.7;margin-top:2px">テーブルレイアウトを再現したPDF</div></div>
+      </button>
+      <button class="btn" style="padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-start" onclick="exportJSON()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+        <div style="text-align:left"><div style="font-weight:700">データで書き出し (.stt)</div><div style="font-size:10px;opacity:.7;margin-top:2px">「開く」から読み込み可能な形式</div></div>
+      </button>
+    </div>
+    <div class="mft"><div></div><button class="btn" onclick="closeExport()">キャンセル</button></div>
+  </div>
+</div>
+
+<!-- CSV modal -->
+<div class="mbg" id="csvm" style="display:none">
+  <div class="mc" style="width:430px" onclick="event.stopPropagation()">
+    <div class="mh"><h3>CSV エクスポート / インポート</h3><button class="mx" onclick="closeCSV()">×</button></div>
+    <div class="mb">
+      <div class="mr"><div class="ml">エクスポート</div><textarea class="csta" id="csvexp" readonly></textarea><button class="btn p" style="margin-top:3px" onclick="dlCSV()">ダウンロード</button></div>
+      <div class="mr"><div class="ml">インポート（上書き）</div><textarea class="csta" id="csvimp" placeholder="CSVをここに貼り付け..."></textarea><button class="btn" style="margin-top:3px" onclick="impCSV()">インポート（上書き）</button></div>
+    </div>
+    <div class="mft"><div></div><button class="btn" onclick="closeCSV()">閉じる</button></div>
+  </div>
+</div>
+<!-- Help modal -->
+<div class="mbg" id="hm" style="display:none">
+  <div class="mc" style="width:520px;max-height:85vh" onclick="event.stopPropagation()">
+    <div class="mh"><h3>操作ガイド</h3><button class="mx" onclick="closeHelp()">×</button></div>
+    <div class="mb" style="gap:12px;font-size:12px;line-height:1.7">
+
+      <div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>基本の流れ</div>
+        <ol style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
+          <li>左列「セッションメニュー」からセッションを<b>ドラッグ&amp;ドロップ</b>して中央「シリアルセッション」に追加</li>
+          <li>ブロックの<b>下端ハンドル</b>（ホバーで表示）を上下にドラッグして時間を調整</li>
+          <li>ブロックを<b>ダブルクリック</b>すると名前・色・時間・コメントを編集</li>
+          <li>ブロックを<b>ドラッグ&amp;ドロップ</b>して並び順を変更</li>
+        </ol>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>フリーセッション</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
+          <li>セッションメニューから右列「フリーセッション」にドラッグして任意の時間帯に配置</li>
+          <li>ブロックをドラッグして時間帯を移動、上下ハンドルで開始・終了時刻を調整</li>
+          <li>同じ時間帯に複数配置すると自動で2〜3列に分割表示（4つ以上は不可）</li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>セッションテンプレート設定（歯車アイコン）</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
+          <li>左列メニューのセッション名・時間・色を自由に編集</li>
+          <li>「テンプレートとして保存」で複数のメニューセットを保存・切り替え可能</li>
+          <li>「現在のシリアルセッションを取り込む」でスケジュールをテンプレート化</li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>イベント管理</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
+          <li>「イベント」ボタンでタイムテーブル全体を名前をつけて保存・呼び出し・削除</li>
+          <li>「新規」で現在のデータをリセットして新しいイベントを作成</li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
+          <li>イベントの概要・目的をテキストで入力、またはPDF・画像をアップロード</li>
+          <li>AIがイベント時間帯に合わせたセッション一覧を自動生成</li>
+          <li>生成結果をチェックして「取り込む」でシリアルセッションに追加</li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>その他の操作</div>
+        <table style="width:100%;border-collapse:collapse;font-size:11px">
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px;width:36px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg></td><td style="padding:3px 6px;font-weight:600;width:80px">CSV</td><td style="padding:3px 6px">シリアル・フリー両方をエクスポート／インポート（上書き）</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></td><td style="padding:3px 6px;font-weight:600">元に戻す</td><td style="padding:3px 6px">操作を最大80ステップ遡れるUndo/Redo</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><line x1="5" y1="12" x2="19" y2="12"/></svg><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></td><td style="padding:3px 6px;font-weight:600">ズーム</td><td style="padding:3px 6px">タイムラインの表示倍率を6段階で調整</td></tr>
+          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></td><td style="padding:3px 6px;font-weight:600">テーブル</td><td style="padding:3px 6px">セッション一覧を表形式で確認・編集・並び替え</td></tr>
+          <tr><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></td><td style="padding:3px 6px;font-weight:600">全削除</td><td style="padding:3px 6px">シリアル・フリー全セッションを一括削除</td></tr>
+        </table>
+      </div>
+
+    </div>
+    <div class="mft"><div></div><button class="btn p" onclick="closeHelp()">閉じる</button></div>
+  </div>
+</div>
+
+<!-- QR共有モーダル -->
+<div class="mbg" id="qr-modal" style="display:none" onclick="if(event.target===this)closeQR()">
+  <div class="mc" style="width:320px" onclick="event.stopPropagation()">
+    <div class="mh">
+      <h3>🔗 ルーム共有</h3>
+      <button class="mx" onclick="closeQR()">×</button>
+    </div>
+    <div class="mb" style="align-items:center;gap:12px">
+      <div style="font-size:11px;color:var(--text2);text-align:center">QRコードをスキャンまたはURLをコピーして共有</div>
+      <div id="qr-code" style="width:200px;height:200px;margin:0 auto;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--border)"></div>
+      <div style="width:100%;background:var(--bg2);border-radius:6px;padding:8px 10px;font-size:10px;word-break:break-all;color:var(--text2);font-family:monospace" id="qr-url"></div>
+    </div>
+    <div class="mft">
+      <div></div>
+      <div class="mbtns">
+        <button class="btn" onclick="closeQR()">閉じる</button>
+        <button class="btn p" onclick="copyQRUrl()">URLをコピー</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="tooltip" id="tt"></div>
+
+<!-- ========== MOBILE VIEW ========== -->
+<div class="mv" id="mv">
+  <div class="mv-header" style="padding:max(env(safe-area-inset-top),20px) 16px 12px">
+    <div style="display:flex;align-items:flex-start;gap:8px;margin-top:8px">
+      <div style="flex:1">
+        <div class="mv-title" id="mv-title" style="font-size:18px;font-weight:700;margin-bottom:4px">タイムテーブル</div>
+        <div class="mv-meta" id="mv-meta" style="font-size:13px"></div>
+      </div>
+      <button id="mv-edit-btn" style="background:none;border:none;padding:8px;cursor:pointer;color:var(--text2);flex-shrink:0;margin-top:2px;min-width:44px;min-height:44px">
+        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      </button>
+    </div>
+    <div id="mv-edit-area" style="display:none;flex-direction:column;gap:8px;margin-top:10px">
+      <input type="text" id="mv-evt" placeholder="イベントタイトル"
+        style="width:100%;font-size:15px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;box-sizing:border-box"/>
+      <div style="display:flex;gap:8px;align-items:center">
+        <input type="date" id="mv-evd"
+          style="flex:1;font-size:15px;padding:10px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+        <span id="mv-dow" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap"></span>
+      </div>
+      <div style="display:flex;gap:8px">
+        <div style="flex:1;display:flex;align-items:center;gap:6px">
+          <span style="font-size:12px;color:var(--text2);white-space:nowrap">開始</span>
+          <input type="time" id="mv-evs" style="flex:1;font-size:15px;padding:10px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;gap:6px">
+          <span style="font-size:12px;color:var(--text2);white-space:nowrap">終了</span>
+          <input type="time" id="mv-eve" style="flex:1;font-size:15px;padding:10px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+        </div>
+      </div>
+      <button id="mv-save-btn" style="width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">保存</button>
+    </div>
+    <div class="mv-progress" style="margin-top:10px"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
+  </div>
+  <div class="mv-clock" id="mv-clock">--:--</div>
+  <div class="mv-now" id="mv-now" style="margin:0 12px 4px;display:none">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span id="mv-now-text">現在のセッション</span>
+  </div>
+  <div class="mv-tabs">
+    <button class="mv-tab on" id="mv-tab-s" onclick="mvSwitchTab('s')">シリアル</button>
+    <button class="mv-tab" id="mv-tab-f" onclick="mvSwitchTab('f')">フリー</button>
+    <button class="mv-tab" onclick="mvAddSession()" style="max-width:52px;font-size:18px;color:var(--accent);padding:8px">＋</button>
+  </div>
+  <div class="mv-body" id="mv-body"></div>
+</div>
+
+<!-- Mobile session edit modal -->
+<div class="mv-modal-bg" id="mv-sm" style="display:none" onclick="if(event.target===this)mvCloseSM()">
+  <div class="mv-modal">
+    <div class="mv-modal-handle"></div>
+    <div class="mv-modal-title" id="mv-sm-title">セッション編集</div>
+    <div class="mv-modal-body">
+      <div>
+        <div class="mv-modal-label">セッション名</div>
+        <input class="mv-modal-input" id="mv-sm-name" type="text" maxlength="40"/>
+      </div>
+      <div>
+        <div class="mv-modal-label">色</div>
+        <div id="mv-sm-colors" style="display:flex;gap:10px;flex-wrap:wrap;padding:4px 0"></div>
+      </div>
+      <div>
+        <div class="mv-modal-label">時間</div>
+        <div class="mv-dur-row">
+          <button class="mv-dur-btn" onclick="mvDurChange(-5)">−</button>
+          <div>
+            <div class="mv-dur-val" id="mv-sm-dur">30</div>
+            <div class="mv-dur-sub">分</div>
+          </div>
+          <button class="mv-dur-btn" onclick="mvDurChange(5)">＋</button>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
+          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(5)">5分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(10)">10分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(15)">15分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(30)">30分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(45)">45分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(60)">60分</button>
+        </div>
+      </div>
+      <div>
+        <div class="mv-modal-label">コメント</div>
+        <textarea class="mv-modal-textarea" id="mv-sm-comment" maxlength="100" placeholder="メモ・注意事項など"></textarea>
+      </div>
+    </div>
+    <div class="mv-modal-footer">
+      <button class="mv-btn danger" onclick="mvDeleteS()">削除</button>
+      <button class="mv-btn cancel" onclick="mvCloseSM()">キャンセル</button>
+      <button class="mv-btn primary" onclick="mvSaveSM()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- Mobile free session edit modal -->
+<div class="mv-modal-bg" id="mv-fm" style="display:none" onclick="if(event.target===this)mvCloseFM()">
+  <div class="mv-modal">
+    <div class="mv-modal-handle"></div>
+    <div class="mv-modal-title" id="mv-fm-title">フリーセッション編集</div>
+    <div class="mv-modal-body">
+      <div>
+        <div class="mv-modal-label">セッション名</div>
+        <input class="mv-modal-input" id="mv-fm-name" type="text" maxlength="40"/>
+      </div>
+      <div>
+        <div class="mv-modal-label">時間帯</div>
+        <div class="mv-time-row">
+          <input class="mv-time-input" id="mv-fm-from" type="time"/>
+          <span style="display:flex;align-items:center;color:var(--text2);font-size:16px">〜</span>
+          <input class="mv-time-input" id="mv-fm-to" type="time"/>
+        </div>
+      </div>
+      <div>
+        <div class="mv-modal-label">コメント</div>
+        <textarea class="mv-modal-textarea" id="mv-fm-comment" maxlength="100" placeholder="メモ・注意事項など"></textarea>
+      </div>
+    </div>
+    <div class="mv-modal-footer">
+      <button class="mv-btn danger" onclick="mvDeleteF()">削除</button>
+      <button class="mv-btn cancel" onclick="mvCloseFM()">キャンセル</button>
+      <button class="mv-btn primary" onclick="mvSaveFM()">保存</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ================================================================
+// CONSTANTS
+// ================================================================
+const COLORS=['purple','teal','green','pink','coral','blue','amber','gray'];
+const CB={white:'#FFFFFF',purple:'#EEEDFE',teal:'#E1F5EE',green:'#EAF3DE',pink:'#FBEAF0',coral:'#FAECE7',blue:'#E6F1FB',amber:'#FAEEDA',gray:'#F1EFE8'};
+const CD={white:'#CCCCCC',purple:'#AFA9EC',teal:'#5DCAA5',green:'#97C459',pink:'#ED93B1',coral:'#F0997B',blue:'#85B7EB',amber:'#EF9F27',gray:'#B4B2A9'};
+const CDot={white:'#AAAAAA',purple:'#7F77DD',teal:'#1D9E75',green:'#639922',pink:'#D4537E',coral:'#D85A30',blue:'#378ADD',amber:'#BA7517',gray:'#888780'};
+const CT={white:'#555555',purple:'#3C3489',teal:'#085041',green:'#27500A',pink:'#72243E',coral:'#712B13',blue:'#0C447C',amber:'#633806',gray:'#444441'};
+const ANY={id:'__any',name:'任意のセッション',dur:10,color:'coral',fixed:true};
+const BUFFER={id:'__buffer',name:'時間調整',dur:10,color:'white',fixed:true};
+
+// ================================================================
+// STATE
+// ================================================================
+let tplName='標準テンプレート';
+let TYPES=[
+  {id:'checkin',name:'チェックイン',dur:10,color:'purple'},
+  {id:'guidance',name:'ガイダンス',dur:10,color:'teal'},
+  {id:'lecture',name:'レクチャー',dur:20,color:'teal'},
+  {id:'qa',name:'質疑応答',dur:10,color:'blue'},
+  {id:'break',name:'小休止',dur:5,color:'amber'},
+  {id:'solo',name:'個人ワーク',dur:10,color:'purple'},
+  {id:'group',name:'グループワーク',dur:15,color:'green'},
+  {id:'discussion',name:'全体ディスカッション',dur:20,color:'purple'},
+  {id:'lunch',name:'ランチ',dur:60,color:'amber'},
+  {id:'workshop',name:'ワークショップ',dur:60,color:'pink'},
+  {id:'checkout',name:'チェックアウト',dur:10,color:'gray'},
+  {id:'survey',name:'アンケート',dur:5,color:'pink'},
+];
+let sessions=[];
+let freeEvs=[];
+let nid=30,nfid=100;
+const ZL=[1,1.5,2,3,4,6];
+let zi=2,PPM=2;
+const SN=5;
+let savedTpls=[{name:'標準テンプレート',types:JSON.parse(JSON.stringify(TYPES))}];
+let savedEvs=[];
+let cv='tl';
+let gSrc=null,gN='',gD=0,gC='teal';
+
+// ================================================================
+// UNDO / REDO
+// ================================================================
+let hist=[s0()],hi=0;
+function s0(){return JSON.stringify({sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))});}
+function snap(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();}
+function undo(){if(hi<=0)return;hi--;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
+function redo(){if(hi>=hist.length-1)return;hi++;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
+function uUR(){document.getElementById('bundo').disabled=hi<=0;document.getElementById('bredo').disabled=hi>=hist.length-1;}
+
+// ================================================================
+// TIME HELPERS
+// ================================================================
+function gSM(){const v=document.getElementById('evs').value||'13:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
+function gEM(){const v=document.getElementById('eve').value||'17:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
+function hm(t){const v=Math.max(0,Math.round(t));return`${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`;}
+function h2m(s){const[h,m]=(s||'00:00').split(':').map(Number);return h*60+m;}
+function gSt(){let c=0;return sessions.map(s=>{const t=c;c+=s.dur;return t;});}
+function cz(d){zi=Math.max(0,Math.min(ZL.length-1,zi+d));PPM=ZL[zi];render();}
+function fitz(){
+  const h=document.getElementById('tls').clientHeight;
+  const tm=gEM()-gSM();
+  if(tm<=0||h<=0)return;
+  PPM=h/tm;
+  let best=0;
+  ZL.forEach((z,i)=>{if(z<=PPM)best=i;});
+  zi=best;
+  render();
+  document.getElementById('tls').scrollTop=0;
+  document.getElementById('frs').scrollTop=0;
+}
+
+// ================================================================
+// VIEW SWITCH
+// ================================================================
+function sv(v){
+  cv=v;
+  document.getElementById('vtl').style.display=v==='tl'?'flex':'none';
+  const tb=document.getElementById('vtb');tb.style.display=v==='tb'?'flex':'none';tb.style.flexDirection='column';
+  document.getElementById('tab-tl').classList.toggle('on',v==='tl');
+  document.getElementById('tab-tb').classList.toggle('on',v==='tb');
+  if(v==='tb')renderTbl();
+}
+
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);}
+
+// ================================================================
+// RENDER BLOCK LIST
+// ================================================================
+function rBL(){
+  document.getElementById('mnb').textContent='テンプレート：'+tplName;
+  document.getElementById('bl').innerHTML=[...TYPES,BUFFER,ANY].map(t=>`
+    <div class="bi${t.fixed?' any':''}" draggable="true"
+      data-n="${esc(t.name)}" data-d="${t.dur}" data-c="${t.color}"
+      ondragstart="onMD(event,this)">
+      <div class="bd" style="background:${CDot[t.color]}"></div>
+      <span class="bn">${esc(t.name)}</span>
+      <span class="bdu">${t.dur}分</span>
+    </div>`).join('');
+}
+
+// ================================================================
+// RENDER TIMELINE
+// ================================================================
+// rTL: セッションブロックをDOM要素として生成し
+//      ハンドルにaddEventListenerで直接バインド
+//      → innerHTML書き換えによるDOM破壊を完全回避
+// ================================================================
+function rTL(){
+  const sm=gSM(),em=gEM(),tm=em-sm,tpx=tm*PPM;
+  const tc=document.getElementById('tc'),sc=document.getElementById('sc');
+  const extraPx=60*PPM;
+  const totalPx2=tpx+extraPx;
+  document.getElementById('tlb').style.height=totalPx2+'px';
+  tc.style.height=totalPx2+'px';sc.style.height=totalPx2+'px';
+
+  // タイムticks（時間軸）
+  let tH='';
+  for(let m=0;m<=tm+60;m++){
+    const abs=sm+m;if(abs%10!==0)continue;
+    const px=m*PPM,mj=abs%60===0,m30=abs%30===0;
+    tH+=`<div class="tt" style="top:${px}px">${mj?hm(abs):m30?hm(abs):''}</div>`;
+    tH+=`<div class="tl fw${mj?' mj':''}" style="top:${px}px"></div>`;
+  }
+  tc.innerHTML=tH;
+
+  // セッションブロックをすべてDOM要素で構築
+  // createElement + addEventListener を使い、innerHTML = 文字列 を使わない
+  // これによりドラッグ中にDOMが破壊されることがなくなる
+  const st=gSt();
+
+  // 既存ブロックを削除（insert-lineは保持）
+  Array.from(sc.children).forEach(el=>{
+    if(el.id!=='il')el.remove();
+  });
+  if(!document.getElementById('il')){
+    const il=document.createElement('div');il.className='il';il.id='il';sc.appendChild(il);
+  }
+
+  // sessions-col: overtime グレー背景
+  const ov=document.createElement('div');
+  ov.style.cssText=`top:${tpx}px;left:0;right:0;height:${extraPx}px;position:absolute;background:rgba(0,0,0,0.04);pointer-events:none;z-index:0`;
+  sc.appendChild(ov);
+  // sessions-col にも時間グリッド線を描画（延長分含む）
+  for(let m=0;m<=tm+60;m++){
+    const abs=sm+m;if(abs%10!==0)continue;
+    const px=m*PPM,mj=abs%60===0;
+    const gl=document.createElement('div');
+    gl.className='tl'+(mj?' mj':'');
+    gl.style.cssText='top:'+px+'px;left:0;right:0;position:absolute;pointer-events:none;z-index:0';
+    sc.appendChild(gl);
+  }
+
+  sessions.forEach((s,i)=>{
+    const top=st[i]*PPM,ht=Math.max(s.dur*PPM,18);
+    const sm2=sm+st[i],short=ht<24,showC=s.comment&&ht>=38;
+    const bg=CB[s.color]||'#F1EFE8',bd=CD[s.color]||'#B4B2A9',tc2=CT[s.color]||'#444';
+
+    // ブロック本体
+    const block=document.createElement('div');
+    block.className='sb';
+    block.id='sb'+s.id;
+    // 左端カラーバーのため、background は薄い色、左端は色付きボーダー
+    block.style.cssText=`top:${top+2}px;height:${ht-2}px;background:${bg};color:${tc2};border-left:4px solid ${bd};border-radius:6px`;
+    block.draggable=true;
+    block.dataset.id=String(s.id);
+    block.title=short?esc(s.name):'';
+    block.ondragstart=function(e){onSD(e,this);};
+    block.ondblclick=function(){openSM(s.id);};
+
+    // 下ハンドルのみ有効 — シリアルセッションはdurのみ変更可能
+    // 下にドラッグ→拡大、上にドラッグ→縮小
+    const hb_el=document.createElement('div');
+    hb_el.className='sh b';
+    hb_el.style.cssText='bottom:-6px;z-index:20;position:absolute;left:0;right:0;height:14px;cursor:s-resize;display:flex;align-items:center;justify-content:center';
+    hb_el.innerHTML='<div class="sp"></div>';
+    (function(capturedSid){
+      hb_el.addEventListener('mousedown',function(e){
+        e.preventDefault();e.stopPropagation();
+        startSResize(e,'b',capturedSid,hb_el);
+      });
+    })(s.id);
+    // 上ハンドル(ダミー — 視覚のみ、クリック無効)
+    const ht_el=document.createElement('div');
+    ht_el.className='sh t';
+    ht_el.style.cssText='top:-6px;z-index:1;position:absolute;left:0;right:0;height:12px;cursor:default;display:flex;align-items:center;justify-content:center;pointer-events:none';
+    ht_el.innerHTML='<div class="sp"></div>';
+
+    // 内部コンテンツ
+    const inner=document.createElement('div');inner.className='si';
+    const hdr=document.createElement('div');hdr.className='shr';
+    if(!short){const tm_el=document.createElement('span');tm_el.className='stm';tm_el.textContent=hm(sm2);hdr.appendChild(tm_el);}
+    const nm=document.createElement('span');nm.className='snm';nm.textContent=s.name;
+    const dr=document.createElement('span');dr.className='sdr';dr.textContent=s.dur+'分';
+    const dl=document.createElement('span');dl.className='sdl';dl.textContent='×';
+    (function(sid){dl.addEventListener('click',function(e){e.stopPropagation();sessions=sessions.filter(x=>x.id!==sid);snap();rTL();if(cv==='tb')renderTbl();});})(s.id);
+    hdr.appendChild(nm);hdr.appendChild(dr);hdr.appendChild(dl);
+    inner.appendChild(hdr);
+    if(showC){const cm=document.createElement('div');cm.className='scm';cm.textContent=s.comment;inner.appendChild(cm);}
+
+    block.appendChild(hb_el);
+    block.appendChild(inner);
+    block.appendChild(ht_el);
+    sc.appendChild(block);
+  });
+
+  // 空のときガイドを表示
+  if(sessions.length===0){
+    const guide=document.createElement('div');
+    guide.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;pointer-events:none;text-align:center;padding:20px';
+    guide.textContent='セッションメニューからここにドラッグして作成';
+    sc.appendChild(guide);
+  }
+  sc.ondragover=onSCo;
+  sc.ondragleave=onSCl;
+  sc.ondrop=onSCd;
+  updateNowLine();
+  uDiff();
+}
+
+function updateNowLine(){
+  document.querySelectorAll('.now-line,.now-label').forEach(el=>el.remove());
+  const evDate=document.getElementById('evd').value;
+  if(!evDate)return;
+  const[y,m,d]=evDate.split('-').map(Number);
+  const today=new Date();
+  if(today.getFullYear()!==y||today.getMonth()+1!==m||today.getDate()!==d)return;
+  const nowMin=today.getHours()*60+today.getMinutes();
+  const sm=gSM();
+  const px=(nowMin-sm)*PPM;
+  const timeStr=String(today.getHours()).padStart(2,'0')+':'+String(today.getMinutes()).padStart(2,'0');
+  const lineColor='#E53E3E';
+  const tc=document.getElementById('tc');
+  if(tc){
+    const label=document.createElement('div');
+    label.className='now-label';
+    label.style.cssText=`position:absolute;right:3px;top:${px-8}px;font-size:8px;font-weight:600;color:${lineColor};white-space:nowrap;z-index:15;pointer-events:none`;
+    label.textContent=timeStr;
+    tc.appendChild(label);
+  }
+  const sc=document.getElementById('sc');
+  if(sc){
+    const line=document.createElement('div');
+    line.className='now-line';
+    line.style.cssText=`position:absolute;left:0;right:0;height:1px;background:${lineColor};z-index:15;pointer-events:none;top:${px}px`;
+    sc.appendChild(line);
+  }
+  const frs=document.getElementById('frs');
+  if(frs){
+    const tls=document.getElementById('tls');
+    const scrollTop=tls?tls.scrollTop:0;
+    const frsLine=document.createElement('div');
+    frsLine.className='now-line';
+    frsLine.style.cssText=`position:absolute;left:0;right:0;height:1px;background:${lineColor};z-index:15;pointer-events:none;top:${px-scrollTop}px`;
+    frs.appendChild(frsLine);
+  }
+}
+
+// ================================================================
+// SESSION HANDLE RESIZE — THE DEFINITIVE FIX
+// Only touches the session identified by sid (the data attribute),
+// never touches any other session, never uses index during drag.
+// ================================================================
+// SESSION HANDLE RESIZE
+// - クロージャでsidとorigDurを完全にカプセル化
+// - グローバル変数sRを使わない
+// - ドラッグ中はDOM styleのみ更新（innerHTML書き換えなし）
+// ================================================================
+function startSResize(e,edge,sid,hel){
+  const s=sessions.find(x=>x.id===sid);
+  if(!s)return;
+
+  // この時点でsidとorigDurをクロージャにキャプチャ
+  const capturedSid=sid;
+  const capturedOrigDur=s.dur;
+  const capturedEdge=edge;
+  const startY=e.clientY;
+
+  hel.classList.add('act');
+
+  function onMove(ev){
+    // クロージャ変数のみ使用 — グローバルstateに依存しない
+    const target=sessions.find(x=>x.id===capturedSid);
+    if(!target)return;
+
+    const dy=ev.clientY-startY;
+    const steps=Math.round(dy/PPM/SN);
+    const delta=steps*SN;
+    const newDur=Math.max(SN, capturedEdge==='b'
+      ? capturedOrigDur+delta
+      : capturedOrigDur-delta);
+
+    if(target.dur!==newDur){
+      target.dur=newDur;
+      // DOMをstyle更新のみで反映（innerHTML書き換えなし）
+      const st=gSt();
+      sessions.forEach((sess,i)=>{
+        const el=document.getElementById('sb'+sess.id);
+        if(!el)return;
+        el.style.top=(st[i]*PPM+2)+'px';
+        el.style.height=Math.max(sess.dur*PPM-2,16)+'px';
+        const tmEl=el.querySelector('.stm');
+        if(tmEl)tmEl.textContent=hm(gSM()+st[i]);
+        const drEl=el.querySelector('.sdr');
+        if(drEl)drEl.textContent=sess.dur+'分';
+      });
+      uDiff();
+    }
+
+    // ツールチップ表示
+    const st2=gSt();
+    const idx=sessions.findIndex(x=>x.id===capturedSid);
+    if(idx>=0){
+      sTT(ev.clientX,ev.clientY,
+        `${hm(gSM()+st2[idx])}〜${hm(gSM()+st2[idx]+target.dur)}（${target.dur}分）`);
+    }
+  }
+
+  function onUp(){
+    hTT();
+    hel.classList.remove('act');
+    document.removeEventListener('mousemove',onMove);
+    document.removeEventListener('mouseup',onUp);
+    snap();
+  }
+
+  document.addEventListener('mousemove',onMove);
+  document.addEventListener('mouseup',onUp);
+}
+
+// ================================================================
+// FREE HANDLE RESIZE — same pattern: ID-based, no index
+// ================================================================
+let fR=null;
+function onFH(e,edge,id,hel){
+  e.preventDefault();e.stopPropagation();
+  const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
+  hel.classList.add('act');
+  fR={edge,id,startY:e.clientY,origFrom:ev.fromMin,origTo:ev.toMin,hel};
+  document.addEventListener('mousemove',onFRM);
+  document.addEventListener('mouseup',onFRU,{once:true});
+}
+function onFRM(e){
+  if(!fR)return;
+  const{edge,id,startY,origFrom,origTo}=fR;
+  const sd=Math.round((e.clientY-startY)/PPM/SN)*SN;
+  const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
+  if(edge==='b'){ev.toMin=Math.max(origFrom+SN,origTo+sd);}
+  else{ev.fromMin=Math.min(origTo-SN,Math.max(0,origFrom+sd));}
+  rFR();
+  sTT(e.clientX,e.clientY,`${hm(gSM()+ev.fromMin)}〜${hm(gSM()+ev.toMin)}（${ev.toMin-ev.fromMin}分）`);
+}
+function onFRU(){
+  hTT();
+  if(fR)fR.hel&&fR.hel.classList.remove('act');
+  fR=null;
+  document.removeEventListener('mousemove',onFRM);
+  if(cv==='tb')renderTbl();
+}
+
+// ================================================================
+// RENDER FREE PANEL
+// ================================================================
+function frLy(evs){
+  // 重なりグループを構築し、グループ内の列数でwidthを決める
+  // 重なりなし → col:0, total:1 (全幅)
+  // 2つ重なり → col:0か1, total:2 (半幅)
+  // 3つ重なり → col:0,1,2, total:3 (1/3幅)
+  const res={};
+  if(!evs||evs.length===0)return res;
+
+  // Step1: 各イベントに列番号を割り当て
+  // colEnd[c] = 列cに最後に入れたイベントのtoMin
+  const colEnd=[];
+  const sorted=[...evs].sort((a,b)=>a.fromMin-b.fromMin);
+  sorted.forEach(ev=>{
+    let col=-1;
+    for(let i=0;i<colEnd.length;i++){
+      if(ev.fromMin>=colEnd[i]){col=i;break;}
+    }
+    if(col===-1){col=colEnd.length;}
+    if(col>2)col=2; // 最大3列
+    while(colEnd.length<=col)colEnd.push(0);
+    colEnd[col]=ev.toMin;
+    res[ev.id]={col,total:1};
+  });
+
+  // Step2: 各イベントについて、同時刻に重なる全イベントを調べ
+  //        そのグループ内で使われている最大列番号+1をtotalとする
+  evs.forEach(ev=>{
+    // evと時間的に重なるイベントのリスト（自分含む）
+    const grp=evs.filter(o=>o.fromMin<ev.toMin&&o.toMin>ev.fromMin);
+    if(grp.length<=1){
+      // 重なりなし → 全幅
+      res[ev.id]={col:0,total:1};
+    } else {
+      // 重なりあり → グループ内の最大列番号+1
+      const maxCol=Math.max(...grp.map(o=>(res[o.id]||{col:0}).col));
+      res[ev.id].total=maxCol+1;
+    }
+  });
+
+  return res;
+}
+
+function rFR(){
+  const sm=gSM(),em=gEM(),tm=em-sm,tpx=tm*PPM;
+  const extraPx=60*PPM;
+  const can=document.getElementById('fcan');
+  can.style.height=(tpx+extraPx)+'px';
+  // 空のときガイドを表示
+  if(freeEvs.length===0){
+    const guide=document.createElement('div');
+    guide.style.cssText='position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--text3);font-size:12px;pointer-events:none;text-align:center;padding:20px';
+    guide.textContent='セッションメニューからここにドラッグして作成';
+    can.appendChild(guide);
+  }
+  Array.from(can.children).forEach(el=>{if(!['fov','fdl'].includes(el.id))el.remove();});
+  // overtime グレー背景
+  const frOv=document.createElement('div');
+  frOv.style.cssText=`top:${tpx}px;left:0;right:0;height:${extraPx}px;position:absolute;background:rgba(0,0,0,0.04);pointer-events:none;z-index:0`;
+  can.appendChild(frOv);
+  for(let m=0;m<=tm+60;m++){
+    const abs=sm+m;if(abs%10!==0)continue;
+    const px=m*PPM,mj=abs%60===0;
+    const l=document.createElement('div');
+    l.className='tl'+(mj?' mj':'');
+    l.style.cssText=`top:${px}px;left:0;right:0;position:absolute;pointer-events:none`;
+    can.appendChild(l);
+  }
+  const cm=frLy(freeEvs);
+  freeEvs.forEach(ev=>{
+    const info=cm[ev.id]||{col:0,total:1};
+    const top=ev.fromMin*PPM,ht=Math.max((ev.toMin-ev.fromMin)*PPM,18);
+    const tot=Math.max(info.total,1),cw=100/tot,lft=info.col*cw;
+    const bg=CB[ev.color]||'#E1F5EE',bd=CD[ev.color]||'#5DCAA5',tc=CT[ev.color]||'#085041';
+    const el=document.createElement('div');
+    el.className='fb';el.id='fb'+ev.id;
+    el.style.cssText=`top:${top+2}px;height:${ht-2}px;left:calc(${lft}% + 1px);width:calc(${cw}% - 2px);background:${bg};color:${tc};border-left:4px solid ${bd};border-radius:6px`;
+    el.draggable=true;
+    // Free handles use closures with ev.id (stable)
+    const htEl=document.createElement('div');htEl.className='fh t';htEl.innerHTML='<div class="fp"></div>';
+    htEl.addEventListener('mousedown',e=>onFH(e,'t',ev.id,htEl));
+    const hbEl=document.createElement('div');hbEl.className='fh b';hbEl.innerHTML='<div class="fp"></div>';
+    hbEl.addEventListener('mousedown',e=>onFH(e,'b',ev.id,hbEl));
+    const inner=document.createElement('div');inner.className='fi';
+    inner.innerHTML=`<div class="fn">${esc(ev.name)}</div>${ht>=34&&ev.comment?`<div class="fc2">${esc(ev.comment)}</div>`:''}`;
+    const del=document.createElement('span');del.className='fdl';del.textContent='×';
+    del.addEventListener('click',e=>{e.stopPropagation();freeEvs=freeEvs.filter(x=>x.id!==ev.id);snap();rFR();if(cv==='tb')renderTbl();});
+    el.appendChild(htEl);el.appendChild(inner);el.appendChild(hbEl);el.appendChild(del);
+    el.ondblclick=()=>openFE(ev.id);
+    el.ondragstart=e=>onFD(e,ev.id);
+    can.appendChild(el);
+  });
+  const fs=document.getElementById('frs');
+  fs.ondragover=onFRo;fs.ondragleave=onFRl;fs.ondrop=onFRd;
+}
+
+// ================================================================
+// RENDER TABLE
+// ================================================================
+function renderTbl(){
+  const st=gSt(),sm=gSM();
+  document.getElementById('stb').innerHTML=sessions.map((s,i)=>`
+    <tr class="tbl-row" id="tr${s.id}" draggable="true"
+      ondragstart="tDS(event,${s.id})"
+      ondragover="tDO(event,${s.id},this)"
+      ondragleave="tDL(this)"
+      ondrop="tDD(event,${s.id})">
+      <td style="width:6px;padding:0;vertical-align:stretch">
+        <div style="width:4px;background:${CD[s.color]||'#B4B2A9'};border-radius:4px;height:100%;min-height:36px;margin:2px 0"></div>
+      </td>
+      <td style="cursor:grab;color:var(--text3);font-size:13px;text-align:center;width:20px;padding:6px 2px">⠿</td>
+      <td style="color:var(--text3);font-size:10px;width:20px;padding:6px 4px">${i+1}</td>
+      <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 7px"><span style="cursor:pointer;font-weight:600;font-size:11px" onclick="openSM(${s.id})">${esc(s.name)}</span></td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+st[i])}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px"><span style="cursor:pointer" onclick="openSM(${s.id})">${s.dur}分</span></td>
+      <td style="font-size:11px;color:var(--text2);padding:6px 7px;white-space:pre-wrap;word-break:break-all"><span style="cursor:pointer" onclick="openSM(${s.id})">${s.comment?esc(s.comment):'<span style="opacity:.3">—</span>'}</span></td>
+      <td style="width:20px;text-align:center;padding:6px 4px"><span style="cursor:pointer;opacity:.3;font-size:13px" onclick="delS(event,${s.id})">×</span></td>
+    </tr>`).join('');
+  const sf=[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin);
+  const cm=frLy(sf);
+  document.getElementById('ftb').innerHTML=sf.map(ev=>{
+    const dur=ev.toMin-ev.fromMin,info=cm[ev.id]||{col:0,total:1};
+    const badge=info.total>1?` <span style="font-size:9px;color:var(--text2)">(${info.col+1}/${info.total}列)</span>`:'';
+    return`<tr class="tbl-row">
+      <td style="width:6px;padding:0;vertical-align:stretch">
+        <div style="width:4px;background:${CD[ev.color]||'#5DCAA5'};border-radius:4px;height:100%;min-height:36px;margin:2px 0"></div>
+      </td>
+      <td style="max-width:240px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 7px"><span style="cursor:pointer;font-weight:600;font-size:11px" onclick="openFE(${ev.id})">${esc(ev.name)}${badge}</span></td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+ev.fromMin)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+ev.toMin)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${dur}分</td>
+      <td style="font-size:11px;color:var(--text2);padding:6px 7px;white-space:pre-wrap;word-break:break-all"><span style="cursor:pointer" onclick="openFE(${ev.id})">${ev.comment?esc(ev.comment):'<span style="opacity:.3">—</span>'}</span></td>
+      <td style="width:20px;text-align:center;padding:6px 4px"><span style="cursor:pointer;opacity:.3;font-size:13px" onclick="delFid(${ev.id})">×</span></td>
+    </tr>`;
+  }).join('');
+  setupDZ();
+}
+
+function uDiff(){
+  const tm=gEM()-gSM(),used=sessions.reduce((a,s)=>a+s.dur,0),diff=used-tm;
+  document.getElementById('trl').textContent=`${hm(gSM())}〜${hm(gEM())}`;
+  let cl,tx;
+  if(diff===0){cl='db ok';tx='ぴったり！';}
+  else if(diff>0){cl='db ov';tx=`+${diff}分`;}
+  else{cl='db un';tx=`${diff}分`;}
+  const b=document.getElementById('dbd');if(b){b.className=cl;b.textContent=tx;}
+}
+
+function addAnyEvent(){sessions.push({id:nid++,name:ANY.name,dur:ANY.dur,color:ANY.color,comment:''});snap();rTL();if(cv==='tb')renderTbl();}
+function addST(){const t=TYPES[0]||ANY;sessions.push({id:nid++,name:t.name,dur:t.dur,color:t.color,comment:''});snap();rTL();if(cv==='tb')renderTbl();}
+function delFid(id){freeEvs=freeEvs.filter(x=>x.id!==id);snap();rFR();if(cv==='tb')renderTbl();}
+function resetAll(){if(!confirm('すべてのセッションを削除しますか？'))return;sessions=[];freeEvs=[];snap();render();}
+
+const TT=document.getElementById('tt');
+function sTT(x,y,t){TT.textContent=t;TT.style.display='block';TT.style.left=x+'px';TT.style.top=(y-26)+'px';}
+function hTT(){TT.style.display='none';}
+
+// ================================================================
+// DRAG & DROP — sessions
+// ================================================================
+let sD={src:null,id:null,ins:null};
+let fBD={id:null,of:0,ot:0};
+
+function onMD(e,el){gSrc='menu';gN=el.dataset.n;gD=parseInt(el.dataset.d)||10;gC=el.dataset.c||'teal';e.dataTransfer.effectAllowed='copy';document.addEventListener('dragend',onGDE,{once:true});}
+function onSD(e,el){
+  gSrc='serial';sD.src='serial';sD.id=parseInt(el.dataset.id);
+  const s=sessions.find(x=>x.id===sD.id);
+  if(s){gN=s.name;gD=s.dur;gC=s.color;}
+  e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>document.getElementById('sb'+sD.id)?.classList.add('dg'),0);
+  document.addEventListener('dragend',onGDE,{once:true});
+}
+function getIns(cy){
+  const sc=document.getElementById('sc'),r=sc.getBoundingClientRect();
+  const relY=cy-r.top+document.getElementById('tls').scrollTop;
+  const filt=gSrc==='serial'?sessions.filter(s=>s.id!==sD.id):sessions;
+  let c=0;
+  for(let i=0;i<filt.length;i++){
+    if(relY<(c+filt[i].dur/2)*PPM)return{idx:i,y:c*PPM};
+    c+=filt[i].dur;
+  }
+  return{idx:filt.length,y:c*PPM};
+}
+function onSCo(e){
+  e.preventDefault();
+  if(gSrc==='fblock')return;
+  const{idx,y}=getIns(e.clientY);
+  if(idx!==sD.ins){
+    sD.ins=idx;
+    const l=document.getElementById('il');
+    if(l){l.style.display='block';l.style.top=(y-1)+'px';}
+  }
+}
+function onSCl(e){
+  const sc=document.getElementById('sc');
+  if(!sc.contains(e.relatedTarget)){
+    document.getElementById('il').style.display='none';sD.ins=null;
+  }
+}
+function onSCd(e){
+  e.preventDefault();
+  if(gSrc==='fblock')return;
+  const{idx}=getIns(e.clientY);
+  document.getElementById('il').style.display='none';
+  if(sD.src==='serial')sessions=sessions.filter(s=>s.id!==sD.id);
+  sessions.splice(idx,0,{id:nid++,name:gN,dur:gD,color:gC,comment:''});
+  sD={src:null,id:null,ins:null};
+  snap();render();
+}
+
+function frRY(e){const c=document.getElementById('fcan'),r=c.getBoundingClientRect();return e.clientY-r.top+document.getElementById('frs').scrollTop;}
+function onFD(e,id){
+  const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
+  gSrc='fblock';fBD={id,of:ev.fromMin,ot:ev.toMin};
+  e.dataTransfer.effectAllowed='move';
+  setTimeout(()=>document.getElementById('fb'+id)?.classList.add('dg'),0);
+  document.addEventListener('dragend',onGDE,{once:true});
+}
+function onFRo(e){
+  e.preventDefault();
+  if(gSrc==='menu'){
+    document.getElementById('fov').classList.add('act');
+    const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
+    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM)+'px';
+    sTT(e.clientX,e.clientY,`${hm(gSM()+fm)}〜${hm(gSM()+fm+gD)}`);
+    e.dataTransfer.dropEffect='copy';return;
+  }
+  if(gSrc==='fblock'&&fBD.id){
+    const ry=frRY(e),dur=fBD.ot-fBD.of,nf=Math.max(0,Math.round((ry/PPM-dur/2)/SN)*SN);
+    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM)+'px';
+    sTT(e.clientX,e.clientY,`${hm(gSM()+nf)}〜${hm(gSM()+nf+dur)}（${dur}分）`);
+    e.dataTransfer.dropEffect='move';
+  }
+}
+function onFRl(e){
+  const fs=document.getElementById('frs');
+  if(!fs.contains(e.relatedTarget)){
+    document.getElementById('fdl').style.display='none';
+    document.getElementById('fov').classList.remove('act');
+    hTT();
+  }
+}
+function onFRd(e){
+  e.preventDefault();
+  document.getElementById('fdl').style.display='none';
+  document.getElementById('fov').classList.remove('act');
+  hTT();
+  if(gSrc==='menu'){
+    const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
+    let cnt=0;freeEvs.forEach(ev=>{if(ev.fromMin<fm+gD&&ev.toMin>fm)cnt++;});
+    if(cnt>=3){alert('同じ時間帯に4つ以上のイベントは配置できません。');return;}
+    freeEvs.push({id:nfid++,name:gN,dur:gD,color:gC,comment:'',fromMin:fm,toMin:fm+gD});
+    snap();rFR();if(cv==='tb')renderTbl();return;
+  }
+  if(gSrc==='fblock'&&fBD.id){
+    const ry=frRY(e),dur=fBD.ot-fBD.of,nf=Math.max(0,Math.round((ry/PPM-dur/2)/SN)*SN);
+    let cnt=0;freeEvs.forEach(ev=>{if(ev.id!==fBD.id&&ev.fromMin<nf+dur&&ev.toMin>nf)cnt++;});
+    if(cnt>=3){alert('同じ時間帯に4つ以上のイベントは配置できません。');fBD={id:null,of:0,ot:0};return;}
+    const ev=freeEvs.find(x=>x.id===fBD.id);
+    if(ev){ev.fromMin=nf;ev.toMin=nf+dur;}
+    fBD={id:null,of:0,ot:0};
+    snap();rFR();if(cv==='tb')renderTbl();
+  }
+}
+function onGDE(){
+  document.querySelectorAll('.dg').forEach(el=>el.classList.remove('dg'));
+  document.getElementById('fdl').style.display='none';
+  document.getElementById('fov').classList.remove('act');
+  document.getElementById('il').style.display='none';
+  hTT();
+  gSrc=null;fBD={id:null,of:0,ot:0};sD={src:null,id:null,ins:null};
+}
+function setupDZ(){
+  const sdz=document.getElementById('sdz');
+  sdz.ondragover=e=>{if(gSrc==='menu'){e.preventDefault();sdz.classList.add('dov');}};
+  sdz.ondragleave=()=>sdz.classList.remove('dov');
+  sdz.ondrop=e=>{e.preventDefault();sdz.classList.remove('dov');if(gSrc==='menu'){sessions.push({id:nid++,name:gN,dur:gD,color:gC,comment:''});snap();rTL();if(cv==='tb')renderTbl();}};
+  const fdz=document.getElementById('fdz');
+  fdz.ondragover=e=>{if(gSrc==='menu'){e.preventDefault();fdz.classList.add('dov');}};
+  fdz.ondragleave=()=>fdz.classList.remove('dov');
+  fdz.ondrop=e=>{e.preventDefault();fdz.classList.remove('dov');if(gSrc==='menu'){freeEvs.push({id:nfid++,name:gN,dur:gD,color:gC,comment:'',fromMin:0,toMin:gD});snap();rFR();if(cv==='tb')renderTbl();}};
+}
+let tDI=null,tDropId=null,tDropPos=null;
+function tDS(e,id){if(gSrc)return;gSrc='trow';tDI=id;e.dataTransfer.effectAllowed='move';setTimeout(()=>document.getElementById('tr'+id)?.classList.add('dg'),0);}
+function tDO(e,id,row){
+  if(gSrc==='trow'||gSrc==='menu'){
+    e.preventDefault();
+    // 既存のガイドラインをすべて削除
+    document.querySelectorAll('.tbl-guide').forEach(el=>el.remove());
+    const rect=row.getBoundingClientRect();
+    const isBefore=e.clientY<rect.top+rect.height/2;
+    row.dataset.dropPos=isBefore?'before':'after';
+    tDropId=id; tDropPos=row.dataset.dropPos;
+    // ガイドライン要素を行の前後に挿入
+    const guide=document.createElement('tr');
+    guide.className='tbl-guide';
+    guide.innerHTML='<td colspan="8" style="padding:0;height:3px;background:var(--accent);border:none"></td>';
+    if(isBefore){
+      row.parentNode.insertBefore(guide,row);
+    } else {
+      row.parentNode.insertBefore(guide,row.nextSibling);
+    }
+  }
+}
+function tDL(row){document.querySelectorAll('.tbl-guide').forEach(el=>el.remove());row.dataset.dropPos='';}
+function tDL(row){row.style.cssText=row.style.cssText.replace(/box-shadow:[^;]+;?/g,'');row.dataset.dropPos='';}
+function tDD(e,tid){
+  e.preventDefault();
+  document.querySelectorAll('.tbl-guide').forEach(el=>el.remove());document.querySelectorAll('#stb tr').forEach(r=>{r.classList.remove('dg');r.dataset.dropPos='';});
+  const pos=tDropPos||'before';
+  // trow の並び替え
+  if(gSrc==='trow'){
+    if(!tDI||tDI===tid){tDI=null;gSrc=null;return;}
+    const fi=sessions.findIndex(s=>s.id===tDI);
+    let ti=sessions.findIndex(s=>s.id===tid);
+    if(fi>=0&&ti>=0){
+      const[m]=sessions.splice(fi,1);
+      ti=sessions.findIndex(s=>s.id===tid);
+      sessions.splice(pos==='after'?ti+1:ti,0,m);
+    }
+    tDI=null;gSrc=null;tDropId=null;tDropPos=null;snap();rTL();renderTbl();
+    return;
+  }
+  // メニューからの行への挿入（その行の位置に挿入）
+  if(gSrc==='menu'){
+    const ti=sessions.findIndex(s=>s.id===tid);
+    const insertAt=pos==='after'?ti+1:ti;
+    if(ti>=0){sessions.splice(insertAt,0,{id:nid++,name:gN,dur:gD,color:gC,comment:''});}
+    else{sessions.push({id:nid++,name:gN,dur:gD,color:gC,comment:''});}
+    tDropId=null;tDropPos=null;snap();rTL();renderTbl();
+  }
+}
+
+// ================================================================
+// SESSION EDIT MODAL
+// ================================================================
+let smId=null,smC='teal';
+function cp(sel,fn){return COLORS.map(c=>`<div class="csw${c===sel?' sel':''}" style="background:${CDot[c]}" onclick="${fn}('${c}')"></div>`).join('');}
+function ssSC(c){smC=c;document.getElementById('scp').style.background=CDot[c];document.getElementById('scolors').querySelectorAll('.csw').forEach(el=>el.classList.toggle('sel',el.style.background===CDot[c]));}
+function openSM(id){
+  smId=id;const s=sessions.find(x=>x.id===id);if(!s)return;
+  smC=s.color||'teal';
+  document.getElementById('slbl').textContent=s.name;
+  document.getElementById('sname').value=s.name;
+  document.getElementById('scp').style.background=CDot[smC];
+  document.getElementById('scolors').innerHTML=cp(smC,'ssSC');
+  document.getElementById('sdur').value=s.dur;
+  document.getElementById('scmt').value=s.comment||'';
+  document.getElementById('scc').textContent=(s.comment||'').length;
+  document.getElementById('sdel').style.display='';
+  document.getElementById('sm').style.display='flex';
+  document.getElementById('sname').focus();
+}
+function closeSM(){document.getElementById('sm').style.display='none';smId=null;}
+function saveSM(){
+  if(smId===null)return;const s=sessions.find(x=>x.id===smId);if(!s)return;
+  const n=document.getElementById('sname').value.trim();if(n)s.name=n;
+  const d=parseInt(document.getElementById('sdur').value);if(!isNaN(d)&&d>=1)s.dur=d;
+  s.color=smC;s.comment=document.getElementById('scmt').value.slice(0,100);
+  closeSM();snap();rTL();if(cv==='tb')renderTbl();
+}
+function delSM(){if(smId===null)return;sessions=sessions.filter(s=>s.id!==smId);closeSM();snap();rTL();if(cv==='tb')renderTbl();}
+function delS(e,id){e.stopPropagation();sessions=sessions.filter(s=>s.id!==id);snap();rTL();if(cv==='tb')renderTbl();}
+document.getElementById('scmt').addEventListener('input',function(){document.getElementById('scc').textContent=this.value.length;});
+document.getElementById('sm').addEventListener('click',function(e){if(e.target===this)closeSM();});
+
+// ================================================================
+// FREE EVENT MODAL
+// ================================================================
+let fmId=null,fmC='teal';
+function sfC(c){fmC=c;document.getElementById('fcp').style.background=CDot[c];document.getElementById('fcolors').querySelectorAll('.csw').forEach(el=>el.classList.toggle('sel',el.style.background===CDot[c]));}
+function openFE(id){
+  fmId=id;const ev=id?freeEvs.find(x=>x.id===id):null;
+  fmC=ev?ev.color:'teal';
+  document.getElementById('flbl').textContent=ev?'フリーセッション編集':'フリーセッション追加';
+  document.getElementById('fname').value=ev?ev.name:'';
+  document.getElementById('fcp').style.background=CDot[fmC];
+  document.getElementById('fcolors').innerHTML=cp(fmC,'sfC');
+  const sm=gSM();
+  document.getElementById('ffrom').value=ev?hm(sm+ev.fromMin):hm(sm);
+  document.getElementById('fto').value=ev?hm(sm+ev.toMin):hm(sm+30);
+  document.getElementById('fcmt').value=ev?ev.comment||'':'';
+  document.getElementById('fcc').textContent=(ev?.comment||'').length;
+  document.getElementById('fdel').style.display=ev?'':'none';
+  document.getElementById('fm').style.display='flex';
+  setTimeout(()=>document.getElementById('fname').focus(),50);
+}
+function closeFM(){document.getElementById('fm').style.display='none';fmId=null;}
+function saveFM(){
+  const name=document.getElementById('fname').value.trim()||'イベント';
+  const fa=h2m(document.getElementById('ffrom').value),ta=h2m(document.getElementById('fto').value);
+  const sm=gSM();let fm=fa-sm,to=ta-sm;if(to<=fm)to=fm+10;
+  const cmt=document.getElementById('fcmt').value.slice(0,100);
+  let cnt=0;freeEvs.forEach(ev=>{if(ev.id!==fmId&&ev.fromMin<to&&ev.toMin>fm)cnt++;});
+  if(cnt>=3){alert('同じ時間帯に4つ以上のイベントは配置できません。');return;}
+  if(fmId===null){freeEvs.push({id:nfid++,name,color:fmC,comment:cmt,fromMin:fm,toMin:to});}
+  else{const ev=freeEvs.find(x=>x.id===fmId);if(ev){ev.name=name;ev.color=fmC;ev.comment=cmt;ev.fromMin=fm;ev.toMin=to;}}
+  closeFM();snap();rFR();if(cv==='tb')renderTbl();
+}
+function delFM(){if(fmId===null)return;freeEvs=freeEvs.filter(x=>x.id!==fmId);closeFM();snap();rFR();if(cv==='tb')renderTbl();}
+document.getElementById('fcmt').addEventListener('input',function(){document.getElementById('fcc').textContent=this.value.length;});
+document.getElementById('fm').addEventListener('click',function(e){if(e.target===this)closeFM();});
+
+// ================================================================
+// SESSION TEMPLATE MODAL
+// ================================================================
+let stTs=[],stIcp=null,stDI2=null;
+function openST(){stTs=JSON.parse(JSON.stringify(TYPES));stIcp=null;document.getElementById('stname').value=tplName;renderST();renderSTL();document.getElementById('stm').style.display='flex';}
+function closeST(){document.getElementById('stm').style.display='none';}
+function applyST(){if(stTs.length===0){alert('セッションが1つ以上必要です');return;}tplName=document.getElementById('stname').value.trim()||'デフォルト';TYPES=JSON.parse(JSON.stringify(stTs));closeST();rBL();}
+document.getElementById('stm').addEventListener('click',function(e){if(e.target===this)closeST();});
+function renderST(){
+  document.getElementById('strows').innerHTML=stTs.map((t,i)=>`
+    <div class="str" id="str${i}" draggable="true" ondragstart="stDS(event,${i})" ondragover="stDO(event,${i})" ondrop="stDD(event,${i})">
+      <span class="sdh">⠿</span>
+      <div class="sdot" style="background:${CDot[t.color]}" onclick="stTI(${i})"></div>
+      <input class="snin" value="${esc(t.name)}" maxlength="30" placeholder="セッション名" oninput="stTs[${i}].name=this.value"/>
+      <input class="sdin" type="number" min="1" max="480" value="${t.dur}" onchange="stTs[${i}].dur=Math.max(1,parseInt(this.value)||1)"/>
+      <span style="font-size:9px;color:var(--text3)">分</span>
+      <span class="sdel" onclick="stRm(${i})">×</span>
+    </div>
+    ${stIcp===i?`<div class="icp">${COLORS.map(c=>`<div class="isw${c===t.color?' on':''}" style="background:${CDot[c]}" onclick="stSC(${i},'${c}')"></div>`).join('')}</div>`:''}`).join('');
+}
+function stTI(i){stIcp=stIcp===i?null:i;renderST();}
+function stSC(i,c){stTs[i].color=c;stIcp=null;renderST();}
+function stRm(i){if(stIcp===i)stIcp=null;stTs.splice(i,1);renderST();}
+function stAdd(){stTs.push({id:'c'+Date.now(),name:'',dur:10,color:COLORS[stTs.length%COLORS.length]});renderST();setTimeout(()=>{const ins=document.getElementById('strows').querySelectorAll('.snin');if(ins.length)ins[ins.length-1].focus();},50);}
+function stSave(){const name=document.getElementById('stname').value.trim()||'テンプレート'+(savedTpls.length+1);if(stTs.length===0){alert('セッションがありません');return;}const idx=savedTpls.findIndex(t=>t.name===name);if(idx>=0)savedTpls[idx].types=JSON.parse(JSON.stringify(stTs));else savedTpls.push({name,types:JSON.parse(JSON.stringify(stTs))});renderSTL();alert(`「${name}」として保存しました`);}
+function stNew(){stTs=[];stIcp=null;document.getElementById('stname').value='新規テンプレート';renderST();}
+function stImport(){stTs=sessions.map(s=>({id:'s'+s.id,name:s.name,dur:s.dur,color:s.color}));renderST();}
+function renderSTL(){document.getElementById('stlist').innerHTML=savedTpls.map((t,i)=>`<div style="display:flex;align-items:center;gap:4px;padding:3px 5px;border:1px solid var(--border);border-radius:3px;font-size:11px"><span style="flex:1">${esc(t.name)}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="stLoad(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="stDel(${i})">×</span></div>`).join('');}
+function stLoad(i){stTs=JSON.parse(JSON.stringify(savedTpls[i].types));document.getElementById('stname').value=savedTpls[i].name;stIcp=null;renderST();}
+function stDel(i){savedTpls.splice(i,1);renderSTL();}
+function stDS(e,i){stDI2=i;e.dataTransfer.effectAllowed='move';setTimeout(()=>document.getElementById('str'+i)?.classList.add('dg'),0);}
+function stDO(e,i){e.preventDefault();if(stDI2===null||stDI2===i)return;document.querySelectorAll('.str').forEach((r,ri)=>r.style.borderTop=ri===i?'2px solid #7F77DD':'');}
+function stDD(e,i){e.preventDefault();document.querySelectorAll('.str').forEach(r=>{r.style.borderTop='';r.classList.remove('dg');});if(stDI2===null||stDI2===i)return;const[m]=stTs.splice(stDI2,1);stTs.splice(i,0,m);stDI2=null;renderST();}
+
+// ================================================================
+// AI MODAL
+// ================================================================
+let aiFs=[],aiSs=[];
+function openAI(){
+  aiFs=[];aiSs=[];
+  document.getElementById('aiprompt').value='';
+  document.getElementById('aifl').innerHTML='';
+  document.getElementById('airw').style.display='none';
+  document.getElementById('aiimport').style.display='none';
+  // セッション中に入力済みのAPIキーを復元
+  const saved=sessionStorage.getItem('ai-apikey')||sessionStorage.getItem('ai-apikey-gemini')||'';
+  document.getElementById('ai-apikey').value=saved;
+  // 音声ファイルの場合はfreeモードをデフォルトに
+  // それ以外はfitモード
+  const freeRadio=document.querySelector('input[name="ai-mode"][value="free"]');
+  const fitRadio=document.querySelector('input[name="ai-mode"][value="fit"]');
+  if(fitRadio) fitRadio.checked=true;
+  aiModeChange();
+  // APIキーが空ならガイドを表示
+  const guide=document.getElementById('ai-key-guide');
+  if(guide) guide.style.display=saved?'none':'block';
+  document.getElementById('aim').style.display='flex';
+  setTimeout(()=>{
+    const k=document.getElementById('ai-apikey');
+    if(!k.value)k.focus();
+    else document.getElementById('aiprompt').focus();
+  },100);
+}
+function closeAI(){document.getElementById('aim').style.display='none';}
+document.getElementById('aim').addEventListener('click',function(e){if(e.target===this)closeAI();});
+function aiFC(e){aiFs=[...aiFs,...Array.from(e.target.files)];document.getElementById('aifl').innerHTML=aiFs.map((f,i)=>`<div class="aifi"><span style="flex:1">${f.name}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`).join('');}
+function aiRF(i){aiFs.splice(i,1);document.getElementById('aifl').innerHTML=aiFs.map((f,i)=>`<div class="aifi"><span style="flex:1">${f.name}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`).join('');}
+function aiModeChange(){
+  const mode=document.querySelector('input[name="ai-mode"]:checked')?.value||'fit';
+  ['fit','free','audio'].forEach(m=>{
+    const el=document.getElementById('ai-mode-'+m+'-label');
+    if(el){
+      el.style.borderColor=mode===m?'var(--accent)':'var(--border)';
+      el.style.background=mode===m?'var(--bg2)':'';
+    }
+  });
+}
+function aiProviderChange(){
+  const prov=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+  const label=document.getElementById('ai-key-label');
+  const link=document.getElementById('ai-key-link');
+  if(prov==='gemini'){
+    if(label)label.textContent='Gemini APIキー';
+    if(link){link.href='https://aistudio.google.com/app/apikey';link.textContent='取得はこちら →';}
+    const saved=sessionStorage.getItem('ai-apikey-gemini')||'';
+    document.getElementById('ai-apikey').value=saved;
+  } else {
+    if(label)label.textContent='Anthropic APIキー';
+    if(link){link.href='https://console.anthropic.com';link.textContent='取得はこちら →';}
+    const saved=sessionStorage.getItem('ai-apikey')||'';
+    document.getElementById('ai-apikey').value=saved;
+  }
+  const guide=document.getElementById('ai-key-guide');
+  if(guide)guide.style.display=document.getElementById('ai-apikey').value?'none':'block';
+}
+async function runAI(){
+  const prompt=document.getElementById('aiprompt').value.trim();
+  if(!prompt&&aiFs.length===0){alert('イベントの概要を入力するかファイルをアップロードしてください');return;}
+  const btn=document.getElementById('aibtn');btn.disabled=true;btn.textContent='⏳ 生成中...';
+  try{
+    const mode=document.querySelector('input[name="ai-mode"]:checked')?.value||'fit';
+    const sm=gSM(),em=gEM();
+    let promptText;
+    if(mode==='fit'){
+      promptText=`あなたは研修ファシリテーターのアシスタントです。以下の情報を元に研修タイムテーブルのセッション一覧を生成してください。
+イベント時間帯: ${hm(sm)}〜${hm(em)}（合計${em-sm}分）
+ユーザー入力: ${prompt||'（ファイルの内容を参照してください）'}
+JSON配列のみで回答してください。説明文・前置き・コードブロックは不要です。形式:
+[{"name":"セッション名","dur":分数,"color":"purple|teal|green|pink|coral|blue|amber|gray","comment":"コメント（任意）"}]
+合計時間が${em-sm}分になるよう調整してください。最初の文字は[、最後の文字は]にしてください。`;
+    } else if(mode==='free'){
+      promptText=`あなたは研修ファシリテーターのアシスタントです。添付されたファイルやテキストの内容を分析し、その内容に最適なタイムテーブルを作成してください。
+${prompt?'追加指示: '+prompt:''}
+セッション数・時間はファイルの内容に合わせて最適に決めてください。
+JSON配列のみで回答してください。説明文・前置き・コードブロックは不要です。形式:
+[{"name":"セッション名","dur":分数,"color":"purple|teal|green|pink|coral|blue|amber|gray","comment":"内容の説明"}]
+最初の文字は[、最後の文字は]にしてください。`;
+    } else {
+      // audioモード: 実際の音声を時間どおりに再現
+      promptText=`あなたは研修ファシリテーターのアシスタントです。添付の音声ファイルを文字起こしし、実際に話された内容・セクション・時間をそのままタイムテーブルとして再現してください。
+${prompt?'追加指示: '+prompt:''}
+重要: セッションを創作するのではなく、音声内で実際に行われた内容をそのまま記録してください。各セッションの時間は音声内の実際の時間（分単位、端数は切り捨て）にしてください。
+JSON配列のみで回答してください。説明文・前置き・コードブロックは不要です。形式:
+[{"name":"セッション名（音声の実際の内容）","dur":実際の時間（分）,"color":"purple|teal|green|pink|coral|blue|amber|gray","comment":"話された内容の要約"}]
+最初の文字は[、最後の文字は]にしてください。`;
+    }
+    let uc=[{type:'text',text:promptText}];
+        // audioモードのとき音声ファイル以外がある場合はエラー
+    const audioExts=['.mp3','.m4a','.wav','.aac','.ogg','.webm'];
+    if(mode==='audio'){
+      const nonAudio=aiFs.filter(f=>!audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
+      if(nonAudio.length>0){
+        throw new Error('「音声ファイルを時間どおりに再現する」モードでは音声ファイルのみアップロードしてください。\n\n非対応ファイル: '+nonAudio.map(f=>f.name).join(', '));
+      }
+      if(aiFs.length===0){
+        throw new Error('「音声ファイルを時間どおりに再現する」モードでは音声ファイルをアップロードしてください。');
+      }
+      const provider2=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+      if(provider2!=='gemini'){
+        throw new Error('音声ファイルの処理にはGeminiプロバイダーが必要です。\nプロバイダーを「Gemini Flash」に切り替えてください。');
+      }
+    }
+    for(const f of aiFs){
+      const fname=f.name.toLowerCase();
+      const mt=f.type||'application/octet-stream';
+      if(mt.startsWith('image/')){
+        const b=await toB64(f);
+        uc.push({type:'image',source:{type:'base64',media_type:mt,data:b}});
+      } else if(fname.endsWith('.pdf')){
+        const b=await toB64(f);
+        uc.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b}});
+      } else if(fname.endsWith('.txt')){
+        const text=await f.text();
+        uc[0].text+=`\n\n【ファイル「${f.name}」の内容】\n${text.slice(0,8000)}`;
+      } else if(fname.endsWith('.docx')||fname.endsWith('.doc')){
+        try{
+          const text=await extractWordText(f);
+          uc[0].text+=`\n\n【Wordファイル「${f.name}」から抽出したテキスト】\n${text.slice(0,8000)}`;
+        }catch(e){
+          uc[0].text+=`\n\n【Wordファイル「${f.name}」テキスト抽出失敗: ${e.message}】`;
+        }
+      } else if(fname.endsWith('.pptx')||fname.endsWith('.ppt')){
+        try{
+          const text=await extractPptxText(f);
+          uc[0].text+=`\n\n【PowerPointファイル「${f.name}」から抽出したテキスト】\n${text.slice(0,8000)}`;
+        }catch(e){
+          uc[0].text+=`\n\n【PowerPointファイル「${f.name}」テキスト抽出失敗: ${e.message}】`;
+        }
+      } else if(['mp3','m4a','wav','aac','ogg','webm'].some(ext=>fname.endsWith('.'+ext))){
+        // 音声ファイル: Gemini専用（base64で送信）
+        const provider=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+        if(provider==='gemini'){
+          const b=await toB64(f);
+          const audioMt=mt||'audio/mpeg';
+          uc.push({type:'audio_file',data:b,mimeType:audioMt});
+          // 音声の場合はaudioモードを自動選択
+          const audioR=document.querySelector('input[name="ai-mode"][value="audio"]');
+          if(audioR) audioR.checked=true;
+          aiModeChange();
+          uc[0].text+=`
+
+添付の音声ファイル「${f.name}」を文字起こし・分析し、内容に最適なセッション構成を作成してください。`;
+        } else {
+          uc[0].text+=`
+
+音声ファイル「${f.name}」が添付されています。Geminiプロバイダーを選択すると音声ファイルを直接読み込めます。`;
+        }
+      } else {
+        uc[0].text+=`
+
+添付ファイル「${f.name}」（${Math.round(f.size/1024)}KB）も参照してください。`;
+      }
+    }
+    const apiKey=(document.getElementById('ai-apikey').value||'').trim();
+    const provider=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+    if(!apiKey){
+      const hint=provider==='gemini'?'https://aistudio.google.com/app/apikey で無料取得できます':'https://console.anthropic.com でキーを取得できます';
+      alert('APIキーを入力してください。\n'+hint);
+      btn.disabled=false;btn.textContent='🚀 生成';return;
+    }
+    if(provider==='gemini') sessionStorage.setItem('ai-apikey-gemini',apiKey);
+    else sessionStorage.setItem('ai-apikey',apiKey);
+
+    let resp;
+    if(provider==='gemini'){
+      const geminiParts=uc.map(item=>{
+        if(item.type==='text') return {text:item.text};
+        if(item.type==='image') return {inlineData:{mimeType:item.source.media_type,data:item.source.data}};
+        if(item.type==='audio_file') return {inlineData:{mimeType:item.mimeType,data:item.data}};
+        return null;
+      }).filter(Boolean);
+      resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({contents:[{role:'user',parts:geminiParts}]})
+      });
+    } else {
+      resp=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{
+          'Content-Type':'application/json',
+          'anthropic-version':'2023-06-01',
+          'anthropic-dangerous-direct-browser-access':'true',
+          'x-api-key':apiKey
+        },
+        body:JSON.stringify({
+          model:'claude-sonnet-4-6',
+          max_tokens:1500,
+          messages:[{role:'user',content:uc}]
+        })
+      });
+    }
+    if(!resp.ok){
+      const errText=await resp.text();
+      throw new Error(`APIエラー ${resp.status}: ${errText.slice(0,200)}`);
+    }
+    const rawText=await resp.text();
+    let data;
+    try{data=JSON.parse(rawText);}
+    catch(e){throw new Error('レスポンスの解析に失敗しました。もう一度お試しください。\n詳細: '+rawText.slice(0,100));}
+    if(data.error){throw new Error('API Error: '+(data.error.message||JSON.stringify(data.error)));}
+    let text='';
+    if(provider==='gemini'){
+      text=((data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+    } else {
+      text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
+    }
+    if(!text)throw new Error('AIからの応答が空でした。もう一度お試しください。');
+    // JSON部分を抽出（前後のテキストや```を除去）
+    let jsonStr = text
+      .replace(/```json\s*/gi,'').replace(/```\s*/g,'')  // コードブロック除去
+      .trim();
+    // [ から始まる配列を探す
+    const jsonMatch = jsonStr.match(/\[[\s\S]*\]/);
+    if(!jsonMatch){
+      throw new Error('JSON形式の応答が取得できませんでした。\n応答内容: '+text.slice(0,200));
+    }
+    try{
+      aiSs=JSON.parse(jsonMatch[0]);
+    }catch(e){
+      throw new Error('JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonMatch[0].slice(0,100));
+    }
+    document.getElementById('aisp').innerHTML=aiSs.map((s,i)=>`<div class="aisi"><input type="checkbox" id="aic${i}" checked/><div style="width:8px;height:8px;border-radius:50%;background:${CDot[s.color]||CDot.teal};flex-shrink:0"></div><span style="flex:1">${esc(s.name)}</span><span style="font-size:10px;color:var(--text2)">${s.dur}分</span></div>`).join('');
+    document.getElementById('airw').style.display='';document.getElementById('aiimport').style.display='';
+  }catch(err){alert('AIの生成に失敗しました: '+err.message);}
+  // ファイルは生成後に自動削除
+  aiFs=[];
+  document.getElementById('aifile').value='';
+  document.getElementById('aifl').innerHTML='';
+  btn.disabled=false;btn.textContent='🚀 生成';
+}
+function importAI(){const cks=document.getElementById('aisp').querySelectorAll('input[type=checkbox]');sessions=[];aiSs.forEach((s,i)=>{if(cks[i]&&cks[i].checked)sessions.push({id:nid++,name:s.name,dur:s.dur,color:s.color||'teal',comment:s.comment||''});});closeAI();snap();render();}
+function toB64(f){return new Promise((r,e)=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.onerror=()=>e(new Error('read'));fr.readAsDataURL(f);});}
+
+async function extractWordText(file){
+  if(!window.mammoth){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://unpkg.com/mammoth@1.6.0/mammoth.browser.min.js';
+      s.onload=resolve;s.onerror=()=>reject(new Error('mammoth.js読み込み失敗'));
+      document.head.appendChild(s);
+    });
+  }
+  const ab=await file.arrayBuffer();
+  const result=await mammoth.extractRawText({arrayBuffer:ab});
+  return result.value||'';
+}
+
+async function extractPptxText(file){
+  if(!window.JSZip){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://unpkg.com/jszip@3.10.1/dist/jszip.min.js';
+      s.onload=resolve;s.onerror=()=>reject(new Error('JSZip読み込み失敗'));
+      document.head.appendChild(s);
+    });
+  }
+  const ab=await file.arrayBuffer();
+  const zip=await JSZip.loadAsync(ab);
+  const texts=[];
+  const slideFiles=Object.keys(zip.files)
+    .filter(n=>n.match(/^ppt\/slides\/slide[0-9]+\.xml$/))
+    .sort((a,b)=>parseInt(a.match(/slide([0-9]+)/)[1])-parseInt(b.match(/slide([0-9]+)/)[1]));
+  for(const sn of slideFiles){
+    const xml=await zip.files[sn].async('string');
+    const matches=xml.match(/<a:t[^>]*>([^<]+)<\/a:t>/g)||[];
+    const txt=matches.map(m=>m.replace(/<[^>]+>/g,'')).join(' ');
+    const num=sn.match(/slide([0-9]+)/)[1];
+    if(txt.trim())texts.push('[スライド'+num+'] '+txt);
+  }
+  return texts.join('\n');
+}
+
+// ================================================================
+// EVENT MANAGER
+// ================================================================
+function openEV(){document.getElementById('evname').value=document.getElementById('evt').value||'';renderEVL();document.getElementById('evm').style.display='flex';}
+function closeEV(){document.getElementById('evm').style.display='none';}
+document.getElementById('evm').addEventListener('click',function(e){if(e.target===this)closeEV();});
+function renderEVL(){document.getElementById('evlist').innerHTML=savedEvs.length===0?'<div style="font-size:11px;color:var(--text3)">保存されたイベントはありません</div>':savedEvs.map((ev,i)=>`<div class="eli"><span style="flex:1;font-size:11px">${esc(ev.name)}</span><span style="font-size:10px;color:var(--text2)">${ev.date||''}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="loadEV(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="delEV(${i})">×</span></div>`).join('');}
+function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();alert(`「${name}」として保存しました`);}
+function loadEV(i){const ev=savedEvs[i];document.getElementById('evt').value=ev.title||'';document.getElementById('evd').value=ev.date||'';document.getElementById('evs').value=ev.start||'13:00';document.getElementById('eve').value=ev.end||'17:00';sessions=JSON.parse(JSON.stringify(ev.sessions));freeEvs=JSON.parse(JSON.stringify(ev.freeEvs));closeEV();snap();render();}
+function delEV(i){if(confirm('削除しますか？')){savedEvs.splice(i,1);renderEVL();}}
+function quickSaveEV(){
+  const title=document.getElementById('evt').value.trim()||'イベント'+(savedEvs.length+1);
+  const idx=savedEvs.findIndex(e=>e.name===title);
+  const d={name:title,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
+  if(idx>=0){savedEvs[idx]=d;alert(`「${title}」を上書き保存しました`);}
+  else{savedEvs.push(d);alert(`「${title}」として保存しました`);}
+}
+function newEV(){if(!confirm('現在のデータをリセットして新規イベントを作成しますか？'))return;sessions=[];freeEvs=[];document.getElementById('evt').value='';document.getElementById('evd').value='';closeEV();snap();render();}
+
+// ================================================================
+// CSV
+// ================================================================
+function openCSV(){document.getElementById('csvexp').value=buildCSV();document.getElementById('csvimp').value='';document.getElementById('csvm').style.display='flex';}
+function closeCSV(){document.getElementById('csvm').style.display='none';}
+document.getElementById('csvm').addEventListener('click',function(e){if(e.target===this)closeCSV();});
+function buildCSV(){const sm=gSM(),st=gSt();let r=['タイプ,セッション名,開始,終了,時間(分),コメント'];sessions.forEach((s,i)=>r.push(`シリアル,${cq(s.name)},${hm(sm+st[i])},${hm(sm+st[i]+s.dur)},${s.dur},${cq(s.comment||'')}`));[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin).forEach(ev=>r.push(`フリー,${cq(ev.name)},${hm(sm+ev.fromMin)},${hm(sm+ev.toMin)},${ev.toMin-ev.fromMin},${cq(ev.comment||'')}`));return r.join('\n');}
+function cq(s){return s.includes(',')||s.includes('"')||s.includes('\n')?`"${s.replace(/"/g,'""')}"`:s;}
+function dlCSV(){const b=new Blob([buildCSV()],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`tt_${document.getElementById('evd').value||'export'}.csv`;a.click();}
+function impCSV(){const text=document.getElementById('csvimp').value.trim();if(!text){alert('CSVを貼り付けてください');return;}if(!confirm('現在のセッションを上書きします。よろしいですか？'))return;const lines=text.split('\n');const sm=gSM();const ns=[],nf=[];for(let i=1;i<lines.length;i++){const c=pcsv(lines[i]);if(c.length<5)continue;const[type,name,,end,dur,cmt]=c;const d=parseInt(dur)||10;if(type==='シリアル'){ns.push({id:nid++,name,dur:d,color:'teal',comment:cmt||''});}else if(type==='フリー'){const fa=h2m(c[2]),ta=h2m(end);nf.push({id:nfid++,name,color:'coral',comment:cmt||'',fromMin:fa-sm,toMin:ta-sm});}}sessions=ns;freeEvs=nf;closeCSV();snap();render();}
+function pcsv(l){const res=[];let cur='',q=false;for(let i=0;i<l.length;i++){const c=l[i];if(c==='"'&&q&&l[i+1]==='"'){cur+='"';i++;}else if(c==='"'){q=!q;}else if(c===','&&!q){res.push(cur);cur='';}else cur+=c;}res.push(cur);return res;}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+
+// ================================================================
+// INIT
+// ================================================================
+let _scrolling=false;
+function syncScroll(src){
+  if(_scrolling)return;
+  _scrolling=true;
+  const tls=document.getElementById('tls');
+  const frs=document.getElementById('frs');
+  if(src==='tls'){frs.scrollTop=tls.scrollTop;}
+  else{tls.scrollTop=frs.scrollTop;}
+  _scrolling=false;
+}
+// ================================================================
+// EXPORT / IMPORT
+// ================================================================
+function openExport(){document.getElementById('expm').style.display='flex';}
+function closeExport(){document.getElementById('expm').style.display='none';}
+document.getElementById('expm').addEventListener('click',function(e){if(e.target===this)closeExport();});
+
+// JSON (.stt) 書き出し: すべての状態を保存
+function exportJSON(){
+  const data={
+    version:1,
+    title:document.getElementById('evt').value,
+    date:document.getElementById('evd').value,
+    start:document.getElementById('evs').value,
+    end:document.getElementById('eve').value,
+    sessions:JSON.parse(JSON.stringify(sessions)),
+    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+    tplName,
+    TYPES:JSON.parse(JSON.stringify(TYPES))
+  };
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  const fname=(document.getElementById('evt').value||'timetable').replace(/[\s/\\:*?"<>|]/g,'_');
+  a.download=fname+'.stt';
+  a.click();
+  closeExport();
+}
+
+// .stt ファイル読み込み
+function loadSTTFile(e){
+  const file=e.target.files[0];if(!file)return;
+  const reader=new FileReader();
+  reader.onload=function(ev){
+    try{
+      const data=JSON.parse(ev.target.result);
+      if(!data.sessions)throw new Error('無効なファイル形式');
+      document.getElementById('evt').value=data.title||'';
+      document.getElementById('evd').value=data.date||'';
+      document.getElementById('evs').value=data.start||'13:00';
+      document.getElementById('eve').value=data.end||'17:00';
+      sessions=data.sessions||[];
+      freeEvs=data.freeEvs||[];
+      if(data.tplName)tplName=data.tplName;
+      if(data.TYPES)TYPES=data.TYPES;
+      closeEV();snap();render();updateDow();
+    }catch(err){alert('読み込みエラー: '+err.message);}
+  };
+  reader.readAsText(file);
+}
+
+// PDF 書き出し: テーブルレイアウトを印刷用HTMLで生成してprint
+function exportPDF(){
+  const sm=gSM(),em=gEM(),st=gSt();
+  const title=document.getElementById('evt').value||'タイムテーブル';
+  const date=document.getElementById('evd').value;
+  const sf=[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin);
+
+  let rows='';
+  sessions.forEach((s,i)=>{
+    rows+=`<tr>
+      <td class="bar-cell"><div class="bar"></div></td>
+      <td class="num-cell">${i+1}</td>
+      <td class="name-cell">${esc(s.name)}</td>
+      <td class="time-cell">${hm(sm+st[i])}</td>
+      <td class="dur-cell">${s.dur}分</td>
+      <td class="cmt-cell">${s.comment?esc(s.comment):''}</td>
+    </tr>`;
+  });
+
+  let frows='';
+  sf.forEach(ev=>{
+    const dur=ev.toMin-ev.fromMin;
+    frows+=`<tr>
+      <td class="bar-cell"><div class="bar"></div></td>
+      <td class="name-cell">${esc(ev.name)}</td>
+      <td class="time-cell">${hm(sm+ev.fromMin)}〜${hm(sm+ev.toMin)}</td>
+      <td class="dur-cell">${dur}分</td>
+      <td class="cmt-cell">${ev.comment?esc(ev.comment):''}</td>
+    </tr>`;
+  });
+
+  const html=`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"/>
+  <title>${esc(title)}</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:11px;color:#000;padding:24px 28px}
+    h1{font-size:17px;font-weight:700;margin-bottom:3px;color:#000}
+    .meta{font-size:11px;color:#333;margin-bottom:18px}
+    h2{font-size:12px;font-weight:700;color:#000;margin:16px 0 5px;padding-bottom:4px;border-bottom:2px solid #000}
+    table{width:100%;border-collapse:collapse;margin-bottom:6px}
+    thead th{padding:4px 6px;font-size:10px;font-weight:600;color:#333;border-bottom:1px solid #000;text-align:left}
+    tr{border-bottom:1px solid #ddd}
+    td{padding:5px 6px;vertical-align:middle;color:#000;font-size:11px}
+    .bar-cell{width:6px;padding:2px 0}
+    .bar{width:4px;height:100%;min-height:30px;border-radius:3px;background:#888!important}
+    .num-cell{width:22px;color:#999;font-size:10px;text-align:center}
+    .name-cell{width:180px;font-weight:700;padding-left:8px}
+    .time-cell{width:70px;white-space:nowrap;color:#000}
+    .dur-cell{width:40px;white-space:nowrap;color:#000}
+    .cmt-cell{color:#444;font-size:10px}
+    @media print{body{padding:12px 16px}tr{page-break-inside:avoid}}
+  </style></head><body>
+  <h1>${esc(title)}</h1>
+  <div class="meta">${date} ${hm(sm)}〜${hm(em)}</div>
+  <h2>シリアルセッション</h2>
+  <table>
+    <thead><tr>
+      <th style="width:6px;padding:0"></th>
+      <th class="num-cell">#</th>
+      <th class="name-cell" style="padding-left:8px">セッション名</th>
+      <th class="time-cell">開始</th>
+      <th class="dur-cell">時間</th>
+      <th class="cmt-cell">コメント</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  ${sf.length>0?`<h2>フリーセッション</h2><table><thead><tr><th style="width:6px;padding:0"></th><th class="name-cell" style="padding-left:8px">セッション名</th><th class="time-cell">開始〜終了</th><th class="dur-cell">時間</th><th class="cmt-cell">コメント</th></tr></thead><tbody>${frows}</tbody></table>`:''}
+  <script>window.onload=function(){window.print();}<\/script>
+  </body></html>`;
+
+  const w=window.open('','_blank','width=700,height=900');
+  w.document.write(html);
+  w.document.close();
+  closeExport();
+}
+
+function updateDow(){
+  const v=document.getElementById('evd').value;
+  const el=document.getElementById('dow-label');
+  if(!v){el.textContent='';return;}
+  const days=['日','月','火','水','木','金','土'];
+  // dateの曜日を取得（タイムゾーンずれ対策でUTC解釈）
+  const[y,m,d]=v.split('-').map(Number);
+  const date=new Date(y,m-1,d);
+  el.textContent='('+days[date.getDay()]+')';
+}
+function openHelp(){document.getElementById('hm').style.display='flex';}
+function closeHelp(){document.getElementById('hm').style.display='none';}
+document.getElementById('hm').addEventListener('click',function(e){if(e.target===this)closeHelp();});
+document.getElementById('evs').addEventListener('change',render);
+document.getElementById('eve').addEventListener('change',render);
+uUR();sv('tl');render();updateDow();setTimeout(function(){fitz();},150);
+setTimeout(function(){fitz();},150);
+
+// ================================================================
+// MOBILE VIEW
+// ================================================================
+let mvTab='s', mvEditId=null, mvDurVal=10;
+let mvDragId=null, mvDragStartY=0, mvDragEl=null, mvDragGhost=null, mvLongPressTimer=null;
+
+function mvRender(){
+  const isMobile=window.innerWidth<=600;
+  if(!isMobile)return;
+  const title=document.getElementById('evt').value||'タイムテーブル';
+  const date=document.getElementById('evd').value;
+  const days=['日','月','火','水','木','金','土'];
+  let dateStr=date;
+  if(date){const[y,m,d]=date.split('-').map(Number);dateStr=`${y}/${m}/${d}(${days[new Date(y,m-1,d).getDay()]})`;}
+  document.getElementById('mv-title').textContent=title;
+  document.getElementById('mv-meta').textContent=`${dateStr} ${hm(gSM())}〜${hm(gEM())}`;
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const sm=gSM(),em=gEM();
+  const evDate=document.getElementById('evd').value;
+  const isToday=(()=>{
+    if(!evDate)return false;
+    const[y,m,d]=evDate.split('-').map(Number);
+    return now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d;
+  })();
+  const prog=isToday?Math.max(0,Math.min(100,(nowMin-sm)/(em-sm)*100)):0;
+  document.getElementById('mv-bar').style.width=prog+'%';
+  document.getElementById('mv-clock').textContent=
+    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+  if(mvTab==='s')mvRenderSerial(isToday?nowMin:-1,sm);
+  else mvRenderFree(isToday?nowMin:-1,sm);
+
+  const editBtn=document.getElementById('mv-edit-btn');
+  if(editBtn&&!editBtn._bound){
+    editBtn._bound=true;
+    editBtn.addEventListener('touchend',function(e){e.preventDefault();mvToggleEdit();},{passive:false});
+    editBtn.addEventListener('click',function(){mvToggleEdit();});
+  }
+  const saveBtn=document.getElementById('mv-save-btn');
+  if(saveBtn&&!saveBtn._bound){
+    saveBtn._bound=true;
+    saveBtn.addEventListener('touchend',function(e){e.preventDefault();mvSaveEventInfo();},{passive:false});
+    saveBtn.addEventListener('click',function(){mvSaveEventInfo();});
+  }
+}
+
+function mvRenderSerial(nowMin,sm){
+  const st=gSt();
+  let currentIdx=-1;
+  sessions.forEach((s,i)=>{const start=sm+st[i],end=start+s.dur;if(nowMin>=start&&nowMin<end)currentIdx=i;});
+  const nowEl=document.getElementById('mv-now'),nowTxt=document.getElementById('mv-now-text');
+  if(nowMin<0){nowEl.style.display='none';}
+  else if(currentIdx>=0){
+    const cs=sessions[currentIdx],remain=(sm+st[currentIdx]+cs.dur)-nowMin;
+    nowEl.style.display='flex';nowTxt.textContent=`${cs.name} — あと${remain}分`;
+  }else if(nowMin<sm){nowEl.style.display='flex';nowTxt.textContent=`開始まであと${sm-nowMin}分`;}
+  else{nowEl.style.display='none';}
+  const body=document.getElementById('mv-body');body.innerHTML='';
+  sessions.forEach((s,i)=>{
+    const start=sm+st[i],end=start+s.dur,isDone=nowMin>=end,isActive=nowMin>=start&&nowMin<end;
+    const card=document.createElement('div');
+    card.className='mv-card'+(isActive?' active':'')+(isDone?' mv-done':'');
+    card.dataset.id=s.id;
+    card.innerHTML=`
+      <div class="mv-card-bar" style="background:${CD[s.color]||'#B4B2A9'}"></div>
+      <div class="mv-card-body" style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1">
+            <div class="mv-card-name">${esc(s.name)}</div>
+            <div class="mv-card-time">${hm(start)}〜${hm(end)} (${s.dur}分)</div>
+          </div>
+          ${s.comment?'<div class="mv-card-chevron">›</div>':''}
+        </div>
+        ${isActive?`<div class="mv-card-remain" style="color:var(--accent);margin-top:4px">▶ 進行中 — あと${end-nowMin}分</div>`:''}
+        
+        ${s.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(s.comment)}</div>`:''}
+      </div>`;
+    // タップ: コメント展開＋モーダル / 長押し: 移動
+    let tapMoved=false,tapStartY=0,tapStartTime=0;
+    card.addEventListener('touchstart',e=>{
+      tapMoved=false;tapStartY=e.touches[0].clientY;tapStartTime=Date.now();
+      mvLongPressTimer=setTimeout(()=>{
+        if(!tapMoved){
+          e.target.blur&&e.target.blur();
+          navigator.vibrate&&navigator.vibrate(30);
+          mvStartDrag(e,s.id,card);
+        }
+      },500);
+    },{passive:false});
+    card.addEventListener('touchmove',e=>{
+      if(Math.abs(e.touches[0].clientY-tapStartY)>8){tapMoved=true;clearTimeout(mvLongPressTimer);}
+      if(mvDragId){e.preventDefault();mvOnDragMove(e);}
+    },{passive:false});
+    card.addEventListener('touchend',e=>{
+      clearTimeout(mvLongPressTimer);
+      if(mvDragId){mvEndDrag(e);return;}
+      if(!tapMoved&&Date.now()-tapStartTime<500){
+        if(s.comment)card.classList.toggle('open');
+        setTimeout(()=>mvOpenSM(s.id),s.comment?0:0);
+      }
+    });
+    body.appendChild(card);
+  });
+}
+
+function mvRenderFree(nowMin,sm){
+  document.getElementById('mv-now').style.display='none';
+  const sf=[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin);
+  const body=document.getElementById('mv-body');body.innerHTML='';
+  if(sf.length===0){body.innerHTML='<div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">フリーセッションはありません</div>';return;}
+  sf.forEach(ev=>{
+    const start=sm+ev.fromMin,end=sm+ev.toMin,dur=ev.toMin-ev.fromMin;
+    const isDone=nowMin>=end,isActive=nowMin>=start&&nowMin<end;
+    const card=document.createElement('div');
+    card.className='mv-card'+(isActive?' active':'')+(isDone?' mv-done':'');
+    card.innerHTML=`
+      <div class="mv-card-bar" style="background:${CD[ev.color]||'#5DCAA5'}"></div>
+      <div class="mv-card-body" style="flex:1">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div style="flex:1">
+            <div class="mv-card-name">${esc(ev.name)}</div>
+            <div class="mv-card-time">${hm(start)}〜${hm(end)} (${dur}分)</div>
+          </div>
+          ${ev.comment?'<div class="mv-card-chevron">›</div>':''}
+        </div>
+        ${isActive?`<div class="mv-card-remain" style="color:var(--accent);margin-top:4px">▶ 進行中</div>`:''}
+        
+        ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(ev.comment)}</div>`:''}
+      </div>`;
+    let fTapMoved=false,fTapStart=0;
+    card.addEventListener('touchstart',e=>{fTapMoved=false;fTapStart=Date.now();},{passive:true});
+    card.addEventListener('touchmove',()=>{fTapMoved=true;},{passive:true});
+    card.addEventListener('touchend',e=>{
+      if(!fTapMoved&&Date.now()-fTapStart<500){
+        if(ev.comment)card.classList.toggle('open');
+        mvOpenFM(ev.id);
+      }
+    });
+    card.addEventListener('click',()=>mvOpenFM(ev.id));
+    body.appendChild(card);
+  });
+}
+
+// ---- ドラッグ（長押し → 全カード動的移動UI）----
+let mvDragFromIdx=-1, mvDragOverIdx=-1, mvDragGhostTop=0;
+let mvCardHeights=[];  // 各カードの高さキャッシュ
+
+function mvStartDrag(e,id,card){
+  mvDragId=id;
+  mvDragFromIdx=sessions.findIndex(s=>s.id===id);
+  mvDragOverIdx=mvDragFromIdx;
+  mvDragStartY=e.touches[0].clientY;
+
+  // 全カードの高さをキャッシュ
+  const allCards=document.querySelectorAll('#mv-body .mv-card[data-id]');
+  mvCardHeights=[];
+  allCards.forEach(c=>{mvCardHeights.push(c.getBoundingClientRect().height+6);});  // +6 = gap
+
+  // ゴーストカード（指に追従する浮いたカード）
+  const rect=card.getBoundingClientRect();
+  mvDragGhost=card.cloneNode(true);
+  mvDragGhost.style.cssText=`position:fixed;left:${rect.left}px;top:${rect.top}px;width:${rect.width}px;height:${rect.height}px;background:var(--bg);border-radius:8px;box-shadow:0 12px 32px rgba(0,0,0,.3);z-index:300;pointer-events:none;opacity:.96;transform:scale(1.04);transition:box-shadow .1s`;
+  document.body.appendChild(mvDragGhost);
+  mvDragGhostTop=rect.top;
+  mvUpdateDragLayout(mvDragFromIdx);
+}
+
+function mvOnDragMove(e){
+  if(!mvDragId)return;
+  e.preventDefault();
+  const y=e.touches[0].clientY;
+  const dy=y-mvDragStartY;
+
+  // ゴーストを指に追従
+  if(mvDragGhost) mvDragGhost.style.top=(mvDragGhostTop+dy)+'px';
+
+  // 挿入位置を計算（ドラッグ中のカードを除いた並びでの位置）
+  const allCards=Array.from(document.querySelectorAll('#mv-body .mv-card[data-id]'));
+  let newOver=mvDragFromIdx;
+  let minDist=Infinity;
+
+  allCards.forEach(c=>{
+    if(parseInt(c.dataset.id)===mvDragId)return;
+    const r=c.getBoundingClientRect();
+    const mid=r.top+r.height/2;
+    const dist=Math.abs(y-mid);
+    if(dist<minDist){
+      minDist=dist;
+      const realIdx=sessions.findIndex(s=>s.id===parseInt(c.dataset.id));
+      newOver=y<mid?realIdx:realIdx+1;
+    }
+  });
+
+  if(newOver!==mvDragOverIdx){
+    mvDragOverIdx=newOver;
+    mvUpdateDragLayout(newOver);
+  }
+}
+
+// 全カードを動的に移動させてプレビュー
+function mvUpdateDragLayout(overIdx){
+  const allCards=Array.from(document.querySelectorAll('#mv-body .mv-card[data-id]'));
+  const dragCardH=mvCardHeights[mvDragFromIdx]||60;
+
+  allCards.forEach(c=>{
+    const sid=parseInt(c.dataset.id);
+    if(sid===mvDragId){
+      c.style.opacity='0';       // ドラッグ中のカードは非表示
+      c.style.transform='';
+      c.style.transition='opacity .15s';
+      return;
+    }
+    const realIdx=sessions.findIndex(s=>s.id===sid);
+    let shift=0;
+    // fromIdxからoverIdxへ移動する場合
+    if(mvDragFromIdx<overIdx){
+      // 下に移動: fromIdx+1 〜 overIdx-1 のカードを上にシフト
+      if(realIdx>mvDragFromIdx&&realIdx<overIdx) shift=-dragCardH;
+    } else {
+      // 上に移動: overIdx 〜 fromIdx-1 のカードを下にシフト
+      if(realIdx>=overIdx&&realIdx<mvDragFromIdx) shift=dragCardH;
+    }
+    c.style.transform=shift!==0?`translateY(${shift}px)`:'';
+    c.style.opacity='1';
+    c.style.transition='transform .18s cubic-bezier(.25,.1,.25,1)';
+  });
+}
+
+function mvEndDrag(e){
+  if(!mvDragId)return;
+  if(mvDragGhost){mvDragGhost.remove();mvDragGhost=null;}
+
+  // アニメーションをリセット
+  document.querySelectorAll('#mv-body .mv-card[data-id]').forEach(c=>{
+    c.style.transform='';c.style.opacity='1';c.style.transition='';
+  });
+
+  // 並び替え確定
+  const from=mvDragFromIdx, to=mvDragOverIdx;
+  if(from>=0&&to>=0&&to!==from&&to!==from+1){
+    const[m]=sessions.splice(from,1);
+    const insertAt=to>from?to-1:to;
+    sessions.splice(Math.max(0,insertAt),0,m);
+    snap();render();
+  }
+  mvDragId=null;mvDragFromIdx=-1;mvDragOverIdx=-1;mvCardHeights=[];
+  mvRender();
+}
+
+// ---- シリアルセッション編集モーダル ----
+function mvOpenSM(id){
+  const s=sessions.find(x=>x.id===id);if(!s)return;
+  mvEditId=id;mvDurVal=s.dur;
+  document.getElementById('mv-sm-title').textContent=s.name;
+  document.getElementById('mv-sm-name').value=s.name;
+  document.getElementById('mv-sm-dur').textContent=s.dur;
+  document.getElementById('mv-sm-comment').value=s.comment||'';
+  // 色選択
+  const colorsEl=document.getElementById('mv-sm-colors');
+  colorsEl.innerHTML=COLORS.map(c=>`
+    <div onclick="mvSelectColor('${c}')" id="mv-color-${c}"
+      style="width:32px;height:32px;border-radius:50%;background:${CDot[c]};
+      border:3px solid ${s.color===c?'#333':'transparent'};
+      box-shadow:${s.color===c?'0 0 0 2px #fff inset':'none'};
+      cursor:pointer;transition:transform .1s;flex-shrink:0"
+      ontouchstart="this.style.transform='scale(1.2)'"
+      ontouchend="this.style.transform=''">
+    </div>`).join('');
+  mvSelectedColor=s.color||'teal';
+  document.getElementById('mv-sm').style.display='flex';
+}
+let mvSelectedColor='teal';
+function mvSelectColor(c){
+  mvSelectedColor=c;
+  COLORS.forEach(col=>{
+    const el=document.getElementById('mv-color-'+col);
+    if(!el)return;
+    el.style.border=col===c?'3px solid #333':'3px solid transparent';
+    el.style.boxShadow=col===c?'0 0 0 2px #fff inset':'none';
+  });
+}
+function mvCloseSM(){document.getElementById('mv-sm').style.display='none';mvEditId=null;}
+function mvDurChange(d){mvDurVal=Math.max(5,mvDurVal+d);document.getElementById('mv-sm-dur').textContent=mvDurVal;}
+function mvDurSet(v){mvDurVal=v;document.getElementById('mv-sm-dur').textContent=mvDurVal;}
+function mvSaveSM(){
+  if(!mvEditId)return;
+  const s=sessions.find(x=>x.id===mvEditId);if(!s)return;
+  const n=document.getElementById('mv-sm-name').value.trim();
+  if(n)s.name=n;
+  s.dur=mvDurVal;
+  s.color=mvSelectedColor||s.color;
+  s.comment=document.getElementById('mv-sm-comment').value.slice(0,100);
+  mvCloseSM();snap();render();mvRender();
+}
+function mvDeleteS(){
+  if(!mvEditId)return;
+  if(!confirm('このセッションを削除しますか？'))return;
+  sessions=sessions.filter(s=>s.id!==mvEditId);
+  mvCloseSM();snap();render();mvRender();
+}
+
+// ---- フリーセッション編集モーダル ----
+function mvOpenFM(id){
+  const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
+  mvEditId=id;
+  const sm=gSM();
+  document.getElementById('mv-fm-title').textContent=ev.name;
+  document.getElementById('mv-fm-name').value=ev.name;
+  document.getElementById('mv-fm-from').value=hm(sm+ev.fromMin);
+  document.getElementById('mv-fm-to').value=hm(sm+ev.toMin);
+  document.getElementById('mv-fm-comment').value=ev.comment||'';
+  document.getElementById('mv-fm').style.display='flex';
+}
+function mvCloseFM(){document.getElementById('mv-fm').style.display='none';mvEditId=null;}
+function mvSaveFM(){
+  if(!mvEditId)return;
+  const ev=freeEvs.find(x=>x.id===mvEditId);if(!ev)return;
+  const n=document.getElementById('mv-fm-name').value.trim();if(n)ev.name=n;
+  const sm=gSM();
+  const fa=h2m(document.getElementById('mv-fm-from').value),ta=h2m(document.getElementById('mv-fm-to').value);
+  ev.fromMin=fa-sm;ev.toMin=Math.max(fa-sm+5,ta-sm);
+  ev.comment=document.getElementById('mv-fm-comment').value.slice(0,100);
+  mvCloseFM();snap();render();mvRender();
+}
+function mvDeleteF(){
+  if(!mvEditId)return;
+  if(!confirm('このセッションを削除しますか？'))return;
+  freeEvs=freeEvs.filter(x=>x.id!==mvEditId);
+  mvCloseFM();snap();render();mvRender();
+}
+
+function mvAddSession(){
+  if(mvTab==='s'){
+    // シリアルセッション: 「任意のセッション」を末尾に追加
+    sessions.push({id:nid++,name:'任意のセッション',dur:10,color:'coral',comment:''});
+    snap();render();mvRender();
+    // 追加したセッションの編集モーダルを開く
+    const last=sessions[sessions.length-1];
+    setTimeout(()=>mvOpenSM(last.id),200);
+  } else {
+    // フリーセッション: 開始時刻から30分のセッションを追加
+    const sm=gSM();
+    const newEv={id:nfid++,name:'フリーセッション',color:'teal',comment:'',fromMin:0,toMin:30};
+    freeEvs.push(newEv);
+    snap();render();mvRender();
+    setTimeout(()=>mvOpenFM(newEv.id),200);
+  }
+}
+function mvToggleEdit(){
+  const area=document.getElementById('mv-edit-area');
+  const btn=document.getElementById('mv-edit-btn');
+  const isOpen=area.style.display==='flex';
+  if(isOpen){
+    area.style.display='none';
+  } else {
+    document.getElementById('mv-evt').value=document.getElementById('evt').value||'';
+    document.getElementById('mv-evd').value=document.getElementById('evd').value||'';
+    document.getElementById('mv-evs').value=document.getElementById('evs').value||'13:00';
+    document.getElementById('mv-eve').value=document.getElementById('eve').value||'17:00';
+    const v=document.getElementById('evd').value;
+    if(v){const days=['日','月','火','水','木','金','土'];const[y,m,d]=v.split('-').map(Number);document.getElementById('mv-dow').textContent='('+days[new Date(y,m-1,d).getDay()]+')';}
+    area.style.display='flex';
+    area.style.flexDirection='column';
+  }
+}
+function mvSaveEventInfo(){
+  document.getElementById('evt').value=document.getElementById('mv-evt').value;
+  document.getElementById('evd').value=document.getElementById('mv-evd').value;
+  document.getElementById('evs').value=document.getElementById('mv-evs').value;
+  document.getElementById('eve').value=document.getElementById('mv-eve').value;
+  updateDow();render();
+  if(typeof fbPush==='function') fbPush();
+  mvToggleEdit();
+  mvRender();
+}
+function mvSwitchTab(tab){
+  mvTab=tab;
+  document.getElementById('mv-tab-s').classList.toggle('on',tab==='s');
+  document.getElementById('mv-tab-f').classList.toggle('on',tab==='f');
+  mvRender();
+}
+setInterval(mvRender,60000);
+setInterval(updateNowLine,60000);
+window.addEventListener('resize',mvRender);
+document.getElementById('mv-body').addEventListener('touchmove',e=>{if(mvDragId){e.preventDefault();mvOnDragMove(e);}},{passive:false});
+mvRender();
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-database-compat.js"></script>
+<script>
+// ===== FIREBASE 共同編集 =====
+var _fbDB = null;
+var _fbRoomId = null;
+var _fbSyncing = false;
+var _fbLastPush = 0;
+var _fbClientId = null;
+var _fbOnlineCount = 0;
+
+function fbGetRoomId(){
+  if(_fbRoomId) return _fbRoomId;
+  var p = new URLSearchParams(window.location.search);
+  var room = p.get('room');
+  if(!room){
+    room = 'room-' + Math.random().toString(36).slice(2,8);
+    var url = new URL(window.location);
+    url.searchParams.set('room', room);
+    window.history.replaceState({}, '', url);
+  }
+  _fbRoomId = room;
+  return room;
+}
+
+function fbShowStatus(text, color){
+  var el = document.getElementById('fb-status');
+  if(el){ el.textContent = text; el.style.color = color || '#27500A'; }
+}
+
+window.closeQR = function(){
+  document.getElementById('qr-modal').style.display='none';
+  document.getElementById('qr-code').innerHTML='';
+};
+window.copyQRUrl = function(){
+  var url = document.getElementById('qr-url').textContent;
+  navigator.clipboard.writeText(url).then(function(){
+    var btn = event.target;
+    btn.textContent='✅ コピー済み';
+    setTimeout(function(){btn.textContent='URLをコピー';},2000);
+  }).catch(function(){prompt('このURLをコピーしてください：',url);});
+};
+window.fbShowRoom = function(){
+  var url = window.location.href;
+  // QRモーダルを表示
+  var qrEl = document.getElementById('qr-code');
+  if(qrEl){
+    document.getElementById('qr-url').textContent = url;
+    qrEl.innerHTML = '';
+    function generateQR(){
+      try{
+        new QRCode(qrEl,{text:url,width:184,height:184,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
+      }catch(e){qrEl.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px">QRコード生成失敗</div>';}
+    }
+    if(!window.QRCode){
+      var s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      s.onload=generateQR;
+      document.head.appendChild(s);
+    } else { generateQR(); }
+    document.getElementById('qr-modal').style.display='flex';
+  } else {
+    // QRモーダルがない場合はクリップボードコピー
+    if(navigator.clipboard){
+      navigator.clipboard.writeText(url).then(function(){alert('✅ 共有URLをコピーしました！\n\n' + url);});
+    } else {
+      prompt('このURLを共有してください：', url);
+    }
+  }
+};
+
+window.fbPush = function(){
+  if(!_fbDB || _fbSyncing) return;
+  var now = Date.now();
+  if(now - _fbLastPush < 500) return;
+  _fbLastPush = now;
+  try{
+    var data = {
+      title: document.getElementById('evt').value || '',
+      date: document.getElementById('evd').value || '',
+      start: document.getElementById('evs').value || '13:00',
+      end: document.getElementById('eve').value || '17:00',
+      sessions: JSON.parse(JSON.stringify(sessions)),
+      freeEvs: JSON.parse(JSON.stringify(freeEvs)),
+      ts: _fbLastPush
+    };
+    _fbDB.ref('rooms/' + fbGetRoomId() + '/data').set(data)
+      .catch(function(e){ console.warn('Firebase push error:', e); });
+  }catch(e){ console.warn('fbPush error:', e); }
+};
+
+function fbUpdateStatus(){
+  var el = document.getElementById('fb-status');
+  if(!el) return;
+  var isLocal = window.location.protocol === 'file:';
+  if(_fbOnlineCount >= 2){
+    el.textContent = '🟢 同期中 ' + _fbOnlineCount + '人 ▶ ルーム共有';
+    el.style.color = '#27500A';
+    el.style.cursor = 'pointer';
+    el.onclick = window.fbShowRoom;
+  } else {
+    el.textContent = '🔗 ルーム共有';
+    el.style.color = 'var(--text2)';
+    el.style.cursor = 'pointer';
+    el.onclick = window.fbShowRoom;
+  }
+}
+
+function fbListen(){
+  var roomId = fbGetRoomId();
+  // Presence
+  var presenceRef = _fbDB.ref('rooms/' + roomId + '/presence/' + _fbClientId);
+  presenceRef.set(true);
+  presenceRef.onDisconnect().remove();
+  _fbDB.ref('rooms/' + roomId + '/presence').on('value', function(snap){
+    var presence = snap.val();
+    _fbOnlineCount = presence ? Object.keys(presence).length : 0;
+    fbUpdateStatus();
+  });
+  // データ受信
+  _fbDB.ref('rooms/' + roomId + '/data').on('value', function(snap){
+    var data = snap.val();
+    if(!data) return;
+    if(data.ts && data.ts === _fbLastPush) return;
+    if(_fbSyncing) return;
+    _fbSyncing = true;
+    try{
+      document.getElementById('evt').value = data.title || '';
+      document.getElementById('evd').value = data.date || '';
+      document.getElementById('evs').value = data.start || '13:00';
+      document.getElementById('eve').value = data.end || '17:00';
+      if(data.sessions && data.sessions.length > 0){ sessions = data.sessions; nid = Math.max(nid, Math.max.apply(null, sessions.map(function(s){return s.id+1;})), 30); }
+      if(data.freeEvs && data.freeEvs.length > 0){ freeEvs = data.freeEvs; nfid = Math.max(nfid, Math.max.apply(null, freeEvs.map(function(e){return e.id+1;})), 100); }
+      render(); updateDow();
+      if(typeof mvRender==='function') mvRender();
+    }catch(e){ console.warn(e); }
+    finally{ setTimeout(function(){ _fbSyncing = false; }, 200); }
+  });
+}
+
+function fbInit(){
+  try{
+    var firebaseConfig = {
+      apiKey: "AIzaSyBFgJzOcTX2lY8sm3nbfvfDZ1hezw2zmrs",
+      authDomain: "smart-timetable-cf10f.firebaseapp.com",
+      databaseURL: "https://smart-timetable-cf10f-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "smart-timetable-cf10f",
+      storageBucket: "smart-timetable-cf10f.firebasestorage.app",
+      messagingSenderId: "1098302014088",
+      appId: "1:1098302014088:web:c0d8bb00aba7391540953d"
+    };
+    if(!firebase.apps.length) firebase.initializeApp(firebaseConfig);
+    _fbDB = firebase.database();
+    _fbClientId = 'client-' + Math.random().toString(36).slice(2,10);
+    var origSnap = window.snap;
+    window.snap = function(){
+      origSnap();
+      window.fbPush();
+    };
+    fbGetRoomId();
+    fbListen();
+    fbUpdateStatus();
+    console.log('Firebase OK. Room:', fbGetRoomId());
+  }catch(e){
+    console.error('Firebase init error:', e);
+  }
+}
+
+var _fbInitTries = 0;
+function fbWaitAndInit(){
+  _fbInitTries++;
+  if(_fbInitTries > 50) return;
+  if(typeof window.snap === 'function' && typeof sessions !== 'undefined'){
+    fbInit();
+  } else {
+    setTimeout(fbWaitAndInit, 200);
+  }
+}
+
+function fbAutoStart(){
+  var authed = sessionStorage.getItem('st-auth') === '1';
+  if(authed){ fbWaitAndInit(); }
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){ setTimeout(fbAutoStart, 1500); });
+} else {
+  setTimeout(fbAutoStart, 800);
+}
+</script>
+</body>
+</html>
