@@ -471,7 +471,6 @@ if(sessionStorage.getItem('st-auth')==='1'){
       <div class="mr" id="ai-key-block">
         <div class="ml" style="display:flex;align-items:center;gap:5px">
           <span id="ai-key-label">APIキー</span>
-          <span style="font-size:9px;background:#EAF3DE;color:#27500A;padding:1px 5px;border-radius:3px">セッション中のみ保持</span>
         </div>
         <input class="mi" id="ai-apikey" type="password" placeholder="sk-ant-... または AIzaSy..." style="font-family:monospace" oninput="document.getElementById('ai-key-guide').style.display=this.value?'none':'block'"/>
         <div id="ai-key-guide" style="margin-top:8px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
