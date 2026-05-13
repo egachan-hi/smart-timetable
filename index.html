@@ -444,7 +444,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
           </label>
           <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:5px 10px;border:1px solid var(--border);border-radius:6px;flex:1">
             <input type="radio" name="ai-provider" value="gemini" id="ai-prov-gemini" onchange="aiProviderChange()"/>
-            <span>Gemini Flash <span style="font-size:9px;background:#EAF3DE;color:#27500A;padding:1px 4px;border-radius:3px">無料枠あり</span></span>
+            <span>Gemini 2.5 Flash (Google) <span style="font-size:9px;background:#EAF3DE;color:#27500A;padding:1px 4px;border-radius:3px">無料枠あり</span></span>
           </label>
         </div>
       </div>
@@ -1763,7 +1763,7 @@ JSON配列のみで回答してください。説明文・前置き・コード�
         if(item.type==='audio_file') return {inlineData:{mimeType:item.mimeType,data:item.data}};
         return null;
       }).filter(Boolean);
-      resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{
+      resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{
         method:'POST',
         headers:{'Content-Type':'application/json'},
         body:JSON.stringify({contents:[{role:'user',parts:geminiParts}]})
