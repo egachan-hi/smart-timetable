@@ -212,7 +212,7 @@ tbody tr:hover td{background:var(--bg2)}
 </style>
 </head>
 <body>
-<div id="pw-screen" style="position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:flex;align-items:center;justify-content:center">
+<div id="pw-screen" style="display:none;position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:flex;align-items:center;justify-content:center">
   <div style="background:#fff;border-radius:16px;padding:40px 36px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
     <svg width="48" height="48" viewBox="0 0 32 32" fill="none" style="margin-bottom:16px"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
     <div style="font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:6px">スマートタイムテーブル</div>
@@ -681,7 +681,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
 </div>
 
 <!-- AI生成確認モーダル -->
-<div class="mbg" id="ai-confirm-modal" style="display:none" onclick="if(event.target===this)aiConfirmClose()">
+<div class="mbg" id="ai-confirm-modal" style="display:none;z-index:2000" onclick="if(event.target===this)aiConfirmClose()">
   <div class="mc" style="width:360px" onclick="event.stopPropagation()">
     <div class="mh"><h3 id="ai-confirm-title">確認</h3></div>
     <div class="mb">
@@ -2142,6 +2142,10 @@ function closeHelp(){document.getElementById('hm').style.display='none';}
 document.getElementById('hm').addEventListener('click',function(e){if(e.target===this)closeHelp();});
 document.getElementById('evs').addEventListener('change',render);
 document.getElementById('eve').addEventListener('change',render);
+// パスワード認証を一時停止（自動通過）
+sessionStorage.setItem('st-auth','1');
+document.getElementById('pw-screen').style.display='none';
+setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); }, 300);
 uUR();sv('tl');render();updateDow();setTimeout(function(){fitz();},150);
 setTimeout(function(){fitz();},150);
 
