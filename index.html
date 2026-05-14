@@ -2592,10 +2592,18 @@ function fbGetRoomId(){
   var p = new URLSearchParams(window.location.search);
   var room = p.get('room');
   if(!room){
-    room = 'room-' + Math.random().toString(36).slice(2,8);
+    // localStorageに保存済みのルームIDを使い回す
+    room = localStorage.getItem('stt-room-id');
+    if(!room){
+      room = 'room-' + Math.random().toString(36).slice(2,8);
+      localStorage.setItem('stt-room-id', room);
+    }
     var url = new URL(window.location);
     url.searchParams.set('room', room);
     window.history.replaceState({}, '', url);
+  } else {
+    // URLにroom指定がある場合はそれを保存
+    localStorage.setItem('stt-room-id', room);
   }
   _fbRoomId = room;
   return room;
