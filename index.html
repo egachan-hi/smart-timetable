@@ -903,7 +903,7 @@ function autoLoad(){
   }catch(e){ console.warn('autoload error:', e); return false; }
 }
 
-function snap(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();}
+function snap(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();setTimeout(autoSave,0);}
 function undo(){if(hi<=0)return;hi--;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
 function redo(){if(hi>=hist.length-1)return;hi++;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
 function uUR(){document.getElementById('bundo').disabled=hi<=0;document.getElementById('bredo').disabled=hi>=hist.length-1;}
@@ -1528,7 +1528,6 @@ function tDO(e,id,row){
   }
 }
 function tDL(row){document.querySelectorAll('.tbl-guide').forEach(el=>el.remove());row.dataset.dropPos='';}
-function tDL(row){row.style.cssText=row.style.cssText.replace(/box-shadow:[^;]+;?/g,'');row.dataset.dropPos='';}
 function tDD(e,tid){
   e.preventDefault();
   document.querySelectorAll('.tbl-guide').forEach(el=>el.remove());document.querySelectorAll('#stb tr').forEach(r=>{r.classList.remove('dg');r.dataset.dropPos='';});
