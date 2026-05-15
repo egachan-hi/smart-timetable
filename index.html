@@ -1016,7 +1016,12 @@ function rBL(){
 //      → innerHTML書き換えによるDOM破壊を完全回避
 // ================================================================
 function rTL(){
-  const sm=gSM(),em=gEM(),tm=em-sm,tpx=tm*PPM;
+  const sm=gSM(),em=gEM(),tm=em-sm;
+  // セッション合計時間・設定時間・24時までの残り時間の最大値を基準にする
+  const sessionTotal=sessions.reduce((a,s)=>a+s.dur,0);
+  const minutesTo24=1440-sm; // 開始時刻から24:00までの分数
+  const displayMin=Math.max(tm, sessionTotal, minutesTo24);
+  const tpx=displayMin*PPM;
   const tc=document.getElementById('tc'),sc=document.getElementById('sc');
   const extraPx=60*PPM;
   const totalPx2=tpx+extraPx;
@@ -1025,7 +1030,7 @@ function rTL(){
 
   // タイムticks（時間軸）
   let tH='';
-  for(let m=0;m<=tm+60;m++){
+  for(let m=0;m<=displayMin+60;m++){
     const abs=sm+m;if(abs%10!==0)continue;
     const px=m*PPM,mj=abs%60===0,m30=abs%30===0;
     tH+=`<div class="tt" style="top:${px}px">${mj?hm(abs):m30?hm(abs):''}</div>`;
@@ -1046,12 +1051,12 @@ function rTL(){
     const il=document.createElement('div');il.className='il';il.id='il';sc.appendChild(il);
   }
 
-  // sessions-col: overtime グレー背景
+  // sessions-col: overtime グレー背景（設定時間外〜24時まで）
   const ov=document.createElement('div');
-  ov.style.cssText=`top:${tpx}px;left:0;right:0;height:${extraPx}px;position:absolute;background:rgba(0,0,0,0.04);pointer-events:none;z-index:0`;
+  ov.style.cssText=`top:${tm*PPM}px;left:0;right:0;height:${(displayMin-tm)*PPM+extraPx}px;position:absolute;background:rgba(0,0,0,0.04);pointer-events:none;z-index:0`;
   sc.appendChild(ov);
-  // sessions-col にも時間グリッド線を描画（延長分含む）
-  for(let m=0;m<=tm+60;m++){
+  // sessions-col にも時間グリッド線を描画（24時まで）
+  for(let m=0;m<=displayMin+60;m++){
     const abs=sm+m;if(abs%10!==0)continue;
     const px=m*PPM,mj=abs%60===0;
     const gl=document.createElement('div');
@@ -1329,7 +1334,10 @@ function frLy(evs){
 }
 
 function rFR(){
-  const sm=gSM(),em=gEM(),tm=em-sm,tpx=tm*PPM;
+  const sm=gSM(),em=gEM(),tm=em-sm;
+  const minutesTo24=1440-sm;
+  const displayMin=Math.max(tm, minutesTo24);
+  const tpx=displayMin*PPM;
   const extraPx=60*PPM;
   const can=document.getElementById('fcan');
   can.style.height=(tpx+extraPx)+'px';
@@ -1337,9 +1345,9 @@ function rFR(){
   Array.from(can.children).forEach(el=>{if(!['fov','fdl'].includes(el.id))el.remove();});
   // overtime グレー背景
   const frOv=document.createElement('div');
-  frOv.style.cssText=`top:${tpx}px;left:0;right:0;height:${extraPx}px;position:absolute;background:rgba(0,0,0,0.04);pointer-events:none;z-index:0`;
+  frOv.style.cssText=`top:${tm*PPM}px;left:0;right:0;height:${(displayMin-tm)*PPM+extraPx}px;position:absolute;background:rgba(0,0,0,0.04);pointer-events:none;z-index:0`;
   can.appendChild(frOv);
-  for(let m=0;m<=tm+60;m++){
+  for(let m=0;m<=displayMin+60;m++){
     const abs=sm+m;if(abs%10!==0)continue;
     const px=m*PPM,mj=abs%60===0;
     const l=document.createElement('div');
@@ -1738,13 +1746,10 @@ function openAI(){
   document.getElementById('aifl').innerHTML='';
   document.getElementById('airw').style.display='none';
   document.getElementById('aiimport').style.display='none';
-  // 複数日モードの場合は警告を表示
+  // 複数日モードの場合はダイアログで確認
   if(dayCount>1){
-    const warn=document.getElementById('ai-multiday-warn');
-    if(warn) warn.style.display='flex';
-  } else {
-    const warn=document.getElementById('ai-multiday-warn');
-    if(warn) warn.style.display='none';
+    const go=confirm('1日のタイムライン（最大24時まで）のみ生成します。\n複数日にまたがる内容の場合も、DAY1の内容しか生成されません。\n\n続けますか？');
+    if(!go) return;
   }
   // セッション中に入力済みのAPIキーを復元
   const saved=localStorage.getItem('ai-apikey')||localStorage.getItem('ai-apikey-gemini')||'';
@@ -2027,7 +2032,11 @@ function importAI(append){
   const checked=aiSs.filter((s,i)=>cks[i]&&cks[i].checked);
   if(!append) sessions=[];
   checked.forEach(s=>sessions.push({id:nid++,name:s.name,dur:s.dur,color:s.color||'teal',comment:s.comment||''}));
-  closeAI();snap();render();
+  closeAI();
+  snap();
+  render();
+  // スマホ表示も強制更新
+  if(typeof mvRender==='function') setTimeout(mvRender, 50);
 }
 
 function aiImportWithConfirm(){
