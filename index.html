@@ -163,7 +163,7 @@ tbody tr:hover td{background:var(--bg2)}
 .mv-card-comment{font-size:11px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:none}
 .mv-card.open .mv-card-comment{display:block}
 .mv-done{opacity:.45}
-.mv-clock{font-size:28px;font-weight:700;color:var(--text);text-align:center;padding:16px 0 8px;flex-shrink:0}
+.mv-clock{display:none;padding:16px 0 8px;flex-shrink:0}
 @media(max-width:600px){
   .body,.top-bar{display:none!important}
   .mv{display:flex}
@@ -2510,9 +2510,9 @@ function mvRenderSerial(nowMin,sm){
   else{nowEl.style.display='none';}
   const body=document.getElementById('mv-body');body.innerHTML='';
   sessions.forEach((s,i)=>{
-    const start=sm+st[i],end=start+s.dur,isDone=nowMin>=end,isActive=nowMin>=start&&nowMin<end;
+    const start=sm+st[i],end=start+s.dur,isActive=nowMin>=start&&nowMin<end;
     const card=document.createElement('div');
-    card.className='mv-card'+(isActive?' active':'')+(isDone?' mv-done':'');
+    card.className='mv-card'+(isActive?' active':'');
     card.dataset.id=s.id;
     card.innerHTML=`
       <div class="mv-card-bar" style="background:${CD[s.color]||'#B4B2A9'}"></div>
@@ -2565,7 +2565,7 @@ function mvRenderFree(nowMin,sm){
     const start=sm+ev.fromMin,end=sm+ev.toMin,dur=ev.toMin-ev.fromMin;
     const isDone=nowMin>=end,isActive=nowMin>=start&&nowMin<end;
     const card=document.createElement('div');
-    card.className='mv-card'+(isActive?' active':'')+(isDone?' mv-done':'');
+    card.className='mv-card'+(isActive?' active':'');
     card.innerHTML=`
       <div class="mv-card-bar" style="background:${CD[ev.color]||'#5DCAA5'}"></div>
       <div class="mv-card-body" style="flex:1">
