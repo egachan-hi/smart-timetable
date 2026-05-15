@@ -319,7 +319,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
         <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
         <input type="time" id="evs" value="13:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();setTimeout(fitz,50);"/>
         <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
-        <input type="time" id="eve" value="17:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();setTimeout(fitz,50);"/>
+        <input type="time" id="eve" value="16:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();setTimeout(fitz,50);"/>
       </div>
     </div>
     <div class="mnb" id="mnb">テンプレート：標準テンプレート</div>
@@ -948,7 +948,7 @@ function uUR(){document.getElementById('bundo').disabled=hi<=0;document.getEleme
 // TIME HELPERS
 // ================================================================
 function gSM(){const v=document.getElementById('evs').value||'13:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
-function gEM(){const v=document.getElementById('eve').value||'17:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
+function gEM(){const v=document.getElementById('eve').value||'16:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
 function hm(t){const v=Math.max(0,Math.round(t));return`${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`;}
 function h2m(s){const[h,m]=(s||'00:00').split(':').map(Number);return h*60+m;}
 function gSt(){let c=0;return sessions.map(s=>{const t=c;c+=s.dur;return t;});}
@@ -2133,7 +2133,7 @@ function duplicateEV(){
   alert(`「${title}」として複製しました`);
 }
 
-function newEV(){if(!confirm('現在のデータをリセットして新規イベントを作成しますか？'))return;sessions=[];freeEvs=[];document.getElementById('evt').value='';document.getElementById('evd').value='';closeEV();snap();render();}
+function newEV(){if(!confirm('現在のデータをリセットして新規イベントを作成しますか？'))return;sessions=[];freeEvs=[];document.getElementById('evt').value='';document.getElementById('evd').value='';document.getElementById('evs').value='13:00';document.getElementById('eve').value='16:00';closeEV();snap();render();updateDow();updateTopDateLabel();}
 
 // ================================================================
 // CSV
