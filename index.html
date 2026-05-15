@@ -142,7 +142,7 @@ tbody tr:hover td{background:var(--bg2)}
 .icp{display:flex;gap:3px;flex-wrap:wrap;padding:2px 0 3px 16px}
 .isw{width:13px;height:13px;border-radius:3px;cursor:pointer;border:2px solid transparent}.isw.on{border-color:var(--text)}
 /* ========== MOBILE VIEW ========== */
-.mv{display:none;flex-direction:column;height:100vh;overflow:hidden;background:var(--bg)}
+.mv{display:none;flex-direction:column;height:100svh;overflow:hidden;background:var(--bg)}
 .mv-header{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
 .mv-title{font-size:16px;font-weight:700;color:var(--text)}
 .mv-meta{font-size:12px;color:var(--text2);margin-top:2px}
@@ -735,7 +735,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
   </div>
   <div class="mv-body" id="mv-body"></div>
   <!-- スマホ用ツールバー（下部固定） -->
-  <div style="display:flex;gap:6px;padding:8px 12px;padding-bottom:max(8px,env(safe-area-inset-bottom));overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0">
+  <div style="display:flex;gap:6px;padding:10px 12px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0">
       <button onclick="openAI()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:none;border-radius:8px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
       </button>
