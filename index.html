@@ -1723,6 +1723,14 @@ function openAI(){
   document.getElementById('aifl').innerHTML='';
   document.getElementById('airw').style.display='none';
   document.getElementById('aiimport').style.display='none';
+  // 複数日モードの場合は警告を表示
+  if(dayCount>1){
+    const warn=document.getElementById('ai-multiday-warn');
+    if(warn) warn.style.display='flex';
+  } else {
+    const warn=document.getElementById('ai-multiday-warn');
+    if(warn) warn.style.display='none';
+  }
   // セッション中に入力済みのAPIキーを復元
   const saved=localStorage.getItem('ai-apikey')||localStorage.getItem('ai-apikey-gemini')||'';
   document.getElementById('ai-apikey').value=saved;
@@ -1748,6 +1756,18 @@ function aiFC(e){aiFs=[...aiFs,...Array.from(e.target.files)];document.getElemen
 function aiRF(i){aiFs.splice(i,1);document.getElementById('aifl').innerHTML=aiFs.map((f,i)=>`<div class="aifi"><span style="flex:1">${f.name}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`).join('');}
 function aiModeChange(){
   const mode=document.querySelector('input[name="ai-mode"]:checked')?.value||'fit';
+
+  // 案B: 複数日キーワード検出
+  if(mode!=='audio'){
+    const promptText_check=(document.getElementById('aiprompt').value||'').toLowerCase();
+    const multiDayKeywords=['2泊','3泊','4泊','5泊','6泊','7泊','泊','2日間','3日間','4日間','5日間','6日間','7日間','複数日','2days','3days','4days','5days','6days','7days','day1','day2','day3','2日目','3日目','4日目'];
+    const foundKeyword=multiDayKeywords.find(kw=>promptText_check.includes(kw));
+    if(foundKeyword){
+      const go=confirm(`「${foundKeyword}」など複数日の内容が含まれている可能性があります。\n\nこのツールは1日分のタイムラインのみ生成します。\nDAY1の内容のみ生成しますがよろしいですか？`);
+      if(!go){btn.disabled=false;btn.textContent='🚀 生成';return;}
+    }
+  }
+
   ['fit','free','audio'].forEach(m=>{
     const el=document.getElementById('ai-mode-'+m+'-label');
     if(el){
