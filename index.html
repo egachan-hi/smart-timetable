@@ -1151,15 +1151,28 @@ function rTL(){
 function updateNowLine(){
   document.querySelectorAll('.now-line,.now-label').forEach(el=>el.remove());
   const evDate=document.getElementById('evd').value;
-  if(!evDate)return;
-  const[y,m,d]=evDate.split('-').map(Number);
+  if(noDate||!evDate)return;
+
   const today=new Date();
-  if(today.getFullYear()!==y||today.getMonth()+1!==m||today.getDate()!==d)return;
+  const todayStr=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+
+  // 複数日モードの場合は表示中のDAYの日付を計算
+  let targetDate=evDate;
+  if(dayCount>1&&currentDay>1){
+    const[y,m,d]=evDate.split('-').map(Number);
+    const dt=new Date(y,m-1,d+currentDay-1);
+    targetDate=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
+  }
+
+  // 今日の日付と一致しない場合は表示しない
+  if(todayStr!==targetDate)return;
+
   const nowMin=today.getHours()*60+today.getMinutes();
   const sm=gSM();
   const px=(nowMin-sm)*PPM;
   const timeStr=String(today.getHours()).padStart(2,'0')+':'+String(today.getMinutes()).padStart(2,'0');
   const lineColor='#E53E3E';
+
   const tc=document.getElementById('tc');
   if(tc){
     const label=document.createElement('div');
@@ -1175,14 +1188,12 @@ function updateNowLine(){
     line.style.cssText=`position:absolute;left:0;right:0;height:1px;background:${lineColor};z-index:15;pointer-events:none;top:${px}px`;
     sc.appendChild(line);
   }
-  const frs=document.getElementById('frs');
-  if(frs){
-    const tls=document.getElementById('tls');
-    const scrollTop=tls?tls.scrollTop:0;
+  const fcan=document.getElementById('fcan');
+  if(fcan){
     const frsLine=document.createElement('div');
     frsLine.className='now-line';
-    frsLine.style.cssText=`position:absolute;left:0;right:0;height:1px;background:${lineColor};z-index:15;pointer-events:none;top:${px-scrollTop}px`;
-    frs.appendChild(frsLine);
+    frsLine.style.cssText=`position:absolute;left:0;right:0;height:1px;background:${lineColor};z-index:15;pointer-events:none;top:${px}px`;
+    fcan.appendChild(frsLine);
   }
 }
 
@@ -1748,7 +1759,7 @@ function openAI(){
   document.getElementById('aiimport').style.display='none';
   // 複数日モードの場合はダイアログで確認
   if(dayCount>1){
-    const go=confirm('1日のタイムライン（最大24時まで）のみ生成します。\n複数日にまたがる内容の場合も、DAY1の内容しか生成されません。\n\n続けますか？');
+    const go=confirm('1日のタイムライン（最大24時まで）のみ生成します。\n複数日にまたがる内容の場合も、1日の内容しか生成されません。\n\n続けますか？');
     if(!go) return;
   }
   // セッション中に入力済みのAPIキーを復元
