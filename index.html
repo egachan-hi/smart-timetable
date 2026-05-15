@@ -270,6 +270,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
   <button class="tb" onclick="quickSaveEV()" title="保存"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>保存</button>
   <button class="tb" onclick="openEV()" title="開く"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く</button>
   <button class="tb" onclick="openExport()" title="書き出し"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し</button>
+  <button class="tb danger" onclick="resetAll()" title="全削除"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
   <div class="sep"></div>
   <button class="tb" id="bundo" onclick="undo()" title="元に戻す"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></button>
   <button class="tb" id="bredo" onclick="redo()" title="やり直す"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg></button>
@@ -277,7 +278,6 @@ if(sessionStorage.getItem('st-auth')==='1'){
   <button class="tb" onclick="cz(-1)" title="縮小"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
   <button class="tb" onclick="cz(1)" title="拡大"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
   <button class="tb" onclick="fitz()" title="全体表示"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="3" x2="20" y2="3"/><line x1="4" y1="21" x2="20" y2="21"/><line x1="12" y1="7" x2="12" y2="17"/><polyline points="7 7 12 3 17 7"/><polyline points="7 17 12 21 17 17"/></svg></button>
-  <button class="tb danger" onclick="resetAll()" title="全削除"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
   <div class="sep"></div>
   <button class="tb" id="btn-prev-day" onclick="shiftDay(-1)" title="前日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
   <span id="top-date-label" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;padding:0 2px"></span>
@@ -317,9 +317,9 @@ if(sessionStorage.getItem('st-auth')==='1'){
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
         <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
-        <input type="time" id="evs" value="13:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();"/>
+        <input type="time" id="evs" value="13:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();setTimeout(fitz,50);"/>
         <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
-        <input type="time" id="eve" value="17:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();"/>
+        <input type="time" id="eve" value="17:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();setTimeout(fitz,50);"/>
       </div>
     </div>
     <div class="mnb" id="mnb">テンプレート：標準テンプレート</div>
@@ -700,18 +700,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
         <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </button>
     </div>
-    <!-- スマホ用ツールバー -->
-    <div style="display:flex;gap:6px;margin-top:8px;overflow-x:auto;padding-bottom:2px;-webkit-overflow-scrolling:touch">
-      <button onclick="openAI()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:none;border-radius:8px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
-      </button>
-      <button onclick="newEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">新規</button>
-      <button onclick="duplicateEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">複製</button>
-      <button onclick="quickSaveEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">保存</button>
-      <button onclick="openEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">開く</button>
-      <button onclick="openExport()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">書き出し</button>
-      <button onclick="if(confirm('全セッションを削除しますか？'))resetAll()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid #F7C1C1;border-radius:8px;background:#FEF2F2;color:#A32D2D;font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">削除</button>
-    </div>
+
     <div id="mv-edit-area" style="display:none;flex-direction:column;gap:8px;margin-top:10px">
       <input type="text" id="mv-evt" placeholder="イベントタイトル"
         style="width:100%;font-size:15px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;box-sizing:border-box"/>
@@ -745,6 +734,18 @@ if(sessionStorage.getItem('st-auth')==='1'){
     <button class="mv-tab" onclick="mvAddSession()" style="max-width:52px;font-size:18px;color:var(--accent);padding:8px">＋</button>
   </div>
   <div class="mv-body" id="mv-body"></div>
+  <!-- スマホ用ツールバー（下部固定） -->
+  <div style="display:flex;gap:6px;padding:8px 12px;padding-bottom:max(8px,env(safe-area-inset-bottom));overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0">
+      <button onclick="openAI()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:none;border-radius:8px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
+      </button>
+      <button onclick="newEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">新規</button>
+      <button onclick="duplicateEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">複製</button>
+      <button onclick="quickSaveEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">保存</button>
+      <button onclick="openEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">開く</button>
+      <button onclick="openExport()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">書き出し</button>
+      <button onclick="if(confirm('全セッションを削除しますか？'))resetAll()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid #F7C1C1;border-radius:8px;background:#FEF2F2;color:#A32D2D;font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">削除</button>
+  </div>
 </div>
 
 <!-- Mobile session edit modal -->
