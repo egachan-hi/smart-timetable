@@ -884,7 +884,7 @@ function autoSave(){
       title: document.getElementById('evt').value||'',
       date: document.getElementById('evd').value||'',
       start: document.getElementById('evs').value||'13:00',
-      end: document.getElementById('eve').value||'17:00',
+      end: document.getElementById('eve').value||'16:00',
       sessions: sessions,
       freeEvs: freeEvs,
       noDate: noDate,
@@ -905,7 +905,7 @@ function autoLoad(){
     document.getElementById('evt').value=data.title||'';
     document.getElementById('evd').value=data.date||'';
     document.getElementById('evs').value=data.start||'13:00';
-    document.getElementById('eve').value=data.end||'17:00';
+    document.getElementById('eve').value=data.end||'16:00';
     if(data.sessions&&data.sessions.length>0){
       sessions=data.sessions;
       nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
@@ -1753,6 +1753,7 @@ function stDD(e,i){e.preventDefault();document.querySelectorAll('.str').forEach(
 // ================================================================
 let aiFs=[],aiSs=[];
 function openAI(){
+  logEvent('ai_open');
   aiFs=[];aiSs=[];
   document.getElementById('aiprompt').value='';
   document.getElementById('aifl').innerHTML='';
@@ -1907,7 +1908,20 @@ JSON配列のみで回答してください。説明文・前置き・コード�
           aiModeChange();
           uc[0].text+=`
 
-添付の音声ファイル「${f.name}」を文字起こし・分析し、内容に最適なセッション構成を作成してください。`;
+添付の音声ファイル「${f.name}」をファイルサイズから推定される録音時間を考慮したタイムテーブルを作成してください。`;
+          // ファイルサイズから推定時間を計算してプロンプトに追記
+          const fileSizeKB=f.size/1024;
+          const fileSizeMB=fileSizeKB/1024;
+          let estMin=0;
+          if(fname.endsWith('.m4a')||fname.endsWith('.aac')){estMin=Math.round(fileSizeKB/128);}
+          else if(fname.endsWith('.mp3')){estMin=Math.round(fileSizeKB/128);}
+          else if(fname.endsWith('.wav')){estMin=Math.round(fileSizeKB/5000);}
+          else{estMin=Math.round(fileSizeKB/100);}
+          estMin=Math.max(1,estMin);
+          const estHour=Math.floor(estMin/60);
+          const estMinRem=estMin%60;
+          const estStr=estHour>0?`約${estHour}時間${estMinRem>0?estMinRem+'分':''}（約${estMin}分）`:`約${estMin}分`;
+          uc[0].text+=`\n【重要】ファイルサイズ${fileSizeMB.toFixed(1)}MBから推定録音時間は${estStr}です。全セッションのdur合計を約${estMin}分に合わせてください。`;
         } else {
           uc[0].text+=`
 
@@ -2040,6 +2054,7 @@ function aiShowConfirm(mode, onOverwrite, onAppend){
 }
 
 function importAI(append){
+  logEvent('ai_import');
   const cks=document.getElementById('aisp').querySelectorAll('input[type=checkbox]');
   const checked=aiSs.filter((s,i)=>cks[i]&&cks[i].checked);
   if(!append) sessions=[];
@@ -2108,9 +2123,10 @@ function closeEV(){document.getElementById('evm').style.display='none';}
 document.getElementById('evm').addEventListener('click',function(e){if(e.target===this)closeEV();});
 function renderEVL(){document.getElementById('evlist').innerHTML=savedEvs.length===0?'<div style="font-size:11px;color:var(--text3)">保存されたイベントはありません</div>':savedEvs.map((ev,i)=>`<div class="eli"><span style="flex:1;font-size:11px">${esc(ev.name)}</span><span style="font-size:10px;color:var(--text2)">${ev.date||''}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="loadEV(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="delEV(${i})">×</span></div>`).join('');}
 function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();alert(`「${name}」として保存しました`);}
-function loadEV(i){const ev=savedEvs[i];document.getElementById('evt').value=ev.title||'';document.getElementById('evd').value=ev.date||'';document.getElementById('evs').value=ev.start||'13:00';document.getElementById('eve').value=ev.end||'17:00';sessions=JSON.parse(JSON.stringify(ev.sessions));freeEvs=JSON.parse(JSON.stringify(ev.freeEvs));closeEV();snap();render();if(typeof mvRender==='function')mvRender();}
+function loadEV(i){const ev=savedEvs[i];document.getElementById('evt').value=ev.title||'';document.getElementById('evd').value=ev.date||'';document.getElementById('evs').value=ev.start||'13:00';document.getElementById('eve').value=ev.end||'16:00';sessions=JSON.parse(JSON.stringify(ev.sessions));freeEvs=JSON.parse(JSON.stringify(ev.freeEvs));closeEV();snap();render();if(typeof mvRender==='function')mvRender();}
 function delEV(i){if(confirm('削除しますか？')){savedEvs.splice(i,1);renderEVL();}}
 function quickSaveEV(){
+  logEvent('save');
   const title=(document.getElementById('evt').value||'').trim();
   if(!title){
     alert('イベントタイトルを入力してください。');
@@ -2123,6 +2139,7 @@ function quickSaveEV(){
   else{savedEvs.push(d);alert(`「${title}」として保存しました`);}
 }
 function duplicateEV(){
+  logEvent('duplicate');
   const title=(document.getElementById('evt').value||'イベント')+' のコピー';
   document.getElementById('evt').value=title;
   // セッションはそのままコピー済み状態でIDだけ新しく振り直す
@@ -2178,6 +2195,7 @@ document.getElementById('expm').addEventListener('click',function(e){if(e.target
 
 // JSON (.stt) 書き出し: すべての状態を保存
 function exportJSON(){
+  logEvent('export_stt');
   // 現在のDAYを保存
   if(dayCount>1) dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
   const data={
@@ -2211,7 +2229,7 @@ function loadSTTFile(e){
       document.getElementById('evt').value=data.title||'';
       document.getElementById('evd').value=data.date||'';
       document.getElementById('evs').value=data.start||'13:00';
-      document.getElementById('eve').value=data.end||'17:00';
+      document.getElementById('eve').value=data.end||'16:00';
       sessions=data.sessions||[];
       freeEvs=data.freeEvs||[];
       if(data.tplName)tplName=data.tplName;
@@ -2224,6 +2242,7 @@ function loadSTTFile(e){
 
 // PDF 書き出し: テーブルレイアウトを印刷用HTMLで生成してprint
 function exportPDF(){
+  logEvent('export_pdf');
   // 現在のDAYを保存
   if(dayCount>1) dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
 
@@ -2810,7 +2829,7 @@ function mvToggleEdit(){
     document.getElementById('mv-evt').value=document.getElementById('evt').value||'';
     document.getElementById('mv-evd').value=document.getElementById('evd').value||'';
     document.getElementById('mv-evs').value=document.getElementById('evs').value||'13:00';
-    document.getElementById('mv-eve').value=document.getElementById('eve').value||'17:00';
+    document.getElementById('mv-eve').value=document.getElementById('eve').value||'16:00';
     const v=document.getElementById('evd').value;
     if(v){const days=['日','月','火','水','木','金','土'];const[y,m,d]=v.split('-').map(Number);document.getElementById('mv-dow').textContent='('+days[new Date(y,m-1,d).getDay()]+')';}
     area.style.display='flex';
@@ -2929,7 +2948,7 @@ window.fbPush = function(){
       title: document.getElementById('evt').value || '',
       date: document.getElementById('evd').value || '',
       start: document.getElementById('evs').value || '13:00',
-      end: document.getElementById('eve').value || '17:00',
+      end: document.getElementById('eve').value || '16:00',
       sessions: JSON.parse(JSON.stringify(sessions)),
       freeEvs: JSON.parse(JSON.stringify(freeEvs)),
       ts: _fbLastPush
@@ -2978,7 +2997,7 @@ function fbListen(){
       document.getElementById('evt').value = data.title || '';
       document.getElementById('evd').value = data.date || '';
       document.getElementById('evs').value = data.start || '13:00';
-      document.getElementById('eve').value = data.end || '17:00';
+      document.getElementById('eve').value = data.end || '16:00';
       if(data.sessions && data.sessions.length > 0){ sessions = data.sessions; nid = Math.max(nid, Math.max.apply(null, sessions.map(function(s){return s.id+1;})), 30); }
       if(data.freeEvs && data.freeEvs.length > 0){ freeEvs = data.freeEvs; nfid = Math.max(nfid, Math.max.apply(null, freeEvs.map(function(e){return e.id+1;})), 100); }
       render(); updateDow();
@@ -3016,12 +3035,39 @@ function fbInit(){
   }
 }
 
+// ================================================================
+// Analytics ログ
+// ================================================================
+function logEvent(eventName){
+  try{
+    if(!_fbDB) return;
+    const today=new Date();
+    const dateKey=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
+    const isMobile=window.innerWidth<=600;
+    const deviceKey=isMobile?'mobile':'desktop';
+    const logsRef=_fbDB.ref('analytics');
+
+    // 日別アクセス数
+    if(eventName==='access'){
+      logsRef.child(`access/${dateKey}/count`).transaction(v=>(v||0)+1);
+      logsRef.child(`access/${dateKey}/devices/${deviceKey}`).transaction(v=>(v||0)+1);
+      logsRef.child('access/total').transaction(v=>(v||0)+1);
+    }
+    // イベント別カウント
+    logsRef.child(`events/${eventName}`).transaction(v=>(v||0)+1);
+    logsRef.child(`events_daily/${dateKey}/${eventName}`).transaction(v=>(v||0)+1);
+  }catch(e){
+    console.warn('logEvent error:', e);
+  }
+}
+
 var _fbInitTries = 0;
 function fbWaitAndInit(){
   _fbInitTries++;
   if(_fbInitTries > 50) return;
   if(typeof window.snap === 'function' && typeof sessions !== 'undefined'){
     fbInit();
+    setTimeout(function(){logEvent('access');},1500);
   } else {
     setTimeout(fbWaitAndInit, 200);
   }
