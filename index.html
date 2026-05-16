@@ -1966,6 +1966,30 @@ function buildCategoryContext(catId, popId, catLabel, popLabel){
   return ctx;
 }
 
+// JSONセッション配列を応答テキストから確実に抽出するヘルパー
+function extractJsonSessions(rawText, label){
+  // ステップ1: コードブロックマーカーをすべて除去
+  let text = rawText;
+  // バッククォート3つ＋任意の言語名を除去（改行含む）
+  text = text.replace(/`{3}[a-zA-Z]*\n?/g, '');
+  text = text.replace(/`{3}/g, '');
+  text = text.trim();
+  // ステップ2: [ ... ] を探す（最初の[から最後の]まで）
+  const firstBracket = text.indexOf('[');
+  const lastBracket  = text.lastIndexOf(']');
+  if(firstBracket === -1 || lastBracket === -1 || lastBracket <= firstBracket){
+    throw new Error((label?label+': ':'')+'JSON形式の応答が取得できませんでした。\n応答内容: '+rawText.slice(0,200));
+  }
+  const jsonStr = text.slice(firstBracket, lastBracket+1);
+  let sessions;
+  try{
+    sessions = JSON.parse(jsonStr);
+  }catch(e){
+    throw new Error((label?label+': ':'')+'JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonStr.slice(0,100));
+  }
+  return sessions.map(s=>({...s, dur:Math.max(1, parseInt(s.dur)||1)}));
+}
+
 async function runAI(){
   const prompt=document.getElementById('aiprompt').value.trim();
   if(!prompt&&aiFs.length===0){alert('イベントの概要を入力するかファイルをアップロードしてください');return;}
@@ -2096,10 +2120,7 @@ JSON配列のみで回答（説明文・コードブロック不要）:
       const step2Text=((step2Data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
       if(!step2Text) throw new Error('Step2: セッション生成結果が空でした。');
 
-      const jsonMatch=step2Text.replace(/```json/gi,'').replace(/```/g,'').match(/\[[\s\S]*\]/);
-      if(!jsonMatch) throw new Error('Step2: JSON形式の応答が取得できませんでした。\n応答内容: '+step2Text.slice(0,200));
-      aiSs=JSON.parse(jsonMatch[0]);
-      aiSs=aiSs.map(s=>({...s,dur:Math.max(1,parseInt(s.dur)||1)}));
+      aiSs=extractJsonSessions(step2Text,'Step2');
 
       // ── STEP C: dur合計を録音時間に自動補正 ──────────────────────
       if(totalMin>0){
@@ -2189,12 +2210,7 @@ JSON配列のみで回答（説明文・コードブロック不要）:
     if(provider==='gemini'){text=((data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');}
     else{text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');}
     if(!text) throw new Error('AIからの応答が空でした。もう一度お試しください。');
-    const jsonMatch=text.match(/\[[\s\S]*\]/);
-    if(!jsonMatch) throw new Error('JSON形式の応答が取得できませんでした。\n応答内容: '+text.slice(0,200));
-    try{
-      aiSs=JSON.parse(jsonMatch[0]);
-      aiSs=aiSs.map(s=>({...s,dur:Math.max(1,parseInt(s.dur)||1)}));
-    }catch(e){throw new Error('JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonMatch[0].slice(0,100));}
+    aiSs=extractJsonSessions(text,'');
     document.getElementById('aisp').innerHTML=aiSs.map((s,i)=>`<div class="aisi"><input type="checkbox" id="aic${i}" checked/><div style="width:8px;height:8px;border-radius:50%;background:${CDot[s.color]||CDot.teal};flex-shrink:0"></div><span style="flex:1">${esc(s.name)}</span><span style="font-size:10px;color:var(--text2)">${s.dur}分</span></div>`).join('');
     document.getElementById('airw').style.display='';document.getElementById('aiimport').style.display='';
   }catch(err){alert('AIの生成に失敗しました: '+err.message);}
