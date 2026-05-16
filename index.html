@@ -1969,20 +1969,165 @@ function buildCategoryContext(catId, popId, catLabel, popLabel){
 async function runAI(){
   const prompt=document.getElementById('aiprompt').value.trim();
   if(!prompt&&aiFs.length===0){alert('イベントの概要を入力するかファイルをアップロードしてください');return;}
-  // バリデーション: カテゴリ・人数必須
-  const catVal=document.querySelector('input[name="ai-cat"]:checked')?.value;
-  if(!catVal){alert('イベントの種類を選択してください。');return;}
-  const popVal=document.querySelector('input[name="ai-pop"]:checked')?.value;
-  if(!popVal){alert('参加人数を選択してください。');return;}
+  const mode=document.querySelector('input[name="ai-mode"]:checked')?.value||'fit';
+  // audioモード以外はカテゴリ・人数必須
+  if(mode!=='audio'){
+    const catVal=document.querySelector('input[name="ai-cat"]:checked')?.value;
+    if(!catVal){alert('イベントの種類を選択してください。');return;}
+    const popVal=document.querySelector('input[name="ai-pop"]:checked')?.value;
+    if(!popVal){alert('参加人数を選択してください。');return;}
+  }
   const btn=document.getElementById('aibtn');btn.disabled=true;btn.textContent='⏳ 生成中...';
   try{
-    const mode=document.querySelector('input[name="ai-mode"]:checked')?.value||'fit';
     const sm=gSM(),em=gEM();
-    // カテゴリ・人数コンテキスト生成
+    const apiKey=(document.getElementById('ai-apikey').value||'').trim();
+    const provider=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+    if(!apiKey){
+      alert('APIキーを入力してください。\n'+(provider==='gemini'?'https://aistudio.google.com/app/apikey で無料取得できます':'https://console.anthropic.com でキーを取得できます'));
+      btn.disabled=false;btn.textContent='🚀 生成';return;
+    }
+    localStorage.setItem('ai-key-'+provider,apiKey);
+
+    // ================================================================
+    // AUDIO MODE: 2段階処理（書き起こし → セッション化）
+    // ================================================================
+    if(mode==='audio'){
+      const audioExts=['.mp3','.m4a','.wav','.aac','.ogg','.webm'];
+      const nonAudio=aiFs.filter(f=>!audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
+      if(nonAudio.length>0) throw new Error('音声モードでは音声ファイルのみアップロードしてください。\n非対応: '+nonAudio.map(f=>f.name).join(', '));
+      if(aiFs.length===0) throw new Error('音声ファイルをアップロードしてください。');
+      if(provider!=='gemini') throw new Error('音声モードはGeminiプロバイダーが必要です。\nプロバイダーを「Gemini 2.5 Flash」に切り替えてください。');
+
+      // 録音時間を取得（入力値 or ファイルサイズから推定）
+      let totalMin=parseInt(document.getElementById('ai-audio-min').value)||0;
+      const audioF=aiFs[0];
+      const audioFname=audioF.name.toLowerCase();
+      if(!totalMin){
+        const fKB=audioF.size/1024;
+        if(audioFname.endsWith('.m4a')||audioFname.endsWith('.aac')) totalMin=Math.round(fKB/128);
+        else if(audioFname.endsWith('.mp3')) totalMin=Math.round(fKB/128);
+        else if(audioFname.endsWith('.wav')) totalMin=Math.round(fKB/5000);
+        else totalMin=Math.round(fKB/100);
+        totalMin=Math.max(1,totalMin);
+      }
+      const th=Math.floor(totalMin/60),tr=totalMin%60;
+      const totalStr=th>0?`${th}時間${tr>0?tr+'分':''}`:`${totalMin}分`;
+
+      // ── STEP 1: タイムスタンプ付き書き起こし ──────────────────────
+      btn.textContent='⏳ Step 1/2: 書き起こし中...';
+      const audioB64=await toB64(audioF);
+      const audioMt=audioF.type||'audio/mpeg';
+
+      const step1Prompt=`あなたは音声書き起こしの専門家です。添付の音声ファイル（総再生時間: ${totalStr}）を正確に書き起こしてください。
+
+【書き起こし手順】
+① 音声全体を10分ごとのチャンクに分けて分析する（例: 0:00-10:00, 10:00-20:00 ...）
+② 各チャンク内で話された内容をすべて漏れなく書き起こす
+③ 話題・話者・内容が変わるタイミングに「[MM:SS]」形式のタイムスタンプを挿入する
+④ チャンクをまたいでも話題が続いている場合は同じセクションとして扱う（チャンク境界でセクションを切らない）
+
+【出力形式】
+[00:00] セクションタイトル（話された内容の要点）
+話された内容の書き起こし（発言・キーワード・議論の流れ）...
+
+[MM:SS] 次のセクションタイトル
+...
+
+【厳守事項】
+- タイムスタンプは実際の経過時間を正確に記録すること
+- 最後のセクションの終了時刻が総再生時間（${totalStr}）に近づくよう、後半も精度を落とさないこと
+- 推測・補足・改善提案は一切含めないこと
+- 実際に話された内容のみを記録すること`;
+
+      const step1Parts=[
+        {text: step1Prompt},
+        {inlineData:{mimeType:audioMt,data:audioB64}}
+      ];
+      const step1Resp=await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({contents:[{role:'user',parts:step1Parts}],
+           generationConfig:{maxOutputTokens:8192}})}
+      );
+      if(!step1Resp.ok){
+        const e=await step1Resp.text();
+        throw new Error(`Step1 APIエラー ${step1Resp.status}: ${e.slice(0,200)}`);
+      }
+      const step1Data=await step1Resp.json();
+      if(step1Data.error) throw new Error('Step1 API Error: '+(step1Data.error.message||JSON.stringify(step1Data.error)));
+      const transcript=((step1Data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+      if(!transcript) throw new Error('Step1: 書き起こし結果が空でした。音声ファイルを確認してください。');
+
+      // ── STEP 2: 書き起こしからセッション配列を生成 ────────────────
+      btn.textContent='⏳ Step 2/2: セッション生成中...';
+
+      const step2Prompt=`以下は音声ファイル（総再生時間: ${totalStr} = ${totalMin}分）のタイムスタンプ付き書き起こしです。
+この書き起こしをもとに、タイムテーブルのセッション配列をJSON形式で出力してください。
+${prompt?'\n追加指示: '+prompt+'\n':''}
+【書き起こし】
+${transcript}
+
+【変換ルール】
+- 各セクション（タイムスタンプで区切られたブロック）を1つのセッションに変換する
+- durは「次のタイムスタンプ - このタイムスタンプ」の分数（整数・最低1）
+- 最後のセクションのdurは「総再生時間 - このセクションの開始時刻」
+- 全セッションのdur合計が必ず${totalMin}分になるよう調整する（端数は最後のセッションに加算）
+- nameは書き起こし内のセクションタイトルを15文字以内に収める
+- commentは実際に話された内容・キーワードを40〜60文字で記載
+- colorは話題の性質で判断（説明・講義:blue 議論・Q&A:teal まとめ・結論:green 雑談・休憩:gray 導入:purple）
+- 改善提案・アドバイス・補足は一切含めない
+
+JSON配列のみで回答（説明文・コードブロック不要）:
+[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"実際に話された内容の要点"}]`;
+
+      const step2Parts=[{text:step2Prompt}];
+      const step2Resp=await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({contents:[{role:'user',parts:step2Parts}],
+           generationConfig:{maxOutputTokens:4096}})}
+      );
+      if(!step2Resp.ok){
+        const e=await step2Resp.text();
+        throw new Error(`Step2 APIエラー ${step2Resp.status}: ${e.slice(0,200)}`);
+      }
+      const step2Data=await step2Resp.json();
+      if(step2Data.error) throw new Error('Step2 API Error: '+(step2Data.error.message||JSON.stringify(step2Data.error)));
+      const step2Text=((step2Data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
+      if(!step2Text) throw new Error('Step2: セッション生成結果が空でした。');
+
+      const jsonMatch=step2Text.match(/\[[\s\S]*\]/);
+      if(!jsonMatch) throw new Error('Step2: JSON形式の応答が取得できませんでした。\n応答内容: '+step2Text.slice(0,200));
+      aiSs=JSON.parse(jsonMatch[0]);
+      aiSs=aiSs.map(s=>({...s,dur:Math.max(1,parseInt(s.dur)||1)}));
+
+      // ── STEP C: dur合計を録音時間に自動補正 ──────────────────────
+      if(totalMin>0){
+        const durSum=aiSs.reduce((a,s)=>a+s.dur,0);
+        const diff=totalMin-durSum;
+        if(diff!==0&&aiSs.length>0){
+          aiSs[aiSs.length-1].dur=Math.max(1,aiSs[aiSs.length-1].dur+diff);
+        }
+      }
+
+      document.getElementById('aisp').innerHTML=aiSs.map((s,i)=>`<div class="aisi"><input type="checkbox" id="aic${i}" checked/><div style="width:8px;height:8px;border-radius:50%;background:${CDot[s.color]||CDot.teal};flex-shrink:0"></div><span style="flex:1">${esc(s.name)}</span><span style="font-size:10px;color:var(--text2)">${s.dur}分</span></div>`).join('');
+      document.getElementById('airw').style.display='';
+      document.getElementById('aiimport').style.display='';
+      aiFs=[];
+      document.getElementById('aifile').value='';
+      document.getElementById('aifl').innerHTML='';
+      btn.disabled=false;btn.textContent='🚀 生成';
+      return;
+    }
+
+    // ================================================================
+    // FIT / FREE MODE（従来処理）
+    // ================================================================
+    const catVal=document.querySelector('input[name="ai-cat"]:checked')?.value||'other';
+    const popVal=document.querySelector('input[name="ai-pop"]:checked')?.value||'unknown';
     const catLabel=document.querySelector('input[name="ai-cat"]:checked')?.closest('label')?.textContent?.trim()||catVal;
     const popLabel=document.querySelector('input[name="ai-pop"]:checked')?.closest('label')?.textContent?.trim()||popVal;
     const categoryContext=buildCategoryContext(catVal,popVal,catLabel,popLabel);
-    // fitモード: 分数入力欄から時間を取得
     let fitSm=sm,fitEm=em;
     if(mode==='fit'){
       const fitMinVal=parseInt(document.getElementById('ai-fit-min').value)||0;
@@ -1991,30 +2136,11 @@ async function runAI(){
     let promptText;
     if(mode==='fit'){
       promptText=`あなたはタイムライン設計のプロフェッショナルです。以下の情報を元に、実践的なタイムテーブルを生成してください。\nイベント時間帯: ${hm(fitSm)}〜${hm(fitEm)}（合計${fitEm-fitSm}分）\nユーザー入力・資料: ${prompt||'（添付ファイルの内容を参照してください）'}\n\n【設計方針】\n① 序盤（最初の20%）: 導入・アイスブレイク・目的共有など参加者が場に慣れる時間を設ける\n② 中盤（約60%）: メインコンテンツ。60〜90分に1回は5〜15分の休憩を入れる\n③ 終盤（最後の20%）: まとめ・振り返り・質疑応答・クロージング\n④ スライド資料がある場合: 1スライドあたり1〜3分を目安に発表時間を配分する\n⑤ 移動・準備・切り替えが必要な場面には時間調整セッションを適宜挿入する\n\n【厳守事項】\n- 全セッションのdur合計 = ${fitEm-fitSm}分（過不足なく）\n- durは1以上の整数\n- セッション名は15文字以内\n- commentには「何をするか・なぜその時間か・参加者への効果」を具体的に30〜50文字で記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"内容と効果の説明"}]\n最初の文字は[、最後の文字は]にしてください。`;
-    } else if(mode==='free'){
-      promptText=`あなたはタイムライン設計のプロフェッショナルです。添付されたファイルやテキストの内容を深く分析し、最適なタイムテーブルを設計してください。\n${prompt?'追加指示: '+prompt:''}\n\n【分析・設計の手順】\n① 資料の全体構成・ページ数・セクション数・内容の重さを把握する\n② PPTXの場合: スライド数と内容から1スライドあたり1〜3分を目安に発表時間を逆算する\n③ 内容の難易度・情報量に応じてセッションの長さを調整する（重い内容は長め）\n④ 60〜90分に1回は5〜15分の休憩を挿入し、参加者の集中力を維持する\n⑤ 関連する複数のスライドやトピックはひとつのセッションにまとめてよい\n⑥ 序盤に導入・中盤にメイン・終盤にまとめ・質疑応答という流れを意識する\n\n【出力の品質基準】\n- セッション数は資料の内容量に応じて適切に設定（多すぎず少なすぎず）\n- durは1以上の整数。5分単位を基本とする\n- セッション名は15文字以内で内容が伝わるものに\n- commentには「このセッションで何を扱うか・なぜこの時間か・参加者にとっての意味」を40〜60文字で具体的に記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber ディスカッション:pink）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"具体的な内容と意図の説明"}]\n最初の文字は[、最後の文字は]にしてください。`;
     } else {
-      promptText=`あなたは音声の書き起こし・タイムテーブル化の専門家です。添付の音声ファイルを一切の脚色・改善・提案なしに、話された内容と実際の時間をそのまま忠実に再現してください。\n${prompt?'追加指示: '+prompt+'\n':''}\n【絶対禁止事項】\n- 改善提案・アドバイス・感想・補足コメントの追加は一切禁止\n- 実際に話されていない内容をセッション名やコメントに含めることを禁止\n- 内容の並び替え・再構成・まとめ・整理を禁止\n- 休憩・準備・転換などの推測セッションを勝手に挿入することを禁止\n\n【分析手順】\n① 音声を最初から最後まで通して聞き、総再生時間を分単位で正確に把握する\n② 話題・話者・内容が明確に変わるタイミングのみを区切りとしてセクションを特定する\n③ 各セクションの実際の経過時間（開始〜終了）を計測し、分に丸める（最低1分）\n④ 音声の前半・後半で精度が落ちないよう均等に分析する\n\n【厳守事項】\n- durは実際に音声で経過した時間（分・整数・最低1）\n- 全セッションのdur合計 = 総再生時間（誤差±2分以内）\n- セッション名は実際に話されたトピック・テーマを15文字以内で記載\n- commentには実際に話された発言内容・キーワード・議論の流れを40〜60文字で書き起こし\n- colorは話題の性質のみで判断（説明・講義:blue 議論・Q&A:teal まとめ・結論:green 雑談・休憩:gray）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"実際に話された内容の要点"}]`;
+      promptText=`あなたはタイムライン設計のプロフェッショナルです。添付されたファイルやテキストの内容を深く分析し、最適なタイムテーブルを設計してください。\n${prompt?'追加指示: '+prompt:''}\n\n【分析・設計の手順】\n① 資料の全体構成・ページ数・セクション数・内容の重さを把握する\n② PPTXの場合: スライド数と内容から1スライドあたり1〜3分を目安に発表時間を逆算する\n③ 内容の難易度・情報量に応じてセッションの長さを調整する（重い内容は長め）\n④ 60〜90分に1回は5〜15分の休憩を挿入し、参加者の集中力を維持する\n⑤ 関連する複数のスライドやトピックはひとつのセッションにまとめてよい\n⑥ 序盤に導入・中盤にメイン・終盤にまとめ・質疑応答という流れを意識する\n\n【出力の品質基準】\n- セッション数は資料の内容量に応じて適切に設定（多すぎず少なすぎず）\n- durは1以上の整数。5分単位を基本とする\n- セッション名は15文字以内で内容が伝わるものに\n- commentには「このセッションで何を扱うか・なぜこの時間か・参加者にとっての意味」を40〜60文字で具体的に記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber ディスカッション:pink）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"具体的な内容と意図の説明"}]\n最初の文字は[、最後の文字は]にしてください。`;
     }
-    if(categoryContext && mode!=='audio') promptText += categoryContext;
+    if(categoryContext) promptText += categoryContext;
     let uc=[{type:'text',text:promptText}];
-    const audioExts=['.mp3','.m4a','.wav','.aac','.ogg','.webm'];
-    if(mode==='audio'){
-      const nonAudio=aiFs.filter(f=>!audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
-      if(nonAudio.length>0) throw new Error('音声モードでは音声ファイルのみアップロードしてください。\n非対応: '+nonAudio.map(f=>f.name).join(', '));
-      if(aiFs.length===0) throw new Error('音声ファイルをアップロードしてください。');
-      const prov2=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
-      if(prov2!=='gemini') throw new Error('音声ファイルの処理にはGeminiが必要です。プロバイダーを切り替えてください。');
-    }
-    const audioFiles=aiFs.filter(f=>audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
-    let audioDurationMin=0;
-    if(mode==='audio'){
-      audioDurationMin=parseInt(document.getElementById('ai-audio-min').value)||0;
-      if(audioDurationMin<=0&&audioFiles.length>0){
-        const retry=window.confirm('録音時間が入力されていません。\n時間指定なしで生成しますか？');
-        if(!retry){btn.disabled=false;btn.textContent='🚀 生成';return;}
-      }
-    }
     for(const f of aiFs){
       const fname=f.name.toLowerCase();
       const mt=f.type||'application/octet-stream';
@@ -2030,49 +2156,29 @@ async function runAI(){
       } else if(fname.endsWith('.pptx')||fname.endsWith('.ppt')){
         try{const text=await extractPptxText(f);uc[0].text+=`\n\n【PPT「${f.name}」から抽出】\n${text.slice(0,8000)}`;}
         catch(e){uc[0].text+=`\n\n【PPT「${f.name}」テキスト抽出失敗: ${e.message}】`;}
-      } else if(['mp3','m4a','wav','aac','ogg','webm'].some(ext=>fname.endsWith('.'+ext))){
-        const provider=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
-        if(provider==='gemini'){
-          const b=await toB64(f);const audioMt=mt||'audio/mpeg';
-          uc.push({type:'audio_file',data:b,mimeType:audioMt});
-          uc[0].text+=`\n\n添付音声「${f.name}」のタイムテーブルを作成してください。`;
-          let estMin=audioDurationMin;
-          if(!estMin){
-            const fKB=f.size/1024;
-            if(fname.endsWith('.m4a')||fname.endsWith('.aac')){estMin=Math.round(fKB/128);}
-            else if(fname.endsWith('.mp3')){estMin=Math.round(fKB/128);}
-            else if(fname.endsWith('.wav')){estMin=Math.round(fKB/5000);}
-            else{estMin=Math.round(fKB/100);}
-          }
-          estMin=Math.max(1,estMin);
-          const eh=Math.floor(estMin/60),er=estMin%60;
-          const estStr=eh>0?`${eh}時間${er>0?er+'分':''}`:`${estMin}分`;
-          uc[0].text+=`\n【重要】${audioDurationMin?'指定された':'推定'}録音時間は${estStr}（${estMin}分）。dur合計を${estMin}分に合わせること。`;
-        } else {
-          uc[0].text+=`\n\n音声ファイル「${f.name}」はGeminiプロバイダーで直接読み込めます。`;
-        }
       } else {
         uc[0].text+=`\n\n添付ファイル「${f.name}」（${Math.round(f.size/1024)}KB）も参照してください。`;
       }
     }
-    const apiKey=(document.getElementById('ai-apikey').value||'').trim();
-    const provider=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
-    if(!apiKey){
-      alert('APIキーを入力してください。\n'+(provider==='gemini'?'https://aistudio.google.com/app/apikey で無料取得できます':'https://console.anthropic.com でキーを取得できます'));
-      btn.disabled=false;btn.textContent='🚀 生成';return;
-    }
-    localStorage.setItem('ai-key-'+provider,apiKey);
     let resp;
     if(provider==='gemini'){
       const geminiParts=uc.map(item=>{
         if(item.type==='text') return {text:item.text};
         if(item.type==='image') return {inlineData:{mimeType:item.source.media_type,data:item.source.data}};
-        if(item.type==='audio_file') return {inlineData:{mimeType:item.mimeType,data:item.data}};
         return null;
       }).filter(Boolean);
-      resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:geminiParts}]})});
+      resp=await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
+        {method:'POST',headers:{'Content-Type':'application/json'},
+         body:JSON.stringify({contents:[{role:'user',parts:geminiParts}],
+           generationConfig:{maxOutputTokens:4096}})}
+      );
     } else {
-      resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,messages:[{role:'user',content:uc}]})});
+      resp=await fetch('https://api.anthropic.com/v1/messages',{
+        method:'POST',
+        headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','x-api-key':apiKey},
+        body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:4096,messages:[{role:'user',content:uc}]})
+      });
     }
     if(!resp.ok){const errText=await resp.text();throw new Error(`APIエラー ${resp.status}: ${errText.slice(0,200)}`);}
     const rawText=await resp.text();
@@ -2082,10 +2188,9 @@ async function runAI(){
     let text='';
     if(provider==='gemini'){text=((data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');}
     else{text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');}
-    if(!text)throw new Error('AIからの応答が空でした。もう一度お試しください。');
-    // JSON部分を抽出\uff08コードブロックや説明文を除去\uff09
+    if(!text) throw new Error('AIからの応答が空でした。もう一度お試しください。');
     const jsonMatch=text.match(/\[[\s\S]*\]/);
-    if(!jsonMatch)throw new Error('JSON形式の応答が取得できませんでした。\n応答内容: '+text.slice(0,200));
+    if(!jsonMatch) throw new Error('JSON形式の応答が取得できませんでした。\n応答内容: '+text.slice(0,200));
     try{
       aiSs=JSON.parse(jsonMatch[0]);
       aiSs=aiSs.map(s=>({...s,dur:Math.max(1,parseInt(s.dur)||1)}));
@@ -2098,7 +2203,6 @@ async function runAI(){
   document.getElementById('aifl').innerHTML='';
   btn.disabled=false;btn.textContent='🚀 生成';
 }
-
 function aiConfirmClose(){
   document.getElementById('ai-confirm-modal').style.display='none';
 }
