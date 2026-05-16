@@ -916,6 +916,7 @@ let nid=30,nfid=100;
 const ZL=[0.5,1,1.5,2,3,4,6,9,12,18,24];
 let zi=2,PPM=2;
 const SN=5;
+const PRESET_TPLS_VERSION=2;
 let savedTpls=[
   {name:'標準テンプレート',types:JSON.parse(JSON.stringify(TYPES))},
   {name:'シンポジウム',types:[
@@ -999,6 +1000,10 @@ function autoSave(){
       dayData: dayData,
       savedAt: Date.now()
     }));
+    const userTpls=savedTpls.filter(function(t){return !t._preset;});
+    localStorage.setItem('stt-user-tpls',JSON.stringify(userTpls));
+    const stnEl=document.getElementById('stname');
+    if(stnEl) localStorage.setItem('stt-tpl-name',stnEl.value||'');
   }catch(e){ console.warn('autosave error:', e); }
 }
 
@@ -1041,6 +1046,27 @@ function autoLoad(){
         nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
       }
     }
+    try{
+      var rawTpls=localStorage.getItem('stt-user-tpls');
+      if(rawTpls){
+        var userTpls=JSON.parse(rawTpls);
+        if(Array.isArray(userTpls)){
+          userTpls.forEach(function(t){
+            if(!savedTpls.find(function(p){return p.name===t.name;}))
+              savedTpls.push(t);
+          });
+        }
+      }
+    }catch(e){console.warn('tpl restore err',e);}
+    try{
+      var savedTplName=localStorage.getItem('stt-tpl-name');
+      if(savedTplName){
+        var stnEl2=document.getElementById('stname');
+        if(stnEl2) stnEl2.value=savedTplName;
+        var foundTpl=savedTpls.find(function(t){return t.name===savedTplName;});
+        if(foundTpl){TYPES=JSON.parse(JSON.stringify(foundTpl.types));}
+      }
+    }catch(e){console.warn('tpl select restore err',e);}
     return true;
   }catch(e){ console.warn('autoload error:', e); return false; }
 }
@@ -1850,12 +1876,12 @@ function stTI(i){stIcp=stIcp===i?null:i;renderST();}
 function stSC(i,c){stTs[i].color=c;stIcp=null;renderST();}
 function stRm(i){if(stIcp===i)stIcp=null;stTs.splice(i,1);renderST();}
 function stAdd(){stTs.push({id:'c'+Date.now(),name:'',dur:10,color:COLORS[stTs.length%COLORS.length]});renderST();setTimeout(()=>{const ins=document.getElementById('strows').querySelectorAll('.snin');if(ins.length)ins[ins.length-1].focus();},50);}
-function stSave(){const name=document.getElementById('stname').value.trim()||'テンプレート'+(savedTpls.length+1);if(stTs.length===0){alert('セッションがありません');return;}const idx=savedTpls.findIndex(t=>t.name===name);if(idx>=0)savedTpls[idx].types=JSON.parse(JSON.stringify(stTs));else savedTpls.push({name,types:JSON.parse(JSON.stringify(stTs))});renderSTL();alert(`「${name}」として保存しました`);}
+function stSave(){const name=document.getElementById('stname').value.trim()||'テンプレート'+(savedTpls.length+1);if(stTs.length===0){alert('セッションがありません');return;}const idx=savedTpls.findIndex(t=>t.name===name);if(idx>=0)savedTpls[idx].types=JSON.parse(JSON.stringify(stTs));else savedTpls.push({name,types:JSON.parse(JSON.stringify(stTs))});renderSTL();const userTpls=savedTpls.filter(t=>!t._preset);localStorage.setItem('stt-user-tpls',JSON.stringify(userTpls));localStorage.setItem('stt-tpl-name',name);alert(`「${name}」として保存しました`);}
 function stNew(){stTs=[];stIcp=null;document.getElementById('stname').value='新規テンプレート';renderST();}
 function stImport(){stTs=sessions.map(s=>({id:'s'+s.id,name:s.name,dur:s.dur,color:s.color}));renderST();}
 function renderSTL(){document.getElementById('stlist').innerHTML=savedTpls.map((t,i)=>`<div style="display:flex;align-items:center;gap:4px;padding:3px 5px;border:1px solid var(--border);border-radius:3px;font-size:11px"><span style="flex:1">${esc(t.name)}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="stLoad(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="stDel(${i})">×</span></div>`).join('');}
-function stLoad(i){stTs=JSON.parse(JSON.stringify(savedTpls[i].types));document.getElementById('stname').value=savedTpls[i].name;stIcp=null;renderST();}
-function stDel(i){savedTpls.splice(i,1);renderSTL();}
+function stLoad(i){stTs=JSON.parse(JSON.stringify(savedTpls[i].types));TYPES=JSON.parse(JSON.stringify(savedTpls[i].types));document.getElementById('stname').value=savedTpls[i].name;stIcp=null;renderST();localStorage.setItem('stt-tpl-name',savedTpls[i].name);}
+function stDel(i){savedTpls.splice(i,1);renderSTL();const userTpls=savedTpls.filter(t=>!t._preset);localStorage.setItem('stt-user-tpls',JSON.stringify(userTpls));}
 function stDS(e,i){stDI2=i;e.dataTransfer.effectAllowed='move';setTimeout(()=>document.getElementById('str'+i)?.classList.add('dg'),0);}
 function stDO(e,i){e.preventDefault();if(stDI2===null||stDI2===i)return;document.querySelectorAll('.str').forEach((r,ri)=>r.style.borderTop=ri===i?'2px solid #7F77DD':'');}
 function stDD(e,i){e.preventDefault();document.querySelectorAll('.str').forEach(r=>{r.style.borderTop='';r.classList.remove('dg');});if(stDI2===null||stDI2===i)return;const[m]=stTs.splice(stDI2,1);stTs.splice(i,0,m);stDI2=null;renderST();}
