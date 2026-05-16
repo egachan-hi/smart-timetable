@@ -14,8 +14,8 @@
 <title>スマートタイムテーブル</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#fff;--bg2:#f8f8f8;--bg3:#f0f0f0;--bg-info:#EFF6FF;--border:#e2e2e2;--border2:#d0d0d0;--border-info:#BFDBFE;--text:#1a1a1a;--text2:#666;--text3:#999;--text-info:#1D4ED8;--accent:#4F46E5}
-@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;--bg-info:#1e3a5f;--border:#3a3a3a;--border2:#4a4a4a;--border-info:#2563EB;--text:#e8e8e8;--text2:#aaa;--text3:#666;--text-info:#93C5FD;--accent:#6366F1}}
+:root{--bg:#fff;--bg2:#f8f8f8;--bg3:#f0f0f0;--bg-info:#EFF6FF;--border:#e2e2e2;--border-min:rgba(0,0,0,0.05);--border2:#d0d0d0;--border-info:#BFDBFE;--text:#1a1a1a;--text2:#666;--text3:#999;--text-info:#1D4ED8;--accent:#4F46E5}
+@media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;--bg-info:#1e3a5f;--border:#3a3a3a;--border-min:rgba(255,255,255,0.055);--border2:#4a4a4a;--border-info:#2563EB;--text:#e8e8e8;--text2:#aaa;--text3:#666;--text-info:#93C5FD;--accent:#6366F1}}
 body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
 .top-bar{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;background:var(--bg)}
 .logo{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;white-space:nowrap;color:var(--text)}
@@ -58,10 +58,10 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .tls::-webkit-scrollbar{display:none}
 .frs{flex:1;overflow-y:auto;position:relative}
 .tlb{display:grid;grid-template-columns:38px 1fr;position:relative}
-.tc{border-right:1px solid var(--border);position:relative}
-.tt{position:absolute;right:0;width:100%;display:flex;align-items:flex-start;justify-content:flex-end;padding-right:3px;font-size:8px;color:var(--text3);pointer-events:none}
-.tl{position:absolute;border-top:1px solid var(--border);pointer-events:none}
-.tl.fw{left:0;right:0}.tl.mj{border-top-color:var(--border2)}
+.tc{border-right:none;position:relative}
+.tt{position:absolute;right:0;width:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:3px;font-size:9px;font-weight:600;color:var(--text3);pointer-events:none;transform:translateY(-50%)}
+.tl{position:absolute;border-top:1px solid var(--border-min);pointer-events:none}
+.tl.fw{left:0;right:0}.tl.mj{border-top:1.2px solid var(--border2)}
 .sc{position:relative}
 /* Session blocks - handles use data attributes, NO inline onmousedown */
 .sb{position:absolute;left:2px;right:2px;border-radius:6px;border:none;overflow:visible;z-index:2;display:flex;flex-direction:column;box-shadow:0 1px 3px rgba(0,0,0,0.06)}
@@ -1166,8 +1166,7 @@ function rTL(){
   for(let m=0;m<=displayMin+60;m++){
     const abs=sm+m;if(abs%10!==0)continue;
     const px=m*PPM,mj=abs%60===0,m30=abs%30===0;
-    tH+=`<div class="tt" style="top:${px}px">${mj?hm(abs):m30?hm(abs):''}</div>`;
-    tH+=`<div class="tl fw${mj?' mj':''}" style="top:${px}px"></div>`;
+    if(mj){const lbl=abs===720?'正午':String(Math.floor(abs/60)).padStart(2,'0');tH+=`<div class="tt" style="top:${px}px">${lbl}</div>`;}
   }
   tc.innerHTML=tH;
 
