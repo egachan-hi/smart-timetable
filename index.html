@@ -442,27 +442,22 @@ if(sessionStorage.getItem('st-auth')==='1'){
 </div>
 <!-- AI modal -->
 <div class="mbg" id="aim" style="display:none">
-  <div class="mc" style="width:460px" onclick="event.stopPropagation()">
+  <div class="mc" style="width:500px;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
     <div class="mh"><h3>✨ AI セッション生成</h3><button class="mx" onclick="closeAI()">×</button></div>
-    <div class="mb">
-      <div class="mr">
-        <div class="ml">AIプロバイダー</div>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:5px 10px;border:1px solid var(--border);border-radius:6px;flex:1">
-            <input type="radio" name="ai-provider" value="anthropic" id="ai-prov-anthropic" checked onchange="aiProviderChange()"/>
-            <span>Claude (Anthropic)</span>
+    <div class="mb" style="display:flex;flex-direction:column;gap:14px">
+
+      <!-- STEP1: APIキー -->
+      <div>
+        <div class="ml" style="margin-bottom:6px">🔑 AIプロバイダーとAPIキー</div>
+        <div style="display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap">
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:5px 10px;border:1px solid var(--border);border-radius:6px;flex:1">
+            <input type="radio" name="ai-provider" value="anthropic" id="ai-prov-anthropic" onchange="aiProviderChange()"/> Claude (Anthropic)
           </label>
-          <label style="display:flex;align-items:center;gap:4px;font-size:11px;cursor:pointer;padding:5px 10px;border:1px solid var(--border);border-radius:6px;flex:1">
-            <input type="radio" name="ai-provider" value="gemini" id="ai-prov-gemini" onchange="aiProviderChange()"/>
-            <span>Gemini 2.5 Flash (Google) <span style="font-size:9px;background:#EAF3DE;color:#27500A;padding:1px 4px;border-radius:3px">無料枠あり</span></span>
+          <label style="display:flex;align-items:center;gap:4px;font-size:12px;cursor:pointer;padding:5px 10px;border:1px solid var(--border);border-radius:6px;flex:1">
+            <input type="radio" name="ai-provider" value="gemini" id="ai-prov-gemini" onchange="aiProviderChange()"/> Gemini 2.5 Flash <span style="font-size:9px;background:#EAF3DE;color:#27500A;padding:1px 4px;border-radius:3px;margin-left:2px">無料枠あり</span>
           </label>
         </div>
-      </div>
-      <div class="mr" id="ai-key-block">
-        <div class="ml" style="display:flex;align-items:center;gap:5px">
-          <span id="ai-key-label">APIキー</span>
-        </div>
-        <input class="mi" id="ai-apikey" type="password" placeholder="sk-ant-... または AIzaSy..." style="font-family:monospace" oninput="document.getElementById('ai-key-guide').style.display=this.value?'none':'block'"/>
+        <input class="mi" id="ai-apikey" type="password" placeholder="sk-ant-... または AIzaSy..." style="font-family:monospace" oninput="aiKeyInput()"/>
         <div id="ai-key-guide" style="margin-top:8px;border:1px solid var(--border);border-radius:8px;overflow:hidden">
           <div style="background:var(--bg2);padding:8px 10px;font-size:11px;font-weight:600;color:var(--text2)">🔑 APIキーをお持ちでない方</div>
           <div style="padding:10px;display:flex;flex-direction:column;gap:6px">
@@ -480,51 +475,102 @@ if(sessionStorage.getItem('st-auth')==='1'){
           </div>
         </div>
       </div>
-      <div class="mr">
-        <div class="ml">生成モード</div>
-        <div style="display:flex;flex-direction:column;gap:6px">
-          <label id="ai-mode-fit-label" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--accent);border-radius:8px;cursor:pointer;background:var(--bg2)">
-            <input type="radio" name="ai-mode" value="fit" checked onchange="aiModeChange()" style="margin-top:2px;flex-shrink:0"/>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text)">設定時間にぴったり合わせる</div>
-              <div style="font-size:10px;color:var(--text2);margin-top:2px">メイン画面の開始〜終了時刻に合わせてセッションを作成</div>
-            </div>
-          </label>
-          <label id="ai-mode-free-label" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer">
-            <input type="radio" name="ai-mode" value="free" onchange="aiModeChange()" style="margin-top:2px;flex-shrink:0"/>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text)">ファイルまたはテキストに最適化する</div>
-              <div style="font-size:10px;color:var(--text2);margin-top:2px">ファイルの内容・時間に合わせた最適なセッション構成を作成</div>
-            </div>
-          </label>
-          <label id="ai-mode-audio-label" style="display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer">
-            <input type="radio" name="ai-mode" value="audio" onchange="aiModeChange()" style="margin-top:2px;flex-shrink:0"/>
-            <div>
-              <div style="font-size:12px;font-weight:600;color:var(--text)">🎤 音声ファイルを時間どおりに再現する</div>
-              <div style="font-size:10px;color:var(--text2);margin-top:2px">音声を文字起こしし、実際の発言・時間をそのままセッションとして再現（Gemini専用）</div>
-            </div>
-          </label>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- STEP2: イベント概要 -->
+      <div>
+        <div class="ml" style="margin-bottom:6px">📝 どのようなイベントですか？</div>
+        <textarea class="mta" id="aiprompt" style="height:60px" placeholder="例: MBTI体験ワークショップ、30分の筋トレメニュー、本格キーマカレーのレシピ　など" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- STEP3: カテゴリ（必須） -->
+      <div>
+        <div class="ml" style="margin-bottom:6px">🎯 イベントの種類 <span style="color:#E53E3E;font-size:10px">必須</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px" id="ai-cat-options">
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="training_student" onchange="aiCatChange()"/>研修（学生向け）</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="training_adult" onchange="aiCatChange()"/>研修（成人向け）</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="hobby_class" onchange="aiCatChange()"/>趣味の教室</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="workshop" onchange="aiCatChange()"/>ワークショップ</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="symposium" onchange="aiCatChange()"/>シンポジウム</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="fitness" onchange="aiCatChange()"/>個人トレーニング</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="travel" onchange="aiCatChange()"/>旅行計画</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-cat" value="recipe" onchange="aiCatChange()"/>料理レシピ</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border);grid-column:1/-1" class="ai-radio-row"><input type="radio" name="ai-cat" value="other" onchange="aiCatChange()"/>その他</label>
         </div>
       </div>
-      <div class="mr"><div class="ml">どのようなイベントを実施しますか？</div>
-        <textarea class="mta" id="aiprompt" style="height:70px" placeholder="イベント等の概要をお知らせください。例: 20人が参加するMBTI体験ワークショップ、30分の筋トレルーティーンメニュー、本格キーマカレーのレシピ、電車でいく東京から伊豆への日帰り温泉旅行　など" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
-      </div>
-      <div class="mr"><div class="ml" style="display:flex;align-items:center;justify-content:space-between">
-          <span>ファイルをアップロード（75MBを超える場合はファイルを分割して実行してください）</span>
-          <span style="font-size:9px;background:#FEF9C3;color:#713F12;padding:1px 6px;border-radius:3px">生成後に自動削除されます</span>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- STEP4: 参加人数（必須） -->
+      <div>
+        <div class="ml" style="margin-bottom:6px">👥 参加人数 <span style="color:#E53E3E;font-size:10px">必須</span></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:3px">
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-pop" value="solo" onchange="aiPopChange()"/>私ひとり</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-pop" value="duo" onchange="aiPopChange()"/>私ともう1人</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-pop" value="small" onchange="aiPopChange()"/>3〜10人</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-pop" value="medium" onchange="aiPopChange()"/>11〜30人</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-pop" value="large" onchange="aiPopChange()"/>31〜100人</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border)" class="ai-radio-row"><input type="radio" name="ai-pop" value="xlarge" onchange="aiPopChange()"/>101人以上</label>
+          <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border);grid-column:1/-1" class="ai-radio-row"><input type="radio" name="ai-pop" value="unknown" onchange="aiPopChange()"/>未定または不明</label>
         </div>
+      </div>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- STEP5: ファイルアップロード -->
+      <div>
+        <div class="ml" style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">
+          <span>📎 ファイルアップロード（任意）</span>
+          <span style="font-size:9px;background:#FEF9C3;color:#713F12;padding:1px 6px;border-radius:3px">生成後に自動削除</span>
+        </div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:5px">PDF・画像・Word・PPT・音声ファイル対応。75MB超の場合は分割してください。</div>
         <div class="aidz" onclick="document.getElementById('aifile').click()">ここをクリックまたはドラッグ&amp;ドロップ<input type="file" id="aifile" multiple accept=".pdf,.png,.jpg,.jpeg,.ppt,.pptx,.doc,.docx,.txt,.mp3,.m4a,.wav,.aac,.ogg,.webm" style="display:none" onchange="aiFC(event)"/></div>
         <div id="aifl"></div>
-
       </div>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- STEP6: 時間設定 -->
+      <div>
+        <div class="ml" style="margin-bottom:6px">⏱ セッション時間の設定</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <label id="ai-mode-fit-label" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--accent);border-radius:8px;cursor:pointer;background:var(--bg2)">
+            <input type="radio" name="ai-mode" value="fit" checked onchange="aiModeChange()" style="flex-shrink:0"/>
+            <span style="font-size:12px;font-weight:600;flex:1">設定時間に合わせる</span>
+            <input type="number" id="ai-fit-min" min="10" max="1440" style="width:60px;font-size:12px;padding:2px 4px;border:1px solid var(--border);border-radius:4px;background:var(--bg2);color:var(--text)" placeholder="分"/>
+            <span id="ai-fit-min-label" style="font-size:11px;color:var(--text2)">分</span>
+          </label>
+          <label id="ai-mode-free-label" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer">
+            <input type="radio" name="ai-mode" value="free" onchange="aiModeChange()" style="flex-shrink:0"/>
+            <span style="font-size:12px;font-weight:600">入力情報に合わせた最適な時間で生成</span>
+          </label>
+          <label id="ai-mode-audio-label" style="display:flex;align-items:center;gap:8px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;cursor:pointer;opacity:0.4">
+            <input type="radio" name="ai-mode" value="audio" onchange="aiModeChange()" style="flex-shrink:0" disabled/>
+            <span style="font-size:12px;font-weight:600;flex:1">🎤 音声ファイルを時間どおりに再現（Gemini専用）</span>
+            <input type="number" id="ai-audio-min" min="1" max="999" style="width:60px;font-size:12px;padding:2px 4px;border:1px solid var(--border);border-radius:4px;background:var(--bg2);color:var(--text);display:none" placeholder="分"/>
+            <span id="ai-audio-min-label" style="font-size:11px;color:var(--text2);display:none">分（任意）</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- 生成ボタン -->
+      <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;margin-top:4px">
+        <button class="btn p" id="aibtn" onclick="runAI()">🚀 生成</button>
+        <div class="mbtns">
+          <button class="btn" onclick="closeAI()">キャンセル</button>
+          <button class="btn p" id="aiimport" style="display:none" onclick="aiImportWithConfirm()">取り込む</button>
+        </div>
+      </div>
+
+      <!-- 結果エリア -->
       <div id="airw" style="display:none">
         <div class="ml" style="margin-bottom:3px">生成されたセッション（チェックして取り込む）</div>
-        <div id="aisp" style="display:flex;flex-direction:column;gap:2px;max-height:160px;overflow-y:auto"></div>
+        <div id="aisp" style="display:flex;flex-direction:column;gap:2px;max-height:160px;overflow-y:auto;border:1px solid var(--border);border-radius:5px;padding:6px"></div>
       </div>
-    </div>
-    <div class="mft">
-      <button class="btn p" id="aibtn" onclick="runAI()">🚀 生成</button>
-      <div class="mbtns"><button class="btn" onclick="closeAI()">キャンセル</button><button class="btn p" id="aiimport" style="display:none" onclick="aiImportWithConfirm()">取り込む</button></div>
+
     </div>
   </div>
 </div>
@@ -1765,18 +1811,21 @@ function openAI(){
     const go=confirm('1日のタイムライン（最大24時まで）のみ生成します。\n複数日にまたがる内容の場合も、1日の内容しか生成されません。\n\n続けますか？');
     if(!go) return;
   }
-  // セッション中に入力済みのAPIキーを復元
-  const saved=localStorage.getItem('ai-apikey')||localStorage.getItem('ai-apikey-gemini')||'';
-  document.getElementById('ai-apikey').value=saved;
-  // 音声ファイルの場合はfreeモードをデフォルトに
-  // それ以外はfitモード
-  const freeRadio=document.querySelector('input[name="ai-mode"][value="free"]');
-  const fitRadio=document.querySelector('input[name="ai-mode"][value="fit"]');
-  if(fitRadio) fitRadio.checked=true;
+  // プロバイダー復元
+  const provider=localStorage.getItem('ai-provider')||'anthropic';
+  const providerEl=document.querySelector('input[name="ai-provider"][value="'+provider+'"]');
+  if(providerEl) providerEl.checked=true;
+  aiProviderChange(); // APIキー復元含む
+  // fitモードをデフォルト選択
+  const fitEl=document.querySelector('input[name="ai-mode"][value="fit"]');
+  if(fitEl) fitEl.checked=true;
+  // fit分数を設定時間で初期化
+  const totalMin=gEM()-gSM();
+  const fitMinEl=document.getElementById('ai-fit-min');
+  if(fitMinEl) fitMinEl.value=totalMin;
+  // カテゴリ・人数は未選択に戻す
+  document.querySelectorAll('input[name="ai-cat"],input[name="ai-pop"]').forEach(el=>el.checked=false);
   aiModeChange();
-  // APIキーが空ならガイドを表示
-  const guide=document.getElementById('ai-key-guide');
-  if(guide) guide.style.display=saved?'none':'block';
   document.getElementById('aim').style.display='flex';
   setTimeout(()=>{
     const k=document.getElementById('ai-apikey');
@@ -1786,111 +1835,99 @@ function openAI(){
 }
 function closeAI(){document.getElementById('aim').style.display='none';}
 document.getElementById('aim').addEventListener('click',function(e){if(e.target===this)closeAI();});
+function aiKeyInput(){
+  document.getElementById('ai-key-guide').style.display=document.getElementById('ai-apikey').value?'none':'block';
+  // プロバイダー別に即時保存
+  const p=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+  const key=document.getElementById('ai-apikey').value.trim();
+  if(key) localStorage.setItem('ai-key-'+p,key);
+}
 function aiFC(e){
   aiFs=[...aiFs,...Array.from(e.target.files)];
   document.getElementById('aifl').innerHTML=aiFs.map((f,i)=>`<div class="aifi"><span style="flex:1">${f.name}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`).join('');
+  // 音声ファイルがあればaudioモードを自動選択・録音時間推定
+  const audioExts=['.mp3','.m4a','.wav','.aac','.ogg','.webm'];
+  const audioFile=aiFs.find(f=>audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
+  const audioEl=document.querySelector('input[name="ai-mode"][value="audio"]');
+  if(audioFile&&audioEl&&!audioEl.disabled){
+    audioEl.checked=true;
+    const fname=audioFile.name.toLowerCase();
+    const fileSizeKB=audioFile.size/1024;
+    let estMin=0;
+    if(fname.endsWith('.m4a')||fname.endsWith('.aac')){estMin=Math.round(fileSizeKB/128);}
+    else if(fname.endsWith('.mp3')){estMin=Math.round(fileSizeKB/128);}
+    else if(fname.endsWith('.wav')){estMin=Math.round(fileSizeKB/5000);}
+    else{estMin=Math.round(fileSizeKB/100);}
+    estMin=Math.max(1,estMin);
+    const audioMinEl=document.getElementById('ai-audio-min');
+    if(audioMinEl&&!audioMinEl.value) audioMinEl.value=estMin;
+  }
+  aiModeChange();
 }
 function aiRF(i){aiFs.splice(i,1);document.getElementById('aifl').innerHTML=aiFs.map((f,i)=>`<div class="aifi"><span style="flex:1">${f.name}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`).join('');}
+function aiCatChange(){
+  document.querySelectorAll('#ai-cat-options .ai-radio-row').forEach(el=>{
+    el.style.background=el.querySelector('input:checked')?'var(--bg-info)':'';
+    el.style.borderColor=el.querySelector('input:checked')?'var(--border-info)':'var(--border)';
+  });
+}
+function aiPopChange(){
+  document.querySelectorAll('.ai-radio-row').forEach(el=>{
+    if(el.querySelector('input[name="ai-pop"]')){
+      el.style.background=el.querySelector('input:checked')?'var(--bg-info)':'';
+      el.style.borderColor=el.querySelector('input:checked')?'var(--border-info)':'var(--border)';
+    }
+  });
+}
 function aiModeChange(){
   const mode=document.querySelector('input[name="ai-mode"]:checked')?.value||'fit';
+  const hasAudio=aiFs.some(f=>['.mp3','.m4a','.wav','.aac','.ogg','.webm'].some(ext=>f.name.toLowerCase().endsWith(ext)));
 
-  // 案B: 複数日キーワード検出
-  if(mode!=='audio'){
-    const promptText_check=(document.getElementById('aiprompt').value||'').toLowerCase();
-    const multiDayKeywords=['2泊','3泊','4泊','5泊','6泊','7泊','泊','2日間','3日間','4日間','5日間','6日間','7日間','複数日','2days','3days','4days','5days','6days','7days','day1','day2','day3','2日目','3日目','4日目'];
-    const foundKeyword=multiDayKeywords.find(kw=>promptText_check.includes(kw));
-    if(foundKeyword){
-      const go=confirm(`「${foundKeyword}」など複数日の内容が含まれている可能性があります。\n\nこのツールは1日分のタイムラインのみ生成します。\nDAY1の内容のみ生成しますがよろしいですか？`);
-      if(!go){btn.disabled=false;btn.textContent='🚀 生成';return;}
+  // fit分数入力欄の表示切り替え
+  const fitMin=document.getElementById('ai-fit-min');
+  const fitMinLabel=document.getElementById('ai-fit-min-label');
+  if(fitMin){fitMin.style.display=mode==='fit'?'inline-block':'none';}
+  if(fitMinLabel){fitMinLabel.style.display=mode==='fit'?'inline':'none';}
+
+  // audio分数入力欄の表示切り替え
+  const audioMin=document.getElementById('ai-audio-min');
+  const audioMinLabel=document.getElementById('ai-audio-min-label');
+  if(audioMin){audioMin.style.display=mode==='audio'?'inline-block':'none';}
+  if(audioMinLabel){audioMinLabel.style.display=mode==='audio'?'inline':'none';}
+
+  // audioモードのラジオボタン: 音声ファイルがない場合は選択不可
+  const prov=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+  const audioOk=hasAudio&&prov==='gemini';
+  const audioRadio=document.querySelector('input[name="ai-mode"][value="audio"]');
+  const audioLabel=document.getElementById('ai-mode-audio-label');
+  if(audioRadio){
+    audioRadio.disabled=!audioOk;
+    if(audioLabel) audioLabel.style.opacity=audioOk?'1':'0.4';
+    if(!audioOk&&mode==='audio'){
+      const fitEl=document.querySelector('input[name="ai-mode"][value="fit"]');
+      if(fitEl) fitEl.checked=true;
     }
   }
 
-
-  // ===== C: テキストからカテゴリ・人数を自動推定 =====
-  if(mode!=='audio'){
-    const txt=(document.getElementById('aiprompt').value||'').toLowerCase();
-
-    // カテゴリ推定
-    const CATS=[
-      {id:'training_student', label:'研修（学生向け）', keys:['学生','生徒','学校','授業','大学','高校','中学']},
-      {id:'training_adult',   label:'研修（成人向け）', keys:['研修','トレーニング','社員','社内','新人','スキルアップ','ビジネス','職場','社会人']},
-      {id:'hobby_class',      label:'趣味の教室',       keys:['料理教室','フラワー','ヨガ教室','陶芸','習い事','お稽古','カルチャー']},
-      {id:'workshop',         label:'ワークショップ',   keys:['ワークショップ','ws','workshop','体験','ハンズオン','グループワーク']},
-      {id:'symposium',        label:'シンポジウム',     keys:['シンポジウム','symposium','学会','講演','基調講演','パネル','討論']},
-      {id:'fitness',          label:'個人的身体トレーニング', keys:['筋トレ','トレーニング','ランニング','ジム','エクササイズ','ワークアウト','有酸素','ストレッチ','yoga','ヨガ']},
-      {id:'travel',           label:'旅行計画',         keys:['旅行','観光','宿泊','ホテル','チェックイン','移動','新幹線','飛行機','旅','温泉','trip','travel']},
-      {id:'recipe',           label:'料理レシピ',       keys:['レシピ','料理','クッキング','調理','食材','仕込み','焼く','煮る','炒める','揚げる','カレー','パスタ']},
-      {id:'other',            label:'その他',           keys:[]},
-    ];
-    const POPS=[
-      {id:'solo',    label:'私ひとり',       keys:['ひとり','一人','自分だけ','単独','個人的','自分用']},
-      {id:'duo',     label:'私ともう1人',    keys:['2人','ふたり','二人','ペア','パートナー','友人と','夫婦','親子']},
-      {id:'small',   label:'3〜10人',        keys:['少人数','小グループ','チーム','3人','4人','5人','6人','7人','8人','9人','10人']},
-      {id:'medium',  label:'11〜30人',       keys:['クラス','20人','25人','30人','中規模']},
-      {id:'large',   label:'31〜100人',      keys:['50人','60人','70人','80人','100人','大人数','大グループ']},
-      {id:'xlarge',  label:'101人以上',      keys:['100人以上','200人','500人','大規模','全社','全員']},
-      {id:'unknown', label:'未定または不明', keys:[]},
-    ];
-
-    // 自動推定
-    let guessedCat = CATS.find(c=>c.keys.some(k=>txt.includes(k))) || CATS[CATS.length-1];
-    let guessedPop = POPS.find(p=>p.keys.some(k=>txt.includes(k))) || POPS[POPS.length-1];
-
-    // ===== B: ダイアログで確認・修正 =====
-    const catOptions = CATS.map((c,i)=>`${i+1}. ${c.label}${c.id===guessedCat.id?' ✅':''}`).join('\n');
-    const popOptions = POPS.map((p,i)=>`${i+1}. ${p.label}${p.id===guessedPop.id?' ✅':''}`).join('\n');
-
-    const catInput = window.prompt(
-      '📋 カテゴリを選んでください（番号を入力、Enterで推定値を使用）\n\n'+catOptions+'\n\n推定: '+guessedCat.label,
-      ''
-    );
-    if(catInput===null){btn.disabled=false;btn.textContent='🚀 生成';return;}
-    if(catInput.trim()!==''){
-      const n=parseInt(catInput)-1;
-      if(n>=0&&n<CATS.length) guessedCat=CATS[n];
-    }
-
-    const popInput = window.prompt(
-      '👥 参加人数を選んでください（番号を入力、Enterで推定値を使用）\n\n'+popOptions+'\n\n推定: '+guessedPop.label,
-      ''
-    );
-    if(popInput===null){btn.disabled=false;btn.textContent='🚀 生成';return;}
-    if(popInput.trim()!==''){
-      const n=parseInt(popInput)-1;
-      if(n>=0&&n<POPS.length) guessedPop=POPS[n];
-    }
-
-    // カテゴリ・人数をプロンプトに付加するコンテキストを生成
-    window._aiCategoryContext = buildCategoryContext(guessedCat.id, guessedPop.id, guessedCat.label, guessedPop.label);
-  } else {
-    window._aiCategoryContext = '';
-  }
-
-    ['fit','free','audio'].forEach(m=>{
+  // モードラベルのハイライト更新
+  ['fit','free','audio'].forEach(m=>{
     const el=document.getElementById('ai-mode-'+m+'-label');
     if(el){
-      el.style.borderColor=mode===m?'var(--accent)':'var(--border)';
-      el.style.background=mode===m?'var(--bg2)':'';
+      const isSelected=document.querySelector('input[name="ai-mode"][value="'+m+'"]:checked');
+      el.style.borderColor=isSelected?'var(--accent)':'var(--border)';
+      el.style.background=isSelected?'var(--bg2)':'';
     }
   });
 }
 function aiProviderChange(){
   const prov=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
-  const label=document.getElementById('ai-key-label');
-  const link=document.getElementById('ai-key-link');
-  if(prov==='gemini'){
-    if(label)label.textContent='Gemini APIキー';
-    if(link){link.href='https://aistudio.google.com/app/apikey';link.textContent='取得はこちら →';}
-    const saved=localStorage.getItem('ai-apikey-gemini')||'';
-    document.getElementById('ai-apikey').value=saved;
-  } else {
-    if(label)label.textContent='Anthropic APIキー';
-    if(link){link.href='https://console.anthropic.com';link.textContent='取得はこちら →';}
-    const saved=localStorage.getItem('ai-apikey')||'';
-    document.getElementById('ai-apikey').value=saved;
-  }
+  localStorage.setItem('ai-provider',prov);
+  const key=localStorage.getItem('ai-key-'+prov)||'';
+  document.getElementById('ai-apikey').value=key;
   const guide=document.getElementById('ai-key-guide');
-  if(guide)guide.style.display=document.getElementById('ai-apikey').value?'none':'block';
+  if(guide) guide.style.display=key?'none':'block';
+  // audioモードのgemini制限を更新
+  aiModeChange();
 }
 function buildCategoryContext(catId, popId, catLabel, popLabel){
   const popNote = {
@@ -1926,132 +1963,99 @@ function buildCategoryContext(catId, popId, catLabel, popLabel){
 async function runAI(){
   const prompt=document.getElementById('aiprompt').value.trim();
   if(!prompt&&aiFs.length===0){alert('イベントの概要を入力するかファイルをアップロードしてください');return;}
+  // バリデーション: カテゴリ・人数必須
+  const catVal=document.querySelector('input[name="ai-cat"]:checked')?.value;
+  if(!catVal){alert('イベントの種類を選択してください。');return;}
+  const popVal=document.querySelector('input[name="ai-pop"]:checked')?.value;
+  if(!popVal){alert('参加人数を選択してください。');return;}
   const btn=document.getElementById('aibtn');btn.disabled=true;btn.textContent='⏳ 生成中...';
   try{
     const mode=document.querySelector('input[name="ai-mode"]:checked')?.value||'fit';
     const sm=gSM(),em=gEM();
+    // カテゴリ・人数コンテキスト生成
+    const catLabel=document.querySelector('input[name="ai-cat"]:checked')?.closest('label')?.textContent?.trim()||catVal;
+    const popLabel=document.querySelector('input[name="ai-pop"]:checked')?.closest('label')?.textContent?.trim()||popVal;
+    const categoryContext=buildCategoryContext(catVal,popVal,catLabel,popLabel);
+    // fitモード: 分数入力欄から時間を取得
+    let fitSm=sm,fitEm=em;
+    if(mode==='fit'){
+      const fitMinVal=parseInt(document.getElementById('ai-fit-min').value)||0;
+      if(fitMinVal>0){ fitEm=sm+fitMinVal; }
+    }
     let promptText;
     if(mode==='fit'){
-      promptText=`あなたはタイムライン設計のプロフェッショナルです。以下の情報を元に、実践的なタイムテーブルを生成してください。\nイベント時間帯: ${hm(sm)}〜${hm(em)}（合計${em-sm}分）\nユーザー入力・資料: ${prompt||'（添付ファイルの内容を参照してください）'}\n\n【設計方針】\n① 序盤（最初の20%）: 導入・アイスブレイク・目的共有など参加者が場に慣れる時間を設ける\n② 中盤（約60%）: メインコンテンツ。60〜90分に1回は5〜15分の休憩を入れる\n③ 終盤（最後の20%）: まとめ・振り返り・質疑応答・クロージング\n④ スライド資料がある場合: 1スライドあたり1〜3分を目安に発表時間を配分する\n⑤ 移動・準備・切り替えが必要な場面には時間調整セッションを適宜挿入する\n\n【厳守事項】\n- 全セッションのdur合計 = ${em-sm}分（過不足なく）\n- durは1以上の整数\n- セッション名は15文字以内\n- commentには「何をするか・なぜその時間か・参加者への効果」を具体的に30〜50文字で記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{\"name\":\"セッション名\",\"dur\":分数,\"color\":\"カラー名\",\"comment\":\"内容と効果の説明\"}]\n最初の文字は[、最後の文字は]にしてください。`;
+      promptText=`あなたはタイムライン設計のプロフェッショナルです。以下の情報を元に、実践的なタイムテーブルを生成してください。\nイベント時間帯: ${hm(fitSm)}〜${hm(fitEm)}（合計${fitEm-fitSm}分）\nユーザー入力・資料: ${prompt||'（添付ファイルの内容を参照してください）'}\n\n【設計方針】\n① 序盤（最初の20%）: 導入・アイスブレイク・目的共有など参加者が場に慣れる時間を設ける\n② 中盤（約60%）: メインコンテンツ。60〜90分に1回は5〜15分の休憩を入れる\n③ 終盤（最後の20%）: まとめ・振り返り・質疑応答・クロージング\n④ スライド資料がある場合: 1スライドあたり1〜3分を目安に発表時間を配分する\n⑤ 移動・準備・切り替えが必要な場面には時間調整セッションを適宜挿入する\n\n【厳守事項】\n- 全セッションのdur合計 = ${fitEm-fitSm}分（過不足なく）\n- durは1以上の整数\n- セッション名は15文字以内\n- commentには「何をするか・なぜその時間か・参加者への効果」を具体的に30〜50文字で記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"内容と効果の説明"}]\n最初の文字は[、最後の文字は]にしてください。`;
     } else if(mode==='free'){
-      promptText=`あなたはタイムライン設計のプロフェッショナルです。添付されたファイルやテキストの内容を深く分析し、最適なタイムテーブルを設計してください。\n${prompt?'追加指示: '+prompt:''}\n\n【分析・設計の手順】\n① 資料の全体構成・ページ数・セクション数・内容の重さを把握する\n② PPTXの場合: スライド数と内容から1スライドあたり1〜3分を目安に発表時間を逆算する\n③ 内容の難易度・情報量に応じてセッションの長さを調整する（重い内容は長め）\n④ 60〜90分に1回は5〜15分の休憩を挿入し、参加者の集中力を維持する\n⑤ 関連する複数のスライドやトピックはひとつのセッションにまとめてよい\n⑥ 序盤に導入・中盤にメイン・終盤にまとめ・質疑応答という流れを意識する\n\n【出力の品質基準】\n- セッション数は資料の内容量に応じて適切に設定（多すぎず少なすぎず）\n- durは1以上の整数。5分単位を基本とする\n- セッション名は15文字以内で内容が伝わるものに\n- commentには「このセッションで何を扱うか・なぜこの時間か・参加者にとっての意味」を40〜60文字で具体的に記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber ディスカッション:pink）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{\"name\":\"セッション名\",\"dur\":分数,\"color\":\"カラー名\",\"comment\":\"具体的な内容と意図の説明\"}]\n最初の文字は[、最後の文字は]にしてください。`;
+      promptText=`あなたはタイムライン設計のプロフェッショナルです。添付されたファイルやテキストの内容を深く分析し、最適なタイムテーブルを設計してください。\n${prompt?'追加指示: '+prompt:''}\n\n【分析・設計の手順】\n① 資料の全体構成・ページ数・セクション数・内容の重さを把握する\n② PPTXの場合: スライド数と内容から1スライドあたり1〜3分を目安に発表時間を逆算する\n③ 内容の難易度・情報量に応じてセッションの長さを調整する（重い内容は長め）\n④ 60〜90分に1回は5〜15分の休憩を挿入し、参加者の集中力を維持する\n⑤ 関連する複数のスライドやトピックはひとつのセッションにまとめてよい\n⑥ 序盤に導入・中盤にメイン・終盤にまとめ・質疑応答という流れを意識する\n\n【出力の品質基準】\n- セッション数は資料の内容量に応じて適切に設定（多すぎず少なすぎず）\n- durは1以上の整数。5分単位を基本とする\n- セッション名は15文字以内で内容が伝わるものに\n- commentには「このセッションで何を扱うか・なぜこの時間か・参加者にとっての意味」を40〜60文字で具体的に記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber ディスカッション:pink）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"具体的な内容と意図の説明"}]\n最初の文字は[、最後の文字は]にしてください。`;
     } else {
-      // audioモード: 実際の音声を時間どおりに再現
       promptText=`あなたは音声分析のプロフェッショナルです。添付の音声ファイルを最初から最後まで正確に分析し、詳細なタイムテーブルを作成してください。\n${prompt?'追加指示: '+prompt+'\n':''}\n【分析手順】\n① 音声を最初から最後まで通して聞き、総再生時間を正確に把握する\n② 前半・中盤・後半の3ブロックに分け、それぞれ丁寧に分析する\n③ 話題・内容・話者が変わるタイミングを区切りとしてセクションを特定する\n④ 各セクションの開始〜終了から実際の経過時間（分）を正確に計算する\n⑤ 後半も前半と同じ精度で計測する（手を抜かない）\n\n【厳守事項】\n- durは実際の経過時間（分）の整数（0禁止・最低1）\n- 全セッションのdur合計 = 総再生時間（誤差±3分以内）\n- セッション名は15文字以内\n- commentには話された内容の要点・キーワード・議論の流れを40〜60文字で具体的に記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber 議論:pink）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"内容の要点と流れ"}]`;
     }
-    // カテゴリ・人数コンテキストをプロンプトに追記
-    if(window._aiCategoryContext) promptText += window._aiCategoryContext;
-    window._aiCategoryContext = '';
+    if(categoryContext) promptText += categoryContext;
     let uc=[{type:'text',text:promptText}];
-        // audioモードのとき音声ファイル以外がある場合はエラー
     const audioExts=['.mp3','.m4a','.wav','.aac','.ogg','.webm'];
     if(mode==='audio'){
       const nonAudio=aiFs.filter(f=>!audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
-      if(nonAudio.length>0){
-        throw new Error('「音声ファイルを時間どおりに再現する」モードでは音声ファイルのみアップロードしてください。\n\n非対応ファイル: '+nonAudio.map(f=>f.name).join(', '));
-      }
-      if(aiFs.length===0){
-        throw new Error('「音声ファイルを時間どおりに再現する」モードでは音声ファイルをアップロードしてください。');
-      }
-      const provider2=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
-      if(provider2!=='gemini'){
-        throw new Error('音声ファイルの処理にはGeminiプロバイダーが必要です。\nプロバイダーを「Gemini Flash」に切り替えてください。');
-      }
+      if(nonAudio.length>0) throw new Error('音声モードでは音声ファイルのみアップロードしてください。\n非対応: '+nonAudio.map(f=>f.name).join(', '));
+      if(aiFs.length===0) throw new Error('音声ファイルをアップロードしてください。');
+      const prov2=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
+      if(prov2!=='gemini') throw new Error('音声ファイルの処理にはGeminiが必要です。プロバイダーを切り替えてください。');
     }
-
-    // 音声ファイルがある場合は録音時間をダイアログで確認
-    const audioExts2=['.mp3','.m4a','.wav','.aac','.ogg','.webm'];
-    const audioFiles=aiFs.filter(f=>audioExts2.some(ext=>f.name.toLowerCase().endsWith(ext)));
+    const audioFiles=aiFs.filter(f=>audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
     let audioDurationMin=0;
-    if(audioFiles.length>0){
-      const input=window.prompt('🎤 音声ファイルの録音時間を入力してください。\n\nファイル: '+audioFiles.map(f=>f.name).join(', ')+'\n\n録音時間（分）を入力 (例: 2時間=120)','');
-      if(input===null){btn.disabled=false;btn.textContent='🚀 生成';return;} // キャンセル
-      audioDurationMin=parseInt(input)||0;
-      if(audioDurationMin<=0){
-        const retry=window.confirm('録音時間が入力されませんでした。\n時間指定なしで生成しますか？\n（OKで続行、キャンセルで戻る）');
+    if(mode==='audio'){
+      audioDurationMin=parseInt(document.getElementById('ai-audio-min').value)||0;
+      if(audioDurationMin<=0&&audioFiles.length>0){
+        const retry=window.confirm('録音時間が入力されていません。\n時間指定なしで生成しますか？');
         if(!retry){btn.disabled=false;btn.textContent='🚀 生成';return;}
       }
     }
-
     for(const f of aiFs){
       const fname=f.name.toLowerCase();
       const mt=f.type||'application/octet-stream';
       if(mt.startsWith('image/')){
-        const b=await toB64(f);
-        uc.push({type:'image',source:{type:'base64',media_type:mt,data:b}});
+        const b=await toB64(f);uc.push({type:'image',source:{type:'base64',media_type:mt,data:b}});
       } else if(fname.endsWith('.pdf')){
-        const b=await toB64(f);
-        uc.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b}});
+        const b=await toB64(f);uc.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b}});
       } else if(fname.endsWith('.txt')){
-        const text=await f.text();
-        uc[0].text+=`\n\n【ファイル「${f.name}」の内容】\n${text.slice(0,8000)}`;
+        const text=await f.text();uc[0].text+=`\n\n【ファイル「${f.name}」の内容】\n${text.slice(0,8000)}`;
       } else if(fname.endsWith('.docx')||fname.endsWith('.doc')){
-        try{
-          const text=await extractWordText(f);
-          uc[0].text+=`\n\n【Wordファイル「${f.name}」から抽出したテキスト】\n${text.slice(0,8000)}`;
-        }catch(e){
-          uc[0].text+=`\n\n【Wordファイル「${f.name}」テキスト抽出失敗: ${e.message}】`;
-        }
+        try{const text=await extractWordText(f);uc[0].text+=`\n\n【Word「${f.name}」から抽出】\n${text.slice(0,8000)}`;}
+        catch(e){uc[0].text+=`\n\n【Word「${f.name}」テキスト抽出失敗: ${e.message}】`;}
       } else if(fname.endsWith('.pptx')||fname.endsWith('.ppt')){
-        try{
-          const text=await extractPptxText(f);
-          uc[0].text+=`\n\n【PowerPointファイル「${f.name}」から抽出したテキスト】\n${text.slice(0,8000)}`;
-        }catch(e){
-          uc[0].text+=`\n\n【PowerPointファイル「${f.name}」テキスト抽出失敗: ${e.message}】`;
-        }
+        try{const text=await extractPptxText(f);uc[0].text+=`\n\n【PPT「${f.name}」から抽出】\n${text.slice(0,8000)}`;}
+        catch(e){uc[0].text+=`\n\n【PPT「${f.name}」テキスト抽出失敗: ${e.message}】`;}
       } else if(['mp3','m4a','wav','aac','ogg','webm'].some(ext=>fname.endsWith('.'+ext))){
-        // 音声ファイル: Gemini専用（base64で送信）
         const provider=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
         if(provider==='gemini'){
-          const b=await toB64(f);
-          const audioMt=mt||'audio/mpeg';
+          const b=await toB64(f);const audioMt=mt||'audio/mpeg';
           uc.push({type:'audio_file',data:b,mimeType:audioMt});
-          // 音声の場合はaudioモードを自動選択
-          const audioR=document.querySelector('input[name="ai-mode"][value="audio"]');
-          if(audioR) audioR.checked=true;
-          aiModeChange();
-          uc[0].text+=`
-
-添付の音声ファイル「${f.name}」をファイルサイズから推定される録音時間を考慮したタイムテーブルを作成してください。`;
-          // ファイルサイズから推定時間を計算してプロンプトに追記
-          const fileSizeKB=f.size/1024;
-          const fileSizeMB=fileSizeKB/1024;
-          // 録音時間：ダイアログ入力値を優先、未入力ならファイルサイズから推定
+          uc[0].text+=`\n\n添付音声「${f.name}」のタイムテーブルを作成してください。`;
           let estMin=audioDurationMin;
           if(!estMin){
-            const fileSizeKB=f.size/1024;
-            if(fname.endsWith('.m4a')||fname.endsWith('.aac')){estMin=Math.round(fileSizeKB/128);}
-            else if(fname.endsWith('.mp3')){estMin=Math.round(fileSizeKB/128);}
-            else if(fname.endsWith('.wav')){estMin=Math.round(fileSizeKB/5000);}
-            else{estMin=Math.round(fileSizeKB/100);}
+            const fKB=f.size/1024;
+            if(fname.endsWith('.m4a')||fname.endsWith('.aac')){estMin=Math.round(fKB/128);}
+            else if(fname.endsWith('.mp3')){estMin=Math.round(fKB/128);}
+            else if(fname.endsWith('.wav')){estMin=Math.round(fKB/5000);}
+            else{estMin=Math.round(fKB/100);}
           }
           estMin=Math.max(1,estMin);
-          const estHour=Math.floor(estMin/60);
-          const estMinRem=estMin%60;
-          const estStr=estHour>0?`${estHour}時間${estMinRem>0?estMinRem+'分':''}`:`${estMin}分`;
-          const srcLabel=audioDurationMin?'指定された':'ファイルサイズから推定した';
-          uc[0].text+=`\n【重要】${srcLabel}録音時間は${estStr}（${estMin}分）です。全セッションのdur合計を必ず${estMin}分に合わせてください。`;
+          const eh=Math.floor(estMin/60),er=estMin%60;
+          const estStr=eh>0?`${eh}時間${er>0?er+'分':''}`:`${estMin}分`;
+          uc[0].text+=`\n【重要】${audioDurationMin?'指定された':'推定'}録音時間は${estStr}（${estMin}分）。dur合計を${estMin}分に合わせること。`;
         } else {
-          uc[0].text+=`
-
-音声ファイル「${f.name}」が添付されています。Geminiプロバイダーを選択すると音声ファイルを直接読み込めます。`;
+          uc[0].text+=`\n\n音声ファイル「${f.name}」はGeminiプロバイダーで直接読み込めます。`;
         }
       } else {
-        uc[0].text+=`
-
-添付ファイル「${f.name}」（${Math.round(f.size/1024)}KB）も参照してください。`;
+        uc[0].text+=`\n\n添付ファイル「${f.name}」（${Math.round(f.size/1024)}KB）も参照してください。`;
       }
     }
     const apiKey=(document.getElementById('ai-apikey').value||'').trim();
     const provider=document.querySelector('input[name="ai-provider"]:checked')?.value||'anthropic';
     if(!apiKey){
-      const hint=provider==='gemini'?'https://aistudio.google.com/app/apikey で無料取得できます':'https://console.anthropic.com でキーを取得できます';
-      alert('APIキーを入力してください。\n'+hint);
+      alert('APIキーを入力してください。\n'+(provider==='gemini'?'https://aistudio.google.com/app/apikey で無料取得できます':'https://console.anthropic.com でキーを取得できます'));
       btn.disabled=false;btn.textContent='🚀 生成';return;
     }
-    if(provider==='gemini') localStorage.setItem('ai-apikey-gemini',apiKey);
-    else localStorage.setItem('ai-apikey',apiKey);
-
+    localStorage.setItem('ai-key-'+provider,apiKey);
     let resp;
     if(provider==='gemini'){
       const geminiParts=uc.map(item=>{
@@ -2060,68 +2064,35 @@ async function runAI(){
         if(item.type==='audio_file') return {inlineData:{mimeType:item.mimeType,data:item.data}};
         return null;
       }).filter(Boolean);
-      resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({contents:[{role:'user',parts:geminiParts}]})
-      });
+      resp=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{role:'user',parts:geminiParts}]})});
     } else {
-      resp=await fetch('https://api.anthropic.com/v1/messages',{
-        method:'POST',
-        headers:{
-          'Content-Type':'application/json',
-          'anthropic-version':'2023-06-01',
-          'anthropic-dangerous-direct-browser-access':'true',
-          'x-api-key':apiKey
-        },
-        body:JSON.stringify({
-          model:'claude-sonnet-4-6',
-          max_tokens:1500,
-          messages:[{role:'user',content:uc}]
-        })
-      });
+      resp=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'Content-Type':'application/json','anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true','x-api-key':apiKey},body:JSON.stringify({model:'claude-sonnet-4-6',max_tokens:1500,messages:[{role:'user',content:uc}]})});
     }
-    if(!resp.ok){
-      const errText=await resp.text();
-      throw new Error(`APIエラー ${resp.status}: ${errText.slice(0,200)}`);
-    }
+    if(!resp.ok){const errText=await resp.text();throw new Error(`APIエラー ${resp.status}: ${errText.slice(0,200)}`);}
     const rawText=await resp.text();
     let data;
-    try{data=JSON.parse(rawText);}
-    catch(e){throw new Error('レスポンスの解析に失敗しました。もう一度お試しください。\n詳細: '+rawText.slice(0,100));}
+    try{data=JSON.parse(rawText);}catch(e){throw new Error('レスポンスの解析に失敗しました。\n詳細: '+rawText.slice(0,100));}
     if(data.error){throw new Error('API Error: '+(data.error.message||JSON.stringify(data.error)));}
     let text='';
-    if(provider==='gemini'){
-      text=((data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
-    } else {
-      text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');
-    }
+    if(provider==='gemini'){text=((data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');}
+    else{text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');}
     if(!text)throw new Error('AIからの応答が空でした。もう一度お試しください。');
-    // JSON部分を抽出（前後のテキストや```を除去）
-    let jsonStr = text
-      .replace(/```json\s*/gi,'').replace(/```\s*/g,'')  // コードブロック除去
-      .trim();
-    // [ から始まる配列を探す
-    const jsonMatch = jsonStr.match(/\[[\s\S]*\]/);
-    if(!jsonMatch){
-      throw new Error('JSON形式の応答が取得できませんでした。\n応答内容: '+text.slice(0,200));
-    }
+    let jsonStr=text.replace(/```json\s*/gi,'').replace(/```\s*/g,'').trim();
+    const jsonMatch=jsonStr.match(/\[\s\S\]*\]/);
+    if(!jsonMatch)throw new Error('JSON形式の応答が取得できませんでした。\n応答内容: '+text.slice(0,200));
     try{
       aiSs=JSON.parse(jsonMatch[0]);
-      // durが0または未設定のセッションを1分に補正
       aiSs=aiSs.map(s=>({...s,dur:Math.max(1,parseInt(s.dur)||1)}));
-    }catch(e){
-      throw new Error('JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonMatch[0].slice(0,100));
-    }
+    }catch(e){throw new Error('JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonMatch[0].slice(0,100));}
     document.getElementById('aisp').innerHTML=aiSs.map((s,i)=>`<div class="aisi"><input type="checkbox" id="aic${i}" checked/><div style="width:8px;height:8px;border-radius:50%;background:${CDot[s.color]||CDot.teal};flex-shrink:0"></div><span style="flex:1">${esc(s.name)}</span><span style="font-size:10px;color:var(--text2)">${s.dur}分</span></div>`).join('');
     document.getElementById('airw').style.display='';document.getElementById('aiimport').style.display='';
   }catch(err){alert('AIの生成に失敗しました: '+err.message);}
-  // ファイルは生成後に自動削除
   aiFs=[];
   document.getElementById('aifile').value='';
   document.getElementById('aifl').innerHTML='';
   btn.disabled=false;btn.textContent='🚀 生成';
 }
+
 function aiConfirmClose(){
   document.getElementById('ai-confirm-modal').style.display='none';
 }
