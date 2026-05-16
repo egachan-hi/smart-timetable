@@ -1969,28 +1969,23 @@ function buildCategoryContext(catId, popId, catLabel, popLabel){
 // JSONセッション配列を応答テキストから確実に抽出するヘルパー
 function extractJsonSessions(rawText, label){
   var text = rawText;
-  // backtick x3 + optional lang name + optional whitespace
-  var cleaned = [];
-  var lines = text.split('\n');
-  for(var i=0;i<lines.length;i++){
-    var l = lines[i];
-    if(l.trimStart().startsWith('```')) continue;
-    cleaned.push(l);
-  }
-  text = cleaned.join('\n').trim();
+  text = text.replace(/`{3}[a-zA-Z]*/g, '');
+  text = text.trim();
   var firstBracket = text.indexOf('[');
   var lastBracket  = text.lastIndexOf(']');
   if(firstBracket === -1 || lastBracket === -1 || lastBracket <= firstBracket){
-    throw new Error((label?label+': ':'')+ 'JSON形式の応答が取得できませんでした。\n応答内容: '+rawText.slice(0,200));
+    throw new Error((label ? label + ': ' : '') + 'JSON形式の応答が取得できませんでした。\n応答内容: ' + rawText.slice(0, 300));
   }
-  var jsonStr = text.slice(firstBracket, lastBracket+1);
+  var jsonStr = text.slice(firstBracket, lastBracket + 1);
   var sessions;
-  try{
+  try {
     sessions = JSON.parse(jsonStr);
-  }catch(e){
-    throw new Error((label?label+': ':'')+ 'JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonStr.slice(0,100));
+  } catch(e) {
+    throw new Error((label ? label + ': ' : '') + 'JSONの解析に失敗しました。\n詳細: ' + e.message + '\n応答: ' + jsonStr.slice(0, 100));
   }
-  return sessions.map(function(s){return Object.assign({},s,{dur:Math.max(1,parseInt(s.dur)||1)});});
+  return sessions.map(function(s) {
+    return Object.assign({}, s, { dur: Math.max(1, parseInt(s.dur) || 1) });
+  });
 }
 
 async function runAI(){
@@ -2112,7 +2107,7 @@ JSON配列のみで回答（説明文・コードブロック不要）:
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {method:'POST',headers:{'Content-Type':'application/json'},
          body:JSON.stringify({contents:[{role:'user',parts:step2Parts}],
-           generationConfig:{maxOutputTokens:4096}})}
+           generationConfig:{maxOutputTokens:8192}})}
       );
       if(!step2Resp.ok){
         const e=await step2Resp.text();
@@ -2195,7 +2190,7 @@ JSON配列のみで回答（説明文・コードブロック不要）:
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {method:'POST',headers:{'Content-Type':'application/json'},
          body:JSON.stringify({contents:[{role:'user',parts:geminiParts}],
-           generationConfig:{maxOutputTokens:4096}})}
+           generationConfig:{maxOutputTokens:8192}})}
       );
     } else {
       resp=await fetch('https://api.anthropic.com/v1/messages',{
