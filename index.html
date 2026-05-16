@@ -1968,26 +1968,29 @@ function buildCategoryContext(catId, popId, catLabel, popLabel){
 
 // JSONセッション配列を応答テキストから確実に抽出するヘルパー
 function extractJsonSessions(rawText, label){
-  // ステップ1: コードブロックマーカーをすべて除去
-  let text = rawText;
-  // バッククォート3つ＋任意の言語名を除去（改行含む）
-  text = text.replace(/`{3}[a-zA-Z]*\n?/g, '');
-  text = text.replace(/`{3}/g, '');
-  text = text.trim();
-  // ステップ2: [ ... ] を探す（最初の[から最後の]まで）
-  const firstBracket = text.indexOf('[');
-  const lastBracket  = text.lastIndexOf(']');
-  if(firstBracket === -1 || lastBracket === -1 || lastBracket <= firstBracket){
-    throw new Error((label?label+': ':'')+'JSON形式の応答が取得できませんでした。\n応答内容: '+rawText.slice(0,200));
+  var text = rawText;
+  // backtick x3 + optional lang name + optional whitespace
+  var cleaned = [];
+  var lines = text.split('\n');
+  for(var i=0;i<lines.length;i++){
+    var l = lines[i];
+    if(l.trimStart().startsWith('```')) continue;
+    cleaned.push(l);
   }
-  const jsonStr = text.slice(firstBracket, lastBracket+1);
-  let sessions;
+  text = cleaned.join('\n').trim();
+  var firstBracket = text.indexOf('[');
+  var lastBracket  = text.lastIndexOf(']');
+  if(firstBracket === -1 || lastBracket === -1 || lastBracket <= firstBracket){
+    throw new Error((label?label+': ':'')+ 'JSON形式の応答が取得できませんでした。\n応答内容: '+rawText.slice(0,200));
+  }
+  var jsonStr = text.slice(firstBracket, lastBracket+1);
+  var sessions;
   try{
     sessions = JSON.parse(jsonStr);
   }catch(e){
-    throw new Error((label?label+': ':'')+'JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonStr.slice(0,100));
+    throw new Error((label?label+': ':'')+ 'JSONの解析に失敗しました。\n詳細: '+e.message+'\n応答: '+jsonStr.slice(0,100));
   }
-  return sessions.map(s=>({...s, dur:Math.max(1, parseInt(s.dur)||1)}));
+  return sessions.map(function(s){return Object.assign({},s,{dur:Math.max(1,parseInt(s.dur)||1)});});
 }
 
 async function runAI(){
