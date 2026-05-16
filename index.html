@@ -1430,7 +1430,13 @@ function rFR(){
     const hbEl=document.createElement('div');hbEl.className='fh b';hbEl.innerHTML='<div class="fp"></div>';
     hbEl.addEventListener('mousedown',e=>onFH(e,'b',ev.id,hbEl));
     const inner=document.createElement('div');inner.className='fi';
-    inner.innerHTML=`<div class="fn">${esc(ev.name)}</div>`;
+    const fShort=ht<24;
+    const fHdr=document.createElement('div');fHdr.className='shr';
+    if(!fShort){const ftm=document.createElement('span');ftm.className='stm';ftm.textContent=hm(sm+ev.fromMin);fHdr.appendChild(ftm);}
+    const fnm=document.createElement('span');fnm.className='snm';fnm.textContent=ev.name;
+    const fdr=document.createElement('span');fdr.className='sdr';fdr.textContent=(ev.toMin-ev.fromMin)+'分';
+    fHdr.appendChild(fnm);fHdr.appendChild(fdr);
+    inner.appendChild(fHdr);
     if(ht>=34&&ev.comment){
       const fc2=document.createElement('div');
       fc2.className='fc2';
