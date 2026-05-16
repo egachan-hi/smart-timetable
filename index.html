@@ -1166,7 +1166,7 @@ function rTL(){
   for(let m=0;m<=displayMin+60;m++){
     const abs=sm+m;if(abs%10!==0)continue;
     const px=m*PPM,mj=abs%60===0,m30=abs%30===0;
-    if(mj){const lbl=abs===720?'正午':String(Math.floor(abs/60)).padStart(2,'0');tH+=`<div class="tt" style="top:${px}px">${lbl}</div>`;}
+    if(mj){const lbl=abs===720?'正午':String(Math.floor(abs/60));tH+=`<div class="tt" style="top:${px}px">${lbl}</div>`;}
   }
   tc.innerHTML=tH;
 
