@@ -2096,7 +2096,7 @@ JSON配列のみで回答（説明文・コードブロック不要）:
       const step2Text=((step2Data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
       if(!step2Text) throw new Error('Step2: セッション生成結果が空でした。');
 
-      const jsonMatch=step2Text.match(/\[[\s\S]*\]/);
+      const jsonMatch=step2Text.replace(/```json/gi,'').replace(/```/g,'').match(/\[[\s\S]*\]/);
       if(!jsonMatch) throw new Error('Step2: JSON形式の応答が取得できませんでした。\n応答内容: '+step2Text.slice(0,200));
       aiSs=JSON.parse(jsonMatch[0]);
       aiSs=aiSs.map(s=>({...s,dur:Math.max(1,parseInt(s.dur)||1)}));
