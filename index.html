@@ -2081,6 +2081,9 @@ async function runAI(){
       if(!transcript) throw new Error('Step1: 書き起こし結果が空でした。音声ファイルを確認してください。');
 
       // ── STEP 2: 書き起こしからセッション配列を生成 ────────────────
+      // RPM制限回避のため5秒待機
+      btn.textContent='⏳ Step 1/2完了 - 5秒待機中...';
+      await new Promise(resolve => setTimeout(resolve, 5000));
       btn.textContent='⏳ Step 2/2: セッション生成中...';
 
       const step2Prompt=`以下は音声ファイル（総再生時間: ${totalStr} = ${totalMin}分）のタイムスタンプ付き書き起こしです。
