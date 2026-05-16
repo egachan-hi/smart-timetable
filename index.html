@@ -1,6 +1,14 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
+<!-- Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-LLKCEB4N1W"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-LLKCEB4N1W');
+</script>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1"/>
 <title>スマートタイムテーブル</title>
@@ -908,7 +916,58 @@ let nid=30,nfid=100;
 const ZL=[0.5,1,1.5,2,3,4,6,9,12,18,24];
 let zi=2,PPM=2;
 const SN=5;
-let savedTpls=[{name:'標準テンプレート',types:JSON.parse(JSON.stringify(TYPES))}];
+let savedTpls=[
+  {name:'標準テンプレート',types:JSON.parse(JSON.stringify(TYPES))},
+  {name:'シンポジウム',types:[
+    {id:'t_s1',name:'オープニング',dur:10,color:'purple'},
+    {id:'t_s2',name:'基調講演',dur:40,color:'blue'},
+    {id:'t_s3',name:'事例発表',dur:30,color:'blue'},
+    {id:'t_s4',name:'コーヒーブレイク',dur:15,color:'gray'},
+    {id:'t_s5',name:'パネルディスカッション',dur:50,color:'teal'},
+    {id:'t_s6',name:'質疑応答',dur:20,color:'teal'},
+    {id:'t_s7',name:'クロージング',dur:15,color:'green'},
+  ]},
+  {name:'ワールドカフェ',types:[
+    {id:'t_w1',name:'チェックイン',dur:10,color:'purple'},
+    {id:'t_w2',name:'テーマ説明',dur:10,color:'blue'},
+    {id:'t_w3',name:'対話ラウンド',dur:30,color:'teal'},
+    {id:'t_w4',name:'席替え',dur:5,color:'gray'},
+    {id:'t_w5',name:'ハーベスト',dur:20,color:'green'},
+    {id:'t_w6',name:'チェックアウト',dur:5,color:'purple'},
+  ]},
+  {name:'オープンスペーステクノロジー',types:[
+    {id:'t_o1',name:'オープニング',dur:10,color:'purple'},
+    {id:'t_o2',name:'アジェンダ・マーケット',dur:20,color:'blue'},
+    {id:'t_o3',name:'分科会',dur:60,color:'teal'},
+    {id:'t_o4',name:'ニュースルーム',dur:20,color:'green'},
+    {id:'t_o5',name:'クロージング',dur:10,color:'purple'},
+  ]},
+  {name:'旅行計画',types:[
+    {id:'t_t1',name:'観光',dur:60,color:'teal'},
+    {id:'t_t2',name:'買い物',dur:30,color:'pink'},
+    {id:'t_t3',name:'準備',dur:20,color:'gray'},
+    {id:'t_t4',name:'電車移動',dur:30,color:'blue'},
+    {id:'t_t5',name:'徒歩移動',dur:10,color:'blue'},
+    {id:'t_t6',name:'飛行機移動',dur:120,color:'blue'},
+    {id:'t_t7',name:'ランチ',dur:60,color:'amber'},
+    {id:'t_t8',name:'夕食',dur:60,color:'amber'},
+    {id:'t_t9',name:'温泉',dur:60,color:'teal'},
+    {id:'t_t10',name:'休憩',dur:20,color:'gray'},
+  ]},
+  {name:'筋トレ',types:[
+    {id:'t_g1',name:'ベンチプレス',dur:10,color:'blue'},
+    {id:'t_g2',name:'ショルダープレス',dur:10,color:'blue'},
+    {id:'t_g3',name:'ラットプルダウン',dur:10,color:'blue'},
+    {id:'t_g4',name:'ベントオーバーロウ',dur:10,color:'blue'},
+    {id:'t_g5',name:'スクワット',dur:10,color:'teal'},
+    {id:'t_g6',name:'デッドリフト',dur:10,color:'teal'},
+    {id:'t_g7',name:'ランジ',dur:10,color:'teal'},
+    {id:'t_g8',name:'プランク',dur:10,color:'green'},
+    {id:'t_g9',name:'クランチ',dur:10,color:'green'},
+    {id:'t_g10',name:'レッグレイズ',dur:10,color:'green'},
+    {id:'t_g11',name:'ストレッチ',dur:10,color:'gray'},
+  ]},
+];
 let savedEvs=[];
 let cv='tl';
 let noDate=false;   // 日付を特定しない
