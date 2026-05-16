@@ -37,7 +37,9 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .ib:hover{background:var(--bg2);color:var(--text)}
 .ib svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ei{padding:7px 8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px;flex-shrink:0}
-.ei input{width:100%;font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text)}
+.ei input{width:100%;font-size:11px;font-weight:600;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text)}
+.ei input[type="date"],.ei input[type="time"]{-webkit-appearance:auto;appearance:auto;min-height:22px}
+.ei input[type="date"]::-webkit-datetime-edit,.ei input[type="time"]::-webkit-datetime-edit{display:inline-flex;align-items:center}
 .r2{display:flex;gap:2px}.r2 input{flex:1}
 .mnb{padding:3px 8px;font-size:10px;color:var(--text2);border-bottom:1px solid var(--border);font-style:italic;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .bl{flex:1;overflow-y:auto;padding:3px}
@@ -307,27 +309,33 @@ if(sessionStorage.getItem('st-auth')==='1'){
     </div>
     <div class="ei">
       <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル"/>
-      <div style="display:flex;align-items:center;gap:3px;flex-wrap:nowrap;width:100%">
-        <input type="date" id="evd" value="2026-05-13" style="flex:1;min-width:0;max-width:120px;font-size:10px" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();autoSave();"/>
-        <span id="dow-label" style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
-        <label style="display:flex;align-items:center;gap:2px;font-size:10px;color:var(--text2);cursor:pointer;flex-shrink:0;white-space:nowrap">
-          <input type="checkbox" id="no-date-chk" onchange="toggleNoDate()" style="margin:0;width:12px;height:12px"/>日付設定しない
-        </label>
-        <select id="day-count-sel" style="font-size:10px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0;margin-left:auto" onchange="onDayCountChange()">
-          <option value="1">1DAY</option>
-          <option value="2">2DAYS</option>
-          <option value="3">3DAYS</option>
-          <option value="4">4DAYS</option>
-          <option value="5">5DAYS</option>
-          <option value="6">6DAYS</option>
-          <option value="7">7DAYS</option>
-        </select>
+      <div style="display:flex;flex-direction:column;gap:3px;width:100%">
+        <div style="display:flex;align-items:center;gap:4px">
+          <input type="date" id="evd" value="2026-05-13" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();autoSave();"/>
+          <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
+          <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:auto">から</span>
+          <select id="day-count-sel" style="font-size:11px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0" onchange="onDayCountChange()">
+            <option value="1">1DAY</option>
+            <option value="2">2DAYS</option>
+            <option value="3">3DAYS</option>
+            <option value="4">4DAYS</option>
+            <option value="5">5DAYS</option>
+            <option value="6">6DAYS</option>
+            <option value="7">7DAYS</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:4px">
+          <label style="display:flex;align-items:center;gap:2px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap">
+            <input type="checkbox" id="no-date-chk" onchange="toggleNoDate()" style="margin:0;width:12px;height:12px"/>日付設定しない
+          </label>
+        </div>
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
-        <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
-        <input type="time" id="evs" value="13:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();setTimeout(fitz,50);"/>
-        <span style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
-        <input type="time" id="eve" value="16:00" style="flex:1;min-width:0;font-size:10px" onchange="render();autoSave();setTimeout(fitz,50);"/>
+        <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
+        <input type="time" id="evs" value="13:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="render();autoSave();setTimeout(fitz,50);updateTotalTime();"/>
+        <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
+        <input type="time" id="eve" value="16:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="render();autoSave();setTimeout(fitz,50);updateTotalTime();"/>
+        <span id="total-time-lbl" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;margin-left:6px"></span>
       </div>
     </div>
     <div class="mnb" id="mnb">テンプレート：標準テンプレート</div>
@@ -1084,6 +1092,13 @@ function gEM(){const v=document.getElementById('eve').value||'16:00';const[h,m]=
 function hm(t){const v=Math.max(0,Math.round(t));return`${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`;}
 function h2m(s){const[h,m]=(s||'00:00').split(':').map(Number);return h*60+m;}
 function gSt(){let c=0;return sessions.map(s=>{const t=c;c+=s.dur;return t;});}
+function updateTotalTime(){
+  const total=gEM()-gSM();
+  if(total<=0){document.getElementById("total-time-lbl").textContent="";return;}
+  const h=Math.floor(total/60),m=total%60;
+  const txt=h>0?(m>0?h+"時間"+m+"分":h+"時間"):m+"分";
+  document.getElementById("total-time-lbl").textContent=txt;
+}
 function cz(d){zi=Math.max(0,Math.min(ZL.length-1,zi+d));PPM=ZL[zi];render();}
 function fitz(){
   const h=document.getElementById('tls').clientHeight;
@@ -2650,12 +2665,19 @@ function toggleNoDate(){
     evd.disabled=false;
     evd.style.opacity='1';
   }
+  const _fl2=document.getElementById('from-label');
+  if(_fl2){
+    const _dc2=parseInt((document.getElementById('day-count-sel')||{}).value)||1;
+    _fl2.style.display=(!noDate&&_dc2>1)?'':' none';
+  }
   updateDow();updateTopDateLabel();autoSave();
 }
 
 function onDayCountChange(){
   const sel=document.getElementById('day-count-sel');
   const newCount=parseInt(sel.value)||1;
+  const fromLbl=document.getElementById('from-label');
+  if(fromLbl) fromLbl.style.display=(!noDate&&newCount>1)?'':' none';
   // 現在のDAYデータを保存してからdayDataを操作
   dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
   // dayDataを拡張（縮小時はデータを保持したまま配列は縮小しない）
@@ -2759,7 +2781,7 @@ setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); },
 // 自動保存データを復元
 dayData=[{sessions:[],freeEvs:[]}];
 autoLoad();
-uUR();sv('tl');render();updateDow();updateTopDateLabel();setTimeout(function(){fitz();},150);
+uUR();sv('tl');render();updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},150);
 setTimeout(function(){fitz();},150);
 
 // ================================================================
