@@ -224,42 +224,6 @@ tbody tr:hover td{background:var(--bg2)}
 </style>
 </head>
 <body>
-<div id="pw-screen" style="display:none;position:fixed;inset:0;background:#1a1a2e;z-index:9999;display:flex;align-items:center;justify-content:center">
-  <div style="background:#fff;border-radius:16px;padding:40px 36px;width:320px;box-shadow:0 20px 60px rgba(0,0,0,.4);text-align:center">
-    <svg width="48" height="48" viewBox="0 0 32 32" fill="none" style="margin-bottom:16px"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
-    <div style="font-size:18px;font-weight:700;color:#1a1a1a;margin-bottom:6px">スマートタイムテーブル</div>
-    <div style="font-size:13px;color:#666;margin-bottom:24px">パスワードを入力してください</div>
-    <input type="password" id="pw-input" placeholder="Password"
-      style="width:100%;padding:12px 14px;border:1.5px solid #e2e2e2;border-radius:10px;font-size:15px;outline:none;margin-bottom:8px;box-sizing:border-box"
-      onkeydown="if(event.key==='Enter')pwCheck()"
-      oninput="document.getElementById('pw-error').style.display='none'"/>
-    <div id="pw-error" style="display:none;font-size:12px;color:#A32D2D;margin-bottom:8px">パスワードが違います</div>
-    <button onclick="pwCheck()"
-      style="width:100%;padding:13px;background:#4F46E5;color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">
-      ログイン
-    </button>
-  </div>
-</div>
-<script>
-function pwCheck(){
-  const v=document.getElementById('pw-input').value;
-  if(v==='areyousmart?'){
-    document.getElementById('pw-screen').style.display='none';
-    sessionStorage.setItem('st-auth','1');
-    setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); }, 300);
-  } else {
-    document.getElementById('pw-error').style.display='block';
-    document.getElementById('pw-input').value='';
-    document.getElementById('pw-input').focus();
-  }
-}
-// セッション中は再入力不要
-if(sessionStorage.getItem('st-auth')==='1'){
-  document.addEventListener('DOMContentLoaded',()=>{
-    document.getElementById('pw-screen').style.display='none';
-  });
-}
-</script>
 <div class="top-bar">
   <div class="logo">
     <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
@@ -678,11 +642,16 @@ if(sessionStorage.getItem('st-auth')==='1'){
       <!-- セッション選択 -->
       <div id="gcal-session-picker" style="display:none">
         <div class="ml" style="margin-bottom:5px">書き出すセッションを選択</div>
+        <!-- DAYタブ -->
+        <div id="gcal-day-tabs" style="display:flex;gap:3px;margin-bottom:6px;flex-wrap:wrap"></div>
+        <!-- 一括操作 -->
         <div style="display:flex;gap:6px;margin-bottom:4px">
-          <button class="btn" style="font-size:10px;padding:2px 8px" onclick="gcalCheckAll(true)">すべて選択</button>
-          <button class="btn" style="font-size:10px;padding:2px 8px" onclick="gcalCheckAll(false)">すべて解除</button>
+          <button class="btn" style="font-size:10px;padding:2px 8px" onclick="gcalCheckAll(true)">このDAYをすべて選択</button>
+          <button class="btn" style="font-size:10px;padding:2px 8px" onclick="gcalCheckAll(false)">このDAYをすべて解除</button>
         </div>
         <div id="gcal-session-list" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:5px;padding:4px"></div>
+        <!-- 選択済みカウント -->
+        <div id="gcal-sel-count" style="font-size:10px;color:var(--text2);margin-top:4px;text-align:right"></div>
       </div>
 
     </div>
@@ -1233,9 +1202,9 @@ function rTL(){
   const extraPx=60*PPM;
   const topPad=Math.round(PPM*10);
   const totalPx2=tpx+extraPx;
-  document.getElementById('tlb').style.cssText=`height:${totalPx2}px;margin-top:${topPad}px`;
-  tc.style.cssText=`height:${totalPx2}px`;
-  sc.style.cssText=`height:${totalPx2}px`;
+  document.getElementById('tlb').style.height=totalPx2+'px';
+  tc.style.height=totalPx2+'px';
+  sc.style.height=totalPx2+'px';
 
   // タイムticks（時間軸）
   let tH='';
@@ -1558,10 +1527,9 @@ function rFR(){
   const displayMin=Math.max(tm, minutesTo24);
   const tpx=displayMin*PPM;
   const extraPx=60*PPM;
-  const topPad=Math.round(PPM*10);
   const can=document.getElementById('fcan');
   can.style.height=(tpx+extraPx)+'px';
-  can.style.marginTop=topPad+'px';
+  can.style.marginTop='';
   // ガイドはシリアル側で統合管理
   Array.from(can.children).forEach(el=>{if(!['fov','fdl'].includes(el.id))el.remove();});
   // overtime グレー背景
@@ -2204,26 +2172,23 @@ async function runAI(){
       const audioB64=await toB64(audioF);
       const audioMt=audioF.type||'audio/mpeg';
 
-      const step1Prompt=`あなたは音声書き起こしの専門家です。添付の音声ファイル（総再生時間: ${totalStr}）を正確に書き起こしてください。
+      const step1Prompt=`あなたは音声分析の専門家です。添付の音声ファイル（総再生時間: ${totalStr}）を分析し、話題・内容・話者が明確に変わるタイミングでセクションに分割してください。
 
-【書き起こし手順】
-① 音声全体を10分ごとのチャンクに分けて分析する（例: 0:00-10:00, 10:00-20:00 ...）
-② 各チャンク内で話された内容をすべて漏れなく書き起こす
-③ 話題・話者・内容が変わるタイミングに「[MM:SS]」形式のタイムスタンプを挿入する
-④ チャンクをまたいでも話題が続いている場合は同じセクションとして扱う（チャンク境界でセクションを切らない）
+【重要な前提】
+- タイムスタンプは「おおよその目安」で構いません。内容の区切りを正確に特定することを優先してください
+- 音声全体を均等に分析し、前半・後半で精度が落ちないようにしてください
 
 【出力形式】
-[00:00] セクションタイトル（話された内容の要点）
-話された内容の書き起こし（発言・キーワード・議論の流れ）...
+必ずJSON配列のみで回答してください（説明文・コードブロック不要）:
+[{"start":"00:00","title":"セクションタイトル（15文字以内）","content":"このセクションで話された内容の要点（50〜100文字）","color":"カラー名"}]
 
-[MM:SS] 次のセクションタイトル
-...
+colorの選び方: 導入・挨拶→purple 説明・講義→blue 議論・Q&A→teal まとめ・結論→green 雑談・休憩→gray
 
 【厳守事項】
-- タイムスタンプは実際の経過時間を正確に記録すること
-- 最後のセクションの終了時刻が総再生時間（${totalStr}）に近づくよう、後半も精度を落とさないこと
-- 推測・補足・改善提案は一切含めないこと
-- 実際に話された内容のみを記録すること`;
+- startは "MM:SS" または "HH:MM:SS" 形式のみ使用
+- 最初のセクションは必ず "00:00" から始める
+- 内容は実際に話されたことのみ記載（推測・補足・改善提案は禁止）
+- JSONとして正しくパースできる形式にすること`;
 
       const step1Parts=[
         {text: step1Prompt},
@@ -2233,7 +2198,7 @@ async function runAI(){
         `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
         {method:'POST',headers:{'Content-Type':'application/json'},
          body:JSON.stringify({contents:[{role:'user',parts:step1Parts}],
-           generationConfig:{maxOutputTokens:8192}})}
+           generationConfig:{maxOutputTokens:16384}})}
       );
       if(!step1Resp.ok){
         const e=await step1Resp.text();
@@ -2244,48 +2209,34 @@ async function runAI(){
       const transcript=((step1Data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
       if(!transcript) throw new Error('Step1: 書き起こし結果が空でした。音声ファイルを確認してください。');
 
-      // ── STEP 2: 書き起こしからセッション配列を生成 ────────────────
-      // RPM制限回避のため5秒待機
-      btn.textContent='⏳ Step 1/2完了 - 5秒待機中...';
-      await new Promise(resolve => setTimeout(resolve, 5000));
-      btn.textContent='⏳ Step 2/2: セッション生成中...';
-
-      const step2Prompt=`以下は音声ファイル（総再生時間: ${totalStr} = ${totalMin}分）のタイムスタンプ付き書き起こしです。
-この書き起こしをもとに、タイムテーブルのセッション配列をJSON形式で出力してください。
-${prompt?'\n追加指示: '+prompt+'\n':''}
-【書き起こし】
-${transcript}
-
-【変換ルール】
-- 各セクション（タイムスタンプで区切られたブロック）を1つのセッションに変換する
-- durは「次のタイムスタンプ - このタイムスタンプ」の分数（整数・最低1）
-- 最後のセクションのdurは「総再生時間 - このセクションの開始時刻」
-- 全セッションのdur合計が必ず${totalMin}分になるよう調整する（端数は最後のセッションに加算）
-- nameは書き起こし内のセクションタイトルを15文字以内に収める
-- commentは実際に話された内容・キーワードを40〜60文字で記載
-- colorは話題の性質で判断（説明・講義:blue 議論・Q&A:teal まとめ・結論:green 雑談・休憩:gray 導入:purple）
-- 改善提案・アドバイス・補足は一切含めない
-
-JSON配列のみで回答（説明文・コードブロック不要）:
-[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"実際に話された内容の要点"}]`;
-
-      const step2Parts=[{text:step2Prompt}];
-      const step2Resp=await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
-        {method:'POST',headers:{'Content-Type':'application/json'},
-         body:JSON.stringify({contents:[{role:'user',parts:step2Parts}],
-           generationConfig:{maxOutputTokens:8192}})}
-      );
-      if(!step2Resp.ok){
-        const e=await step2Resp.text();
-        throw new Error(`Step2 APIエラー ${step2Resp.status}: ${e.slice(0,200)}`);
+      // ── STEP 2: Step1のJSONからJSで機械的にdurを計算 ────────────────
+      btn.textContent='⏳ Step 2/2: セッション変換中...';
+      let step1Sections;
+      try{
+        step1Sections=extractJsonSessions(transcript,'Step1');
+      }catch(e){
+        throw new Error('Step1の書き起こし結果をJSONとして解析できませんでした。\n詳細: '+e.message+'\n\n応答の先頭: '+transcript.slice(0,200));
       }
-      const step2Data=await step2Resp.json();
-      if(step2Data.error) throw new Error('Step2 API Error: '+(step2Data.error.message||JSON.stringify(step2Data.error)));
-      const step2Text=((step2Data.candidates||[])[0]?.content?.parts||[]).map(p=>p.text||'').join('');
-      if(!step2Text) throw new Error('Step2: セッション生成結果が空でした。');
-
-      aiSs=extractJsonSessions(step2Text,'Step2');
+      function tsToMin(ts){
+        if(!ts) return 0;
+        const parts=String(ts).trim().split(':').map(Number);
+        if(parts.length===3) return parts[0]*60+parts[1]+Math.round(parts[2]/60);
+        if(parts.length===2) return parts[0]*60+parts[1];
+        return 0;
+      }
+      aiSs=step1Sections.map(function(sec,i){
+        const startMin=tsToMin(sec.start||sec.time||'0:00');
+        const endMin=i<step1Sections.length-1
+          ? tsToMin(step1Sections[i+1].start||step1Sections[i+1].time||'0:00')
+          : totalMin;
+        const dur=Math.max(1,Math.round(endMin-startMin));
+        return {
+          name:(sec.title||sec.name||'セッション').slice(0,15),
+          dur:dur,
+          color:sec.color||'blue',
+          comment:sec.content||sec.comment||''
+        };
+      });
 
       // ── STEP C: dur合計を録音時間に自動補正 ──────────────────────
       if(totalMin>0){
@@ -2582,7 +2533,10 @@ function openGCal(){
 
   // 日選択リストを生成
   gcalBuildDayList();
-  // セッション選択リストを生成
+  // セッション選択: 初期化
+  gcalActiveDay=0;
+  gcalInitSelections();
+  gcalBuildTabs();
   gcalBuildSessionList();
 
   document.getElementById('gcalm').style.display='flex';
@@ -2620,41 +2574,114 @@ function gcalBuildDayList(){
   }
 }
 
-function gcalBuildSessionList(){
-  const list=document.getElementById('gcal-session-list');
-  const sm=gSM();
-  const st=gSt();
-  list.innerHTML='';
-  // シリアルセッション
-  sessions.forEach((s,i)=>{
-    const row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:11px';
-    row.innerHTML='<input type="checkbox" id="gcal-s-'+s.id+'" checked/>'
-      +'<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[s.color]||CDot.teal)+';flex-shrink:0"></div>'
-      +'<span style="flex:1">'+esc(s.name)+'</span>'
-      +'<span style="font-size:10px;color:var(--text2)">'+hm(sm+st[i])+'〜'+hm(sm+st[i]+s.dur)+'</span>';
-    list.appendChild(row);
-  });
-  // フリーセッション
-  if(freeEvs.length>0){
-    const sep=document.createElement('div');
-    sep.style.cssText='font-size:10px;color:var(--text2);padding:4px 4px 2px;margin-top:4px;border-top:1px solid var(--border)';
-    sep.textContent='フリーセッション';
-    list.appendChild(sep);
-    freeEvs.forEach(ev=>{
-      const row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:11px';
-      row.innerHTML='<input type="checkbox" id="gcal-f-'+ev.id+'" checked/>'
-        +'<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[ev.color]||CDot.teal)+';flex-shrink:0"></div>'
-        +'<span style="flex:1">'+esc(ev.name)+'</span>'
-        +'<span style="font-size:10px;color:var(--text2)">'+hm(sm+ev.fromMin)+'〜'+hm(sm+ev.toMin)+'</span>';
-      list.appendChild(row);
-    });
+// gcalSelections: {dayIndex: {serial:{id:true/false}, free:{id:true/false}}}
+let gcalSelections={};
+let gcalActiveDay=0;
+
+function gcalInitSelections(){
+  gcalSelections={};
+  for(let d=0;d<dayCount;d++){
+    const ss=dayCount>1?(dayData[d]?.sessions||[]):sessions;
+    const fs=dayCount>1?(dayData[d]?.freeEvs||[]):freeEvs;
+    gcalSelections[d]={serial:{},free:{}};
+    ss.forEach(s=>gcalSelections[d].serial[s.id]=true);
+    fs.forEach(ev=>gcalSelections[d].free[ev.id]=true);
   }
 }
 
+function gcalBuildTabs(){
+  const tabs=document.getElementById('gcal-day-tabs');
+  tabs.innerHTML='';
+  if(dayCount<=1){tabs.style.display='none';return;}
+  tabs.style.display='flex';
+  const baseDate=document.getElementById('gcal-date').value;
+  for(let d=0;d<dayCount;d++){
+    let label='DAY'+(d+1);
+    if(baseDate){
+      const[y,m,dy]=baseDate.split('-').map(Number);
+      const dt=new Date(y,m-1,dy+d);
+      const days=['日','月','火','水','木','金','土'];
+      label+=' ('+String(dt.getMonth()+1)+'/'+String(dt.getDate())+' '+days[dt.getDay()]+')';
+    }
+    const btn=document.createElement('button');
+    btn.className='btn';
+    btn.id='gcal-tab-'+d;
+    btn.style.cssText='font-size:10px;padding:3px 8px;'+(d===gcalActiveDay?'background:var(--accent);color:#fff;border-color:var(--accent)':'');
+    btn.textContent=label;
+    btn.onclick=(function(di){return function(){gcalSaveCurrentTab();gcalActiveDay=di;gcalBuildTabs();gcalBuildSessionList();};})(d);
+    tabs.appendChild(btn);
+  }
+}
+
+function gcalSaveCurrentTab(){
+  // 現在タブの選択状態を保存
+  document.querySelectorAll('#gcal-session-list input[type="checkbox"]').forEach(el=>{
+    const id=parseInt(el.dataset.id);
+    const type=el.dataset.type;
+    if(!gcalSelections[gcalActiveDay]) return;
+    if(type==='serial') gcalSelections[gcalActiveDay].serial[id]=el.checked;
+    else if(type==='free') gcalSelections[gcalActiveDay].free[id]=el.checked;
+  });
+}
+
+function gcalBuildSessionList(){
+  const list=document.getElementById('gcal-session-list');
+  list.innerHTML='';
+  const sm=gSM();
+  const d=gcalActiveDay;
+  const ss=dayCount>1?(dayData[d]?.sessions||[]):sessions;
+  const fs=dayCount>1?(dayData[d]?.freeEvs||[]):freeEvs;
+  if(!gcalSelections[d]) gcalSelections[d]={serial:{},free:{}};
+
+  let c=0;
+  ss.forEach(s=>{
+    const checked=gcalSelections[d].serial[s.id]!==false;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px;font-size:11px;border-radius:4px';
+    row.innerHTML='<input type="checkbox" data-id="'+s.id+'" data-type="serial" '+(checked?'checked':'')+'/>'+
+      '<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[s.color]||CDot.teal)+';flex-shrink:0"></div>'+
+      '<span style="flex:1">'+esc(s.name)+'</span>'+
+      '<span style="font-size:10px;color:var(--text2)">'+hm(sm+c)+'〜'+hm(sm+c+s.dur)+'</span>';
+    row.querySelector('input').onchange=gcalUpdateCount;
+    list.appendChild(row);
+    c+=s.dur;
+  });
+
+  if(fs.length>0){
+    const sep=document.createElement('div');
+    sep.style.cssText='font-size:10px;color:var(--text2);padding:5px 4px 2px;margin-top:3px;border-top:1px solid var(--border)';
+    sep.textContent='フリーセッション';
+    list.appendChild(sep);
+    fs.forEach(ev=>{
+      const checked=gcalSelections[d].free[ev.id]!==false;
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px;font-size:11px;border-radius:4px';
+      row.innerHTML='<input type="checkbox" data-id="'+ev.id+'" data-type="free" '+(checked?'checked':'')+'/>'+
+        '<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[ev.color]||CDot.teal)+';flex-shrink:0"></div>'+
+        '<span style="flex:1">'+esc(ev.name)+'</span>'+
+        '<span style="font-size:10px;color:var(--text2)">'+hm(sm+ev.fromMin)+'〜'+hm(sm+ev.toMin)+'</span>';
+      row.querySelector('input').onchange=gcalUpdateCount;
+      list.appendChild(row);
+    });
+  }
+  gcalUpdateCount();
+}
+
+function gcalUpdateCount(){
+  gcalSaveCurrentTab();
+  let total=0;
+  Object.values(gcalSelections).forEach(d=>{
+    Object.values(d.serial).forEach(v=>{if(v)total++;});
+    Object.values(d.free).forEach(v=>{if(v)total++;});
+  });
+  const el=document.getElementById('gcal-sel-count');
+  if(el) el.textContent='合計 '+total+' 件選択中';
+}
+
 function gcalCheckAll(checked){
-  document.querySelectorAll('#gcal-session-list input[type="checkbox"]').forEach(el=>el.checked=checked);
+  document.querySelectorAll('#gcal-session-list input[type="checkbox"]').forEach(el=>{el.checked=checked;});
+  gcalSaveCurrentTab();
+  gcalUpdateCount();
 }
 
 function gcalMakeURL(title,dateStr,startMin,endMin,desc){
@@ -2705,16 +2732,27 @@ function execGCal(){
       });
     }
   } else {
-    // セッション個別選択
-    const st=gSt();
-    sessions.forEach((s,i)=>{
-      if(!document.getElementById('gcal-s-'+s.id)?.checked) return;
-      urls.push(gcalMakeURL(s.name,baseDate,sm+st[i],sm+st[i]+s.dur,s.comment||''));
-    });
-    freeEvs.forEach(ev=>{
-      if(!document.getElementById('gcal-f-'+ev.id)?.checked) return;
-      urls.push(gcalMakeURL(ev.name,baseDate,sm+ev.fromMin,sm+ev.toMin,ev.comment||''));
-    });
+    // セッション個別選択（全DAY・gcalSelectionsベース）
+    gcalSaveCurrentTab();
+    for(let d=0;d<dayCount;d++){
+      const[y,m,dy]=baseDate.split('-').map(Number);
+      const dt=new Date(y,m-1,dy+d);
+      const pad=n=>String(n).padStart(2,'0');
+      const dateStr=dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());
+      const ss=dayCount>1?(dayData[d]?.sessions||[]):sessions;
+      const fs=dayCount>1?(dayData[d]?.freeEvs||[]):freeEvs;
+      const sel=gcalSelections[d]||{serial:{},free:{}};
+      let c=0;
+      ss.forEach(s=>{
+        if(sel.serial[s.id]!==false)
+          urls.push(gcalMakeURL(s.name,dateStr,sm+c,sm+c+s.dur,s.comment||''));
+        c+=s.dur;
+      });
+      fs.forEach(ev=>{
+        if(sel.free[ev.id]!==false)
+          urls.push(gcalMakeURL(ev.name,dateStr,sm+ev.fromMin,sm+ev.toMin,ev.comment||''));
+      });
+    }
   }
 
   if(urls.length===0){alert('書き出すセッションがありません。');return;}
@@ -3005,7 +3043,6 @@ document.getElementById('evs').addEventListener('change',render);
 document.getElementById('eve').addEventListener('change',render);
 // パスワード認証を一時停止（自動通過）
 sessionStorage.setItem('st-auth','1');
-document.getElementById('pw-screen').style.display='none';
 setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); }, 300);
 // 自動保存データを復元
 dayData=[{sessions:[],freeEvs:[]}];
@@ -3615,8 +3652,7 @@ function fbWaitAndInit(){
 }
 
 function fbAutoStart(){
-  var authed = sessionStorage.getItem('st-auth') === '1';
-  if(authed){ fbWaitAndInit(); }
+  fbWaitAndInit();
 }
 
 if(document.readyState === 'loading'){
