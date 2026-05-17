@@ -79,7 +79,7 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .sdr{font-size:10px;white-space:nowrap;flex-shrink:0}
 .sdl{font-size:12px;cursor:pointer;opacity:.35;flex-shrink:0}.sdl:hover{opacity:1}
 .scm{font-size:9px;line-height:1.3;margin-top:1px;opacity:.7;overflow:hidden;word-break:break-all;flex:1}
-.il{position:absolute;left:2px;right:2px;height:2px;border-radius:1px;background:#7F77DD;z-index:12;pointer-events:none;display:none}
+.il{position:absolute;left:2px;right:2px;height:2px;border-radius:1px;background:#BA7517;z-index:12;pointer-events:none;display:none}
 .now-line{position:absolute;left:0;right:0;height:1px;background:#E53E3E;z-index:15;pointer-events:none}
 
 .now-time{position:absolute;left:2px;top:-9px;font-size:9px;font-weight:700;color:#E53E3E;white-space:nowrap;pointer-events:none}
@@ -95,7 +95,7 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .fc2{font-size:9px;opacity:.7;overflow:hidden;word-break:break-all;flex:1;margin-top:1px}
 .fdl{position:absolute;top:1px;right:2px;font-size:9px;cursor:pointer;opacity:0;z-index:9}
 .fb:hover .fdl{opacity:.55}.fdl:hover{opacity:1}
-.fdl2{position:absolute;left:0;right:0;height:2px;background:#7F77DD;z-index:20;pointer-events:none;display:none}
+.fdl2{position:absolute;left:0;right:0;height:2px;background:#BA7517;z-index:20;pointer-events:none;display:none}
 .fov{position:absolute;inset:0;z-index:15;pointer-events:none;border:2px dashed transparent;border-radius:3px}
 .fov.act{}
 .tbv{flex:1;overflow-y:auto;display:none;flex-direction:column}
@@ -114,7 +114,9 @@ tbody tr:hover td{background:var(--bg2)}
 .tdiv{height:5px;background:var(--bg2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
 .dz{padding:3px 9px;font-size:10px;color:var(--text3);border-bottom:1px solid var(--border);min-height:22px}
 .dz.dov{background:var(--bg-info);color:var(--text-info)}
-.drgt td{border-top:2px solid #7F77DD!important}
+.drgt td{border-top:2px solid #BA7517!important}
+
+@media(prefers-color-scheme:dark){.il,.fdl2{background:#FAC775!important}.drgt td{border-top-color:#FAC775!important}}
 .tooltip{position:fixed;background:#1A1A18;color:#fff;font-size:10px;padding:3px 7px;border-radius:4px;pointer-events:none;z-index:500;white-space:nowrap;display:none;transform:translateX(-50%)}
 .mbg{position:fixed;inset:0;background:rgba(0,0,0,.3);z-index:100;display:flex;align-items:center;justify-content:center}
 .mc{background:var(--bg);border:1px solid var(--border);border-radius:8px;display:flex;flex-direction:column;overflow:hidden;max-height:90vh;box-shadow:0 8px 32px rgba(0,0,0,.2)}
@@ -357,10 +359,10 @@ if(sessionStorage.getItem('st-auth')==='1'){
           <span>フリーセッション</span>
           <button class="ib" onclick="openFE(null)" style="font-size:15px;width:18px;height:18px">+</button>
         </div>
-        <div class="frs" id="frs" onscroll="syncScroll('frs')">
+        <div class="frs" id="frs" onscroll="syncScroll('frs')" style="position:relative">
+          <div class="fdl2" id="fdl" style="position:absolute;left:0;right:0;height:2px;background:#BA7517;z-index:20;pointer-events:none;display:none"></div>
           <div class="fc" id="fcan">
             <div class="fov" id="fov"></div>
-            <div class="fdl2" id="fdl"></div>
           </div>
         </div>
       </div>
@@ -376,7 +378,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
   <th style="width:55px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)"">開始</th>
   <th style="width:55px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)"">終了</th>
   <th style="width:48px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)"">時間</th>
-  <th style="font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)"">コメント</th>
+  <th style="font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)"">メモ</th>
   <th style="width:22px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)""></th>
 </tr></thead>
         <tbody id="stb"></tbody></table>
@@ -393,7 +395,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
   <th style="width:55px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)">開始</th>
   <th style="width:55px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)">終了</th>
   <th style="width:48px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)">時間</th>
-  <th style="font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)">コメント</th>
+  <th style="font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)">メモ</th>
   <th style="width:22px;font-size:10px;font-weight:500;color:var(--text2);padding:5px 7px;white-space:nowrap;border-bottom:1px solid var(--border)"></th>
 </tr></thead>
         <tbody id="ftb"></tbody></table>
@@ -411,7 +413,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
       <div class="mr"><div class="ml">名前</div><input class="mi" id="sname" maxlength="40" placeholder="セッション名"/></div>
       <div class="mr"><div class="ml">色</div><div class="cr2" id="scolors"></div></div>
       <div class="mr"><div class="ml">時間（分）</div><input type="number" class="mi din" id="sdur" min="1" max="480"/></div>
-      <div class="mr"><div class="ml">コメント</div><textarea class="mta" id="scmt" maxlength="100"></textarea></div>
+      <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="scmt" maxlength="100"></textarea></div>
     </div>
     <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="scc">0</span>/100</span>
       <div class="mbtns"><button class="btn d" id="sdel" onclick="delSM()">削除</button><button class="btn" onclick="closeSM()">キャンセル</button><button class="btn p" onclick="saveSM()">保存</button></div>
@@ -426,7 +428,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
       <div class="mr"><div class="ml">名前</div><input class="mi" id="fname" maxlength="40" placeholder="イベント名"/></div>
       <div class="mr"><div class="ml">色</div><div class="cr2" id="fcolors"></div></div>
       <div class="mr"><div class="ml">時間帯</div><div class="trr"><input class="tin" id="ffrom" type="time"/><span style="font-size:11px;color:var(--text2)">〜</span><input class="tin" id="fto" type="time"/></div></div>
-      <div class="mr"><div class="ml">コメント</div><textarea class="mta" id="fcmt" maxlength="100"></textarea></div>
+      <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="fcmt" maxlength="100"></textarea></div>
     </div>
     <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="fcc">0</span>/100</span>
       <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
@@ -627,8 +629,67 @@ if(sessionStorage.getItem('st-auth')==='1'){
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         <div style="text-align:left"><div style="font-weight:700">データで書き出し (.stt)</div><div style="font-size:10px;opacity:.7;margin-top:2px">「開く」から読み込み可能な形式</div></div>
       </button>
+      <button class="btn" style="padding:10px 14px;font-size:12px;display:flex;align-items:center;gap:8px;width:100%;justify-content:flex-start" onclick="closeExport();openGCal()">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        <div style="text-align:left"><div style="font-weight:700">Google カレンダーへ書き出し</div><div style="font-size:10px;opacity:.7;margin-top:2px">セッションをGoogleカレンダーに追加</div></div>
+      </button>
     </div>
     <div class="mft"><div></div><button class="btn" onclick="closeExport()">キャンセル</button></div>
+  </div>
+</div>
+
+<!-- Google Calendar export modal -->
+<div class="mbg" id="gcalm" style="display:none">
+  <div class="mc" style="width:440px;max-height:90vh;overflow-y:auto" onclick="event.stopPropagation()">
+    <div class="mh"><h3>📅 Google カレンダーへ書き出し</h3><button class="mx" onclick="closeGCal()">×</button></div>
+    <div class="mb" style="gap:12px">
+
+      <!-- 日付 -->
+      <div>
+        <div class="ml" style="margin-bottom:5px">📆 基準日</div>
+        <input type="date" id="gcal-date" class="mi" style="width:100%;font-size:11px"/>
+        <div style="font-size:10px;color:var(--text2);margin-top:3px">Googleカレンダーに登録する日付を確認・変更してください</div>
+      </div>
+
+      <div style="height:1px;background:var(--border)"></div>
+
+      <!-- 書き出し範囲 -->
+      <div>
+        <div class="ml" style="margin-bottom:5px">📋 書き出す範囲</div>
+        <div style="display:flex;flex-direction:column;gap:4px">
+          <label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:11px" id="gcal-scope-all-lbl">
+            <input type="radio" name="gcal-scope" value="all" onchange="gcalScopeChange()" checked/> 全日程（全DAYのすべてのセッション）
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:11px" id="gcal-scope-day-lbl">
+            <input type="radio" name="gcal-scope" value="day" onchange="gcalScopeChange()"/> 特定の日を選択
+          </label>
+          <label style="display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:11px" id="gcal-scope-session-lbl">
+            <input type="radio" name="gcal-scope" value="session" onchange="gcalScopeChange()"/> セッションを個別に選択
+          </label>
+        </div>
+      </div>
+
+      <!-- 日選択 -->
+      <div id="gcal-day-picker" style="display:none">
+        <div class="ml" style="margin-bottom:5px">DAY を選択</div>
+        <div id="gcal-day-list" style="display:flex;flex-direction:column;gap:3px"></div>
+      </div>
+
+      <!-- セッション選択 -->
+      <div id="gcal-session-picker" style="display:none">
+        <div class="ml" style="margin-bottom:5px">書き出すセッションを選択</div>
+        <div style="display:flex;gap:6px;margin-bottom:4px">
+          <button class="btn" style="font-size:10px;padding:2px 8px" onclick="gcalCheckAll(true)">すべて選択</button>
+          <button class="btn" style="font-size:10px;padding:2px 8px" onclick="gcalCheckAll(false)">すべて解除</button>
+        </div>
+        <div id="gcal-session-list" style="max-height:200px;overflow-y:auto;border:1px solid var(--border);border-radius:5px;padding:4px"></div>
+      </div>
+
+    </div>
+    <div class="mft">
+      <button class="btn p" onclick="execGCal()">📅 書き出す</button>
+      <button class="btn" onclick="closeGCal()">キャンセル</button>
+    </div>
   </div>
 </div>
 
@@ -654,7 +715,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
         <ol style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
           <li>隙間なく連続してセッションを積み上げる方法です。左列「セッションメニュー」からセッションを<b>ドラッグ&amp;ドロップ</b>して中央「シリアルセッション」に追加</li>
           <li>ブロックの<b>下端ハンドル</b>（ホバーで表示）を上下にドラッグして時間を調整</li>
-          <li>ブロックを<b>ダブルクリック</b>すると名前・色・時間・コメントを編集</li>
+          <li>ブロックを<b>ダブルクリック</b>すると名前・色・時間・メモを編集</li>
           <li>ブロックを<b>ドラッグ&amp;ドロップ</b>して並び順を変更</li>
         </ol>
       </div>
@@ -845,7 +906,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
         </div>
       </div>
       <div>
-        <div class="mv-modal-label">コメント</div>
+        <div class="mv-modal-label">メモ</div>
         <textarea class="mv-modal-textarea" id="mv-sm-comment" maxlength="100" placeholder="メモ・注意事項など"></textarea>
       </div>
     </div>
@@ -876,7 +937,7 @@ if(sessionStorage.getItem('st-auth')==='1'){
         </div>
       </div>
       <div>
-        <div class="mv-modal-label">コメント</div>
+        <div class="mv-modal-label">メモ</div>
         <textarea class="mv-modal-textarea" id="mv-fm-comment" maxlength="100" placeholder="メモ・注意事項など"></textarea>
       </div>
     </div>
@@ -1109,8 +1170,6 @@ function fitz(){
   ZL.forEach((z,i)=>{if(z<=PPM)best=i;});
   zi=best;
   render();
-  document.getElementById('tls').scrollTop=0;
-  document.getElementById('frs').scrollTop=0;
 }
 
 // ================================================================
@@ -1172,9 +1231,11 @@ function rTL(){
   const tpx=displayMin*PPM;
   const tc=document.getElementById('tc'),sc=document.getElementById('sc');
   const extraPx=60*PPM;
+  const topPad=Math.round(PPM*10);
   const totalPx2=tpx+extraPx;
-  document.getElementById('tlb').style.height=totalPx2+'px';
-  tc.style.height=totalPx2+'px';sc.style.height=totalPx2+'px';
+  document.getElementById('tlb').style.cssText=`height:${totalPx2}px;margin-top:${topPad}px`;
+  tc.style.cssText=`height:${totalPx2}px`;
+  sc.style.cssText=`height:${totalPx2}px`;
 
   // タイムticks（時間軸）
   let tH='';
@@ -1260,7 +1321,7 @@ function rTL(){
     if(showC){
       const cm=document.createElement('div');cm.className='scm';
       cm.innerHTML=escLink(s.comment);
-      // コメント内のリンクがクリックできるようにイベント伝播を制御
+      // メモ内のリンクがクリックできるようにイベント伝播を制御
       cm.addEventListener('click',function(e){
         if(e.target.tagName==='A') e.stopPropagation();
       });
@@ -1497,8 +1558,10 @@ function rFR(){
   const displayMin=Math.max(tm, minutesTo24);
   const tpx=displayMin*PPM;
   const extraPx=60*PPM;
+  const topPad=Math.round(PPM*10);
   const can=document.getElementById('fcan');
   can.style.height=(tpx+extraPx)+'px';
+  can.style.marginTop=topPad+'px';
   // ガイドはシリアル側で統合管理
   Array.from(can.children).forEach(el=>{if(!['fov','fdl'].includes(el.id))el.remove();});
   // overtime グレー背景
@@ -1687,13 +1750,15 @@ function onFRo(e){
   if(gSrc==='menu'){
     document.getElementById('fov').classList.add('act');
     const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
-    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM)+'px';
+    const _fcanMT1=parseInt(document.getElementById('fcan').style.marginTop)||0;
+    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM+_fcanMT1)+'px';
     sTT(e.clientX,e.clientY,`${hm(gSM()+fm)}〜${hm(gSM()+fm+gD)}`);
     e.dataTransfer.dropEffect='copy';return;
   }
   if(gSrc==='fblock'&&fBD.id){
     const ry=frRY(e),dur=fBD.ot-fBD.of,nf=Math.max(0,Math.round((ry/PPM-dur/2)/SN)*SN);
-    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM)+'px';
+    const _fcanMT2=parseInt(document.getElementById('fcan').style.marginTop)||0;
+    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM+_fcanMT2)+'px';
     sTT(e.clientX,e.clientY,`${hm(gSM()+nf)}〜${hm(gSM()+nf+dur)}（${dur}分）`);
     e.dataTransfer.dropEffect='move';
   }
@@ -1897,7 +1962,7 @@ function renderSTL(){document.getElementById('stlist').innerHTML=savedTpls.map((
 function stLoad(i){stTs=JSON.parse(JSON.stringify(savedTpls[i].types));TYPES=JSON.parse(JSON.stringify(savedTpls[i].types));document.getElementById('stname').value=savedTpls[i].name;stIcp=null;renderST();localStorage.setItem('stt-tpl-name',savedTpls[i].name);}
 function stDel(i){savedTpls.splice(i,1);renderSTL();const userTpls=savedTpls.filter(t=>!t._preset);localStorage.setItem('stt-user-tpls',JSON.stringify(userTpls));}
 function stDS(e,i){stDI2=i;e.dataTransfer.effectAllowed='move';setTimeout(()=>document.getElementById('str'+i)?.classList.add('dg'),0);}
-function stDO(e,i){e.preventDefault();if(stDI2===null||stDI2===i)return;document.querySelectorAll('.str').forEach((r,ri)=>r.style.borderTop=ri===i?'2px solid #7F77DD':'');}
+function stDO(e,i){e.preventDefault();if(stDI2===null||stDI2===i)return;document.querySelectorAll('.str').forEach((r,ri)=>r.style.borderTop=ri===i?'2px solid #BA7517':'');}
 function stDD(e,i){e.preventDefault();document.querySelectorAll('.str').forEach(r=>{r.style.borderTop='';r.classList.remove('dg');});if(stDI2===null||stDI2===i)return;const[m]=stTs.splice(stDI2,1);stTs.splice(i,0,m);stDI2=null;renderST();}
 
 // ================================================================
@@ -2464,7 +2529,7 @@ function newEV(){if(!confirm('現在のデータをリセットして新規イ�
 function openCSV(){document.getElementById('csvexp').value=buildCSV();document.getElementById('csvimp').value='';document.getElementById('csvm').style.display='flex';}
 function closeCSV(){document.getElementById('csvm').style.display='none';}
 document.getElementById('csvm').addEventListener('click',function(e){if(e.target===this)closeCSV();});
-function buildCSV(){const sm=gSM(),st=gSt();let r=['タイプ,セッション名,開始,終了,時間(分),コメント'];sessions.forEach((s,i)=>r.push(`シリアル,${cq(s.name)},${hm(sm+st[i])},${hm(sm+st[i]+s.dur)},${s.dur},${cq(s.comment||'')}`));[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin).forEach(ev=>r.push(`フリー,${cq(ev.name)},${hm(sm+ev.fromMin)},${hm(sm+ev.toMin)},${ev.toMin-ev.fromMin},${cq(ev.comment||'')}`));return r.join('\n');}
+function buildCSV(){const sm=gSM(),st=gSt();let r=['タイプ,セッション名,開始,終了,時間(分),メモ'];sessions.forEach((s,i)=>r.push(`シリアル,${cq(s.name)},${hm(sm+st[i])},${hm(sm+st[i]+s.dur)},${s.dur},${cq(s.comment||'')}`));[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin).forEach(ev=>r.push(`フリー,${cq(ev.name)},${hm(sm+ev.fromMin)},${hm(sm+ev.toMin)},${ev.toMin-ev.fromMin},${cq(ev.comment||'')}`));return r.join('\n');}
 function cq(s){return s.includes(',')||s.includes('"')||s.includes('\n')?`"${s.replace(/"/g,'""')}"`:s;}
 function dlCSV(){const b=new Blob([buildCSV()],{type:'text/csv;charset=utf-8'});const a=document.createElement('a');a.href=URL.createObjectURL(b);a.download=`tt_${document.getElementById('evd').value||'export'}.csv`;a.click();}
 function impCSV(){const text=document.getElementById('csvimp').value.trim();if(!text){alert('CSVを貼り付けてください');return;}if(!confirm('現在のセッションを上書きします。よろしいですか？'))return;const lines=text.split('\n');const sm=gSM();const ns=[],nf=[];for(let i=1;i<lines.length;i++){const c=pcsv(lines[i]);if(c.length<5)continue;const[type,name,,end,dur,cmt]=c;const d=parseInt(dur)||10;if(type==='シリアル'){ns.push({id:nid++,name,dur:d,color:'teal',comment:cmt||''});}else if(type==='フリー'){const fa=h2m(c[2]),ta=h2m(end);nf.push({id:nfid++,name,color:'coral',comment:cmt||'',fromMin:fa-sm,toMin:ta-sm});}}sessions=ns;freeEvs=nf;closeCSV();snap();render();if(typeof mvRender==='function')mvRender();}
@@ -2500,6 +2565,170 @@ function closeExport(){document.getElementById('expm').style.display='none';}
 document.getElementById('expm').addEventListener('click',function(e){if(e.target===this)closeExport();});
 
 // JSON (.stt) 書き出し: すべての状態を保存
+
+// ================================================================
+// GOOGLE CALENDAR EXPORT
+// ================================================================
+function openGCal(){
+  // 日付初期値
+  const evd=document.getElementById('evd').value;
+  const dateEl=document.getElementById('gcal-date');
+  dateEl.value=evd||new Date().toISOString().slice(0,10);
+
+  // スコープをリセット
+  const allR=document.querySelector('input[name="gcal-scope"][value="all"]');
+  if(allR) allR.checked=true;
+  gcalScopeChange();
+
+  // 日選択リストを生成
+  gcalBuildDayList();
+  // セッション選択リストを生成
+  gcalBuildSessionList();
+
+  document.getElementById('gcalm').style.display='flex';
+}
+function closeGCal(){document.getElementById('gcalm').style.display='none';}
+document.getElementById('gcalm').addEventListener('click',function(e){if(e.target===this)closeGCal();});
+
+function gcalScopeChange(){
+  const scope=document.querySelector('input[name="gcal-scope"]:checked')?.value||'all';
+  document.getElementById('gcal-day-picker').style.display=scope==='day'?'':'none';
+  document.getElementById('gcal-session-picker').style.display=scope==='session'?'':'none';
+  // ラベルのハイライト
+  ['all','day','session'].forEach(s=>{
+    const el=document.getElementById('gcal-scope-'+s+'-lbl');
+    if(el){el.style.borderColor=scope===s?'var(--accent)':'var(--border)';el.style.background=scope===s?'var(--bg2)':'';}
+  });
+}
+
+function gcalBuildDayList(){
+  const list=document.getElementById('gcal-day-list');
+  list.innerHTML='';
+  const baseDate=document.getElementById('gcal-date').value;
+  for(let d=0;d<dayCount;d++){
+    let label='DAY '+(d+1);
+    if(baseDate){
+      const[y,m,dy]=baseDate.split('-').map(Number);
+      const dt=new Date(y,m-1,dy+d);
+      const days=['日','月','火','水','木','金','土'];
+      label+=' ('+dt.getFullYear()+'/'+String(dt.getMonth()+1).padStart(2,'0')+'/'+String(dt.getDate()).padStart(2,'0')+' '+days[dt.getDay()]+')';
+    }
+    const row=document.createElement('label');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 6px;border-radius:4px;cursor:pointer;font-size:11px';
+    row.innerHTML='<input type="checkbox" id="gcal-day-'+d+'" checked/>'+label;
+    list.appendChild(row);
+  }
+}
+
+function gcalBuildSessionList(){
+  const list=document.getElementById('gcal-session-list');
+  const sm=gSM();
+  const st=gSt();
+  list.innerHTML='';
+  // シリアルセッション
+  sessions.forEach((s,i)=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:11px';
+    row.innerHTML='<input type="checkbox" id="gcal-s-'+s.id+'" checked/>'
+      +'<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[s.color]||CDot.teal)+';flex-shrink:0"></div>'
+      +'<span style="flex:1">'+esc(s.name)+'</span>'
+      +'<span style="font-size:10px;color:var(--text2)">'+hm(sm+st[i])+'〜'+hm(sm+st[i]+s.dur)+'</span>';
+    list.appendChild(row);
+  });
+  // フリーセッション
+  if(freeEvs.length>0){
+    const sep=document.createElement('div');
+    sep.style.cssText='font-size:10px;color:var(--text2);padding:4px 4px 2px;margin-top:4px;border-top:1px solid var(--border)';
+    sep.textContent='フリーセッション';
+    list.appendChild(sep);
+    freeEvs.forEach(ev=>{
+      const row=document.createElement('div');
+      row.style.cssText='display:flex;align-items:center;gap:6px;padding:3px 4px;font-size:11px';
+      row.innerHTML='<input type="checkbox" id="gcal-f-'+ev.id+'" checked/>'
+        +'<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[ev.color]||CDot.teal)+';flex-shrink:0"></div>'
+        +'<span style="flex:1">'+esc(ev.name)+'</span>'
+        +'<span style="font-size:10px;color:var(--text2)">'+hm(sm+ev.fromMin)+'〜'+hm(sm+ev.toMin)+'</span>';
+      list.appendChild(row);
+    });
+  }
+}
+
+function gcalCheckAll(checked){
+  document.querySelectorAll('#gcal-session-list input[type="checkbox"]').forEach(el=>el.checked=checked);
+}
+
+function gcalMakeURL(title,dateStr,startMin,endMin,desc){
+  // ICS形式のdatetime文字列を生成
+  function toGCalDT(dateStr,minFromMidnight){
+    const[y,m,d]=dateStr.split('-').map(Number);
+    const dt=new Date(y,m-1,d,Math.floor(minFromMidnight/60),minFromMidnight%60,0);
+    const pad=n=>String(n).padStart(2,'0');
+    return dt.getFullYear()+pad(dt.getMonth()+1)+pad(dt.getDate())+'T'+pad(dt.getHours())+pad(dt.getMinutes())+'00';
+  }
+  const start=toGCalDT(dateStr,startMin);
+  const end=toGCalDT(dateStr,endMin);
+  const params=new URLSearchParams({
+    action:'TEMPLATE',
+    text:title,
+    dates:start+'/'+end,
+    details:desc||'',
+  });
+  return 'https://calendar.google.com/calendar/render?'+params.toString();
+}
+
+function execGCal(){
+  const scope=document.querySelector('input[name="gcal-scope"]:checked')?.value||'all';
+  const baseDate=document.getElementById('gcal-date').value;
+  if(!baseDate){alert('基準日を入力してください。');return;}
+  const sm=gSM();
+  const urls=[];
+
+  if(scope==='all'||scope==='day'){
+    // 全DAYまたは選択DAYのすべてのセッション
+    for(let d=0;d<dayCount;d++){
+      if(scope==='day'&&!document.getElementById('gcal-day-'+d)?.checked) continue;
+      // 日付を計算
+      const[y,m,dy]=baseDate.split('-').map(Number);
+      const dt=new Date(y,m-1,dy+d);
+      const pad=n=>String(n).padStart(2,'0');
+      const dateStr=dt.getFullYear()+'-'+pad(dt.getMonth()+1)+'-'+pad(dt.getDate());
+      // そのDAYのセッション取得
+      const daySessions=dayCount>1?(dayData[d]?.sessions||[]):sessions;
+      const dayFreeEvs=dayCount>1?(dayData[d]?.freeEvs||[]):freeEvs;
+      let c=0;
+      daySessions.forEach(s=>{
+        urls.push(gcalMakeURL(s.name,dateStr,sm+c,sm+c+s.dur,s.comment||''));
+        c+=s.dur;
+      });
+      dayFreeEvs.forEach(ev=>{
+        urls.push(gcalMakeURL(ev.name,dateStr,sm+ev.fromMin,sm+ev.toMin,ev.comment||''));
+      });
+    }
+  } else {
+    // セッション個別選択
+    const st=gSt();
+    sessions.forEach((s,i)=>{
+      if(!document.getElementById('gcal-s-'+s.id)?.checked) return;
+      urls.push(gcalMakeURL(s.name,baseDate,sm+st[i],sm+st[i]+s.dur,s.comment||''));
+    });
+    freeEvs.forEach(ev=>{
+      if(!document.getElementById('gcal-f-'+ev.id)?.checked) return;
+      urls.push(gcalMakeURL(ev.name,baseDate,sm+ev.fromMin,sm+ev.toMin,ev.comment||''));
+    });
+  }
+
+  if(urls.length===0){alert('書き出すセッションがありません。');return;}
+  if(urls.length>10){
+    if(!confirm(urls.length+'件のセッションをGoogleカレンダーに書き出します。\n\nブラウザのポップアップブロックを解除してください。\n\n続けますか？'))return;
+  }
+  // 順番に新しいタブで開く
+  urls.forEach((url,i)=>{
+    setTimeout(()=>window.open(url,'_blank'),i*400);
+  });
+  closeGCal();
+  logEvent('export_gcal');
+}
+
 function exportJSON(){
   logEvent('export_stt');
   // 現在のDAYを保存
@@ -2616,11 +2845,11 @@ function exportPDF(){
       <th class="name-cell" style="padding-left:8px">セッション名</th>
       <th class="time-cell">開始</th>
       <th class="dur-cell">時間</th>
-      <th class="cmt-cell">コメント</th>
+      <th class="cmt-cell">メモ</th>
     </tr></thead>
     <tbody>${rows}</tbody>
   </table>
-  ${sf.length>0?`<h2>フリーセッション</h2><table><thead><tr><th style="width:6px;padding:0"></th><th class="name-cell" style="padding-left:8px">セッション名</th><th class="time-cell">開始〜終了</th><th class="dur-cell">時間</th><th class="cmt-cell">コメント</th></tr></thead><tbody>${frows}</tbody></table>`:''}`;
+  ${sf.length>0?`<h2>フリーセッション</h2><table><thead><tr><th style="width:6px;padding:0"></th><th class="name-cell" style="padding-left:8px">セッション名</th><th class="time-cell">開始〜終了</th><th class="dur-cell">時間</th><th class="cmt-cell">メモ</th></tr></thead><tbody>${frows}</tbody></table>`:''}`;
   }
 
   const html=`<!DOCTYPE html><html lang="ja"><head><meta charset="UTF-8"/>
@@ -2781,8 +3010,7 @@ setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); },
 // 自動保存データを復元
 dayData=[{sessions:[],freeEvs:[]}];
 autoLoad();
-uUR();sv('tl');render();updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},150);
-setTimeout(function(){fitz();},150);
+uUR();sv('tl');render();updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
 
 // ================================================================
 // MOBILE VIEW
@@ -2861,7 +3089,7 @@ function mvRenderSerial(nowMin,sm){
         
         ${s.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(s.comment)}</div>`:''}
       </div>`;
-    // タップ: コメント展開＋モーダル / 長押し: 移動
+    // タップ: メモ展開＋モーダル / 長押し: 移動
     let tapMoved=false,tapStartY=0,tapStartTime=0;
     card.addEventListener('touchstart',e=>{
       tapMoved=false;tapStartY=e.touches[0].clientY;tapStartTime=Date.now();
