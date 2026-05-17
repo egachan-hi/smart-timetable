@@ -56,9 +56,9 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .ch{font-size:11px;font-weight:700;color:var(--text2);padding:4px 7px;border-bottom:1px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:space-between}
 .db{font-size:9px;font-weight:600;padding:2px 5px;border-radius:999px}
 .ok{background:#EAF3DE;color:#27500A}.ov{background:#FCEBEB;color:#A32D2D}.un{background:#FAEEDA;color:#633806}
-.tls{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.tls{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding-top:14px}
 .tls::-webkit-scrollbar{display:none}
-.frs{flex:1;overflow-y:auto;position:relative}
+.frs{flex:1;overflow-y:auto;position:relative;padding-top:14px}
 .tlb{display:grid;grid-template-columns:38px 1fr;position:relative}
 .tc{border-right:none;position:relative}
 .tt{position:absolute;right:0;width:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:3px;font-size:9px;font-weight:600;color:var(--text3);pointer-events:none;transform:translateY(-50%)}
@@ -238,6 +238,10 @@ tbody tr:hover td{background:var(--bg2)}
       <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>テーブル
     </button>
   </div>
+  <div class="sep"></div>
+  <button class="tb" id="btn-prev-day" onclick="shiftDay(-1)" title="前日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <span id="top-date-label" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;padding:0 2px"></span>
+  <button class="tb" id="btn-next-day" onclick="shiftDay(1)" title="翌日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
   <div class="spacer"></div>
   <button class="tb ai" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成</button>
   <div class="sep"></div>
@@ -254,13 +258,6 @@ tbody tr:hover td{background:var(--bg2)}
   <button class="tb" onclick="cz(-1)" title="縮小"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
   <button class="tb" onclick="cz(1)" title="拡大"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
   <button class="tb" onclick="fitz()" title="全体表示"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="3" x2="20" y2="3"/><line x1="4" y1="21" x2="20" y2="21"/><line x1="12" y1="7" x2="12" y2="17"/><polyline points="7 7 12 3 17 7"/><polyline points="7 17 12 21 17 17"/></svg></button>
-  <div class="sep"></div>
-  <button class="tb" id="btn-prev-day" onclick="shiftDay(-1)" title="前日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-  <span id="top-date-label" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;padding:0 2px"></span>
-  <button class="tb" id="btn-next-day" onclick="shiftDay(1)" title="翌日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
-  <div class="sep"></div>
-  <span style="font-size:10px;font-weight:600;white-space:nowrap;color:var(--text)" id="trl">13:00〜17:00</span>
-  <span class="db ok" id="dbd">ぴったり！</span>
   <div class="sep"></div>
   <span id="fb-status" style="font-size:10px;white-space:nowrap;cursor:pointer" onclick="if(typeof fbShowRoom==='function')fbShowRoom()" title="ルーム共有">⚪ 未接続</span>
   <button class="tb" onclick="openHelp()" title="操作ガイド"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
@@ -310,7 +307,7 @@ tbody tr:hover td{background:var(--bg2)}
   <div class="cr">
     <div class="tlv" id="vtl">
       <div class="tlp">
-        <div class="ch"><span>シリアルセッション</span><button class="ib" onclick="addAnyEvent()" style="font-size:15px;width:18px;height:18px" title="任意のセッションを追加">+</button></div>
+        <div class="ch"><span>シリアルセッション</span><span style="flex:1"></span><span style="font-size:10px;font-weight:600;white-space:nowrap;color:var(--text);margin-right:4px" id="trl">13:00〜17:00</span><span class="db ok" id="dbd">ぴったり！</span><button class="ib" onclick="addAnyEvent()" style="font-size:15px;width:18px;height:18px;margin-left:4px" title="任意のセッションを追加">+</button></div>
         <div class="tls" id="tls" onscroll="syncScroll('tls')">
           <div class="tlb" id="tlb">
             <div class="tc" id="tc"></div>
@@ -1120,6 +1117,7 @@ function uUR(){document.getElementById('bundo').disabled=hi<=0;document.getEleme
 function gSM(){const v=document.getElementById('evs').value||'13:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
 function gEM(){const v=document.getElementById('eve').value||'16:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
 function hm(t){const v=Math.max(0,Math.round(t));return`${String(Math.floor(v/60)).padStart(2,'0')}:${String(v%60).padStart(2,'0')}`;}
+function hmn(t){const v=Math.max(0,Math.round(t));return`${Math.floor(v/60)}:${String(v%60).padStart(2,'0')}`;}
 function h2m(s){const[h,m]=(s||'00:00').split(':').map(Number);return h*60+m;}
 function gSt(){let c=0;return sessions.map(s=>{const t=c;c+=s.dur;return t;});}
 function updateTotalTime(){
@@ -1346,7 +1344,7 @@ function updateNowLine(){
   const nowMin=today.getHours()*60+today.getMinutes();
   const sm=gSM();
   const px=(nowMin-sm)*PPM;
-  const timeStr=String(today.getHours()).padStart(2,'0')+':'+String(today.getMinutes()).padStart(2,'0');
+  const timeStr=today.getHours()+':'+String(today.getMinutes()).padStart(2,'0');
   const lineColor='#E53E3E';
 
   const tc=document.getElementById('tc');
@@ -1564,7 +1562,9 @@ function rFR(){
     if(!fShort){const ftm=document.createElement('span');ftm.className='stm';ftm.textContent=hm(sm+ev.fromMin);fHdr.appendChild(ftm);}
     const fnm=document.createElement('span');fnm.className='snm';fnm.textContent=ev.name;
     const fdr=document.createElement('span');fdr.className='sdr';fdr.textContent=(ev.toMin-ev.fromMin)+'分';
-    fHdr.appendChild(fnm);fHdr.appendChild(fdr);
+    const del=document.createElement('span');del.className='sdl';del.textContent='×';
+    del.addEventListener('click',e=>{e.stopPropagation();freeEvs=freeEvs.filter(x=>x.id!==ev.id);snap();rFR();if(cv==='tb')renderTbl();});
+    fHdr.appendChild(fnm);fHdr.appendChild(fdr);fHdr.appendChild(del);
     inner.appendChild(fHdr);
     if(ht>=34&&ev.comment){
       const fc2=document.createElement('div');
@@ -1574,9 +1574,7 @@ function rFR(){
       fc2.addEventListener('dblclick',function(e){if(e.target.tagName==='A')e.stopPropagation();});
       inner.appendChild(fc2);
     }
-    const del=document.createElement('span');del.className='fdl';del.textContent='×';
-    del.addEventListener('click',e=>{e.stopPropagation();freeEvs=freeEvs.filter(x=>x.id!==ev.id);snap();rFR();if(cv==='tb')renderTbl();});
-    el.appendChild(htEl);el.appendChild(inner);el.appendChild(hbEl);el.appendChild(del);
+    el.appendChild(htEl);el.appendChild(inner);el.appendChild(hbEl);
     el.ondblclick=()=>openFE(ev.id);
     el.ondragstart=e=>onFD(e,ev.id);
     can.appendChild(el);
@@ -1634,7 +1632,7 @@ function uDiff(){
   const tm=gEM()-gSM(),used=sessions.reduce((a,s)=>a+s.dur,0),diff=used-tm;
   // trlはシリアルセッションの実際の時間を表示
   const serialEnd=gSM()+used;
-  document.getElementById('trl').textContent=`${hm(gSM())}〜${hm(serialEnd)}`;
+  document.getElementById('trl').textContent=`${hmn(gSM())}〜${hmn(serialEnd)}`;
   let cl,tx;
   if(diff===0){cl='db ok';tx='ぴったり！';}
   else if(diff>0){cl='db ov';tx=`+${diff}分`;}
@@ -1717,15 +1715,15 @@ function onFRo(e){
   if(gSrc==='menu'){
     document.getElementById('fov').classList.add('act');
     const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
-    const _fcanMT1=parseInt(document.getElementById('fcan').style.marginTop)||0;
-    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM+_fcanMT1)+'px';
+    const _frsPT1=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;
+    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM+_frsPT1)+'px';
     sTT(e.clientX,e.clientY,`${hm(gSM()+fm)}〜${hm(gSM()+fm+gD)}`);
     e.dataTransfer.dropEffect='copy';return;
   }
   if(gSrc==='fblock'&&fBD.id){
     const ry=frRY(e),dur=fBD.ot-fBD.of,nf=Math.max(0,Math.round((ry/PPM-dur/2)/SN)*SN);
-    const _fcanMT2=parseInt(document.getElementById('fcan').style.marginTop)||0;
-    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM+_fcanMT2)+'px';
+    const _frsPT2=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;
+    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM+_frsPT2)+'px';
     sTT(e.clientX,e.clientY,`${hm(gSM()+nf)}〜${hm(gSM()+nf+dur)}（${dur}分）`);
     e.dataTransfer.dropEffect='move';
   }
@@ -1792,7 +1790,9 @@ function tDO(e,id,row){
     // ガイドライン要素を行の前後に挿入
     const guide=document.createElement('tr');
     guide.className='tbl-guide';
-    guide.innerHTML='<td colspan="8" style="padding:0;height:3px;background:var(--accent);border:none"></td>';
+    guide.innerHTML='<td colspan="8" style="padding:0;height:3px;background:#BA7517;border:none"></td>';
+    // ダークモード対応
+    if(window.matchMedia('(prefers-color-scheme:dark)').matches) guide.querySelector('td').style.background='#FAC775';
     if(isBefore){
       row.parentNode.insertBefore(guide,row);
     } else {
