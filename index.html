@@ -1880,19 +1880,23 @@ function tDD(e,tid){
 // ================================================================
 let smId=null,smC='teal';
 function cp(sel,fn){
-  const row1=COLORS.map(c=>`<div class="csw${c===sel?' sel':''}" data-color="${c}" style="background:${CDot[c]};border-radius:50%" onclick="${fn}('${c}')"></div>`).join('');
-  const row2=ICON_COLORS.map(c=>`<div class="csw${c===sel?' sel':''}" data-color="${c}" style="background:${CB[c]};border:2px solid ${c===sel?CDot[c]:'transparent'}" onclick="${fn}('${c}')"><svg viewBox="0 0 24 24" width="12" height="12" fill="${CDot[c]}" style="display:block;margin:auto;margin-top:2px"><path d="${ICON_SVG[c]}"/></svg></div>`).join('');
+  const ICLBL={'ic_check':'✓','ic_chat':'✉','ic_book':'▣','ic_coffee':'☕','ic_group':'⚇','ic_pencil':'✎','ic_bulb':'☼','ic_star':'★','ic_fork':'⚔','ic_mic':'♪'};
+  const row1=COLORS.map(c=>'<div class="csw'+(c===sel?' sel':'')+'" data-color="'+c+'" style="background:'+CDot[c]+';border-radius:50%" onclick="'+fn+"('"+c+"'"+')"></div>').join('');
+  const row2=ICON_COLORS.map(c=>'<div class="csw'+(c===sel?' sel':'')+'" data-color="'+c+'" style="background:'+(CB[c]||'#eee')+';border:2px solid '+(c===sel?(CDot[c]||'#666'):'transparent')+';font-size:13px;display:flex;align-items:center;justify-content:center;color:'+(CDot[c]||'#666')+'" onclick="'+fn+"('"+c+"'"+')">'+ICLBL[c]+'</div>').join('');
   return '<div style="display:flex;gap:4px;margin-bottom:4px">'+row1+'</div><div style="display:flex;gap:4px">'+row2+'</div>';
 }
 function ssSC(c){
   smC=c;
   const scp=document.getElementById('scp');
+  scp.innerHTML='';
   if(ICON_SVG[c]){
-    scp.style.background=CB[c];
-    scp.innerHTML='<svg viewBox="0 0 24 24" width="11" height="11" fill="'+CDot[c]+'" style="display:block"><path d="'+ICON_SVG[c]+'"/></svg>';
+    scp.style.background=CB[c]||'#eee';
+    const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','11');sv.setAttribute('height','11');sv.setAttribute('fill',CDot[c]||'#333');
+    const pth=document.createElementNS('http://www.w3.org/2000/svg','path');
+    pth.setAttribute('d',ICON_SVG[c]);sv.appendChild(pth);scp.appendChild(sv);
   } else {
-    scp.style.background=CDot[c];
-    scp.innerHTML='';
+    scp.style.background=CDot[c]||'#999';
   }
   document.getElementById('scolors').querySelectorAll('.csw').forEach(el=>el.classList.toggle('sel',el.dataset.color===c));
 }
