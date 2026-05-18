@@ -2041,9 +2041,13 @@ function dupFM(){
   const ev=freeEvs.find(x=>x.id===fmId);
   if(!ev) return;
   const dur=ev.toMin-ev.fromMin;
-  // 最終フリーセッションの終了位置に配置
-  const lastEv=freeEvs.reduce((a,b)=>b.toMin>a.toMin?b:a,{toMin:gSM()});
-  const newFrom=lastEv.toMin;
+  // 元セッションの直後に配置（重なりがあれば最後にずらす）
+  let newFrom=ev.toMin;
+  const overlap=freeEvs.some(e=>e.id!==ev.id&&e.fromMin<newFrom+dur&&e.toMin>newFrom);
+  if(overlap){
+    const lastEv=freeEvs.reduce((a,b)=>b.toMin>a.toMin?b:a,{toMin:gSM()});
+    newFrom=lastEv.toMin;
+  }
   const newTo=newFrom+dur;
   const copy={id:nid++,name:ev.name+'のコピー',fromMin:newFrom,toMin:newTo,color:ev.color,comment:ev.comment||''};
   freeEvs.push(copy);
