@@ -376,7 +376,7 @@ tbody tr:hover td{background:var(--bg2)}
       <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="scmt" maxlength="100"></textarea></div>
     </div>
     <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="scc">0</span>/100</span>
-      <div class="mbtns"><button class="btn d" id="sdel" onclick="delSM()">削除</button><button class="btn" onclick="closeSM()">キャンセル</button><button class="btn p" onclick="saveSM()">保存</button></div>
+      <div class="mbtns"><button class="btn d" id="sdel" onclick="delSM()">削除</button><button class="btn" onclick="dupSM()">複製</button><button class="btn" onclick="closeSM()">キャンセル</button><button class="btn p" onclick="saveSM()">保存</button></div>
     </div>
   </div>
 </div>
@@ -391,7 +391,7 @@ tbody tr:hover td{background:var(--bg2)}
       <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="fcmt" maxlength="100"></textarea></div>
     </div>
     <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="fcc">0</span>/100</span>
-      <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
+      <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" onclick="dupFM()">複製</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
     </div>
   </div>
 </div>
@@ -1757,9 +1757,9 @@ function onSD(e,el){
   document.addEventListener('dragend',onGDE,{once:true});
 }
 function getIns(cy){
-  const sc=document.getElementById('sc'),r=sc.getBoundingClientRect();
+  const sc=document.getElementById('sc');
   const tls=document.getElementById('tls');
-  const relY=cy-r.top+tls.scrollTop-parseInt(getComputedStyle(tls).paddingTop)||0;
+  const relY=cy-sc.getBoundingClientRect().top+tls.scrollTop;
   const filt=gSrc==='serial'?sessions.filter(s=>s.id!==sD.id):sessions;
   let c=0;
   for(let i=0;i<filt.length;i++){
@@ -2023,6 +2023,26 @@ function saveSM(){
   const d=parseInt(document.getElementById('sdur').value);if(!isNaN(d)&&d>=1)s.dur=d;
   s.color=smC;s.comment=document.getElementById('scmt').value.slice(0,100);
   closeSM();snap();rTL();if(cv==='tb')renderTbl();
+}
+function dupSM(){
+  const s=sessions.find(x=>x.id===smId);
+  if(!s) return;
+  const idx=sessions.findIndex(x=>x.id===smId);
+  const copy={id:nid++,name:s.name+'のコピー',dur:s.dur,color:s.color,comment:s.comment||''};
+  sessions.splice(idx+1,0,copy);
+  closeSM();snap();rTL();if(cv==='tb')renderTbl();
+}
+function dupFM(){
+  const ev=freeEvs.find(x=>x.id===fmId);
+  if(!ev) return;
+  const dur=ev.toMin-ev.fromMin;
+  // 最終フリーセッションの終了位置に配置
+  const lastEv=freeEvs.reduce((a,b)=>b.toMin>a.toMin?b:a,{toMin:gSM()});
+  const newFrom=lastEv.toMin;
+  const newTo=newFrom+dur;
+  const copy={id:nid++,name:ev.name+'のコピー',fromMin:newFrom,toMin:newTo,color:ev.color,comment:ev.comment||''};
+  freeEvs.push(copy);
+  closeFM();snap();rFR();if(cv==='tb')renderTbl();
 }
 function delSM(){if(smId===null)return;sessions=sessions.filter(s=>s.id!==smId);closeSM();snap();rTL();if(cv==='tb')renderTbl();}
 function delS(e,id){e.stopPropagation();sessions=sessions.filter(s=>s.id!==id);snap();rTL();if(cv==='tb')renderTbl();}
