@@ -1757,15 +1757,21 @@ function onSD(e,el){
   document.addEventListener('dragend',onGDE,{once:true});
 }
 function getIns(cy){
-  const sc=document.getElementById('sc');
-  const relY=cy-sc.getBoundingClientRect().top;
+  const tls=document.getElementById('tls');
+  const tlb=document.getElementById('tlb');
+  const relY=cy-tls.getBoundingClientRect().top-tlb.offsetTop+tls.scrollTop;
   const filt=gSrc==='serial'?sessions.filter(s=>s.id!==sD.id):sessions;
   let c=0;
   for(let i=0;i<filt.length;i++){
-    if(relY<(c+filt[i].dur/2)*PPM)return{idx:i,y:c*PPM};
+    if(relY<(c+filt[i].dur/2)*PPM){
+      // il表示用: sessions配列での累積y（ドラッグ中セッション含む）
+      const realY=sessions.slice(0,sessions.findIndex(s=>s===filt[i])).reduce((a,s)=>a+s.dur,0)*PPM;
+      return{idx:i,y:realY};
+    }
     c+=filt[i].dur;
   }
-  return{idx:filt.length,y:c*PPM};
+  const realY=sessions.reduce((a,s)=>a+s.dur,0)*PPM;
+  return{idx:filt.length,y:realY};
 }
 function onSCo(e){
   e.preventDefault();
@@ -1794,7 +1800,7 @@ function onSCd(e){
   snap();render();if(typeof mvRender==='function')mvRender();
 }
 
-function frRY(e){const frs=document.getElementById('frs'),r=frs.getBoundingClientRect();return e.clientY-r.top+frs.scrollTop-parseInt(getComputedStyle(frs).paddingTop)||0;}
+function frRY(e){const frs=document.getElementById('frs'),r=frs.getBoundingClientRect();const pt=parseInt(getComputedStyle(frs).paddingTop)||0;return e.clientY-r.top+frs.scrollTop-pt;}
 function onFD(e,id){
   const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
   gSrc='fblock';fBD={id,of:ev.fromMin,ot:ev.toMin};
@@ -1807,13 +1813,13 @@ function onFRo(e){
   if(gSrc==='menu'){
     document.getElementById('fov').classList.add('act');
     const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
-    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=fm*PPM+'px';
+    const _frsPT1=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM+_frsPT1)+'px';
     sTT(e.clientX,e.clientY,`${hm(gSM()+fm)}〜${hm(gSM()+fm+gD)}`);
     e.dataTransfer.dropEffect='copy';return;
   }
   if(gSrc==='fblock'&&fBD.id){
     const ry=frRY(e),dur=fBD.ot-fBD.of,nf=Math.max(0,Math.round((ry/PPM-dur/2)/SN)*SN);
-    const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=nf*PPM+'px';
+    const _frsPT2=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM+_frsPT2)+'px';
     sTT(e.clientX,e.clientY,`${hm(gSM()+nf)}〜${hm(gSM()+nf+dur)}（${dur}分）`);
     e.dataTransfer.dropEffect='move';
   }
