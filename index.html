@@ -680,8 +680,9 @@ tbody tr:hover td{background:var(--bg2)}
         <ol style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
           <li>隙間なく連続してセッションを積み上げる方法です。左列「セッションメニュー」からセッションを<b>ドラッグ&amp;ドロップ</b>して中央「シリアルセッション」に追加</li>
           <li>ブロックの<b>下端ハンドル</b>（ホバーで表示）を上下にドラッグして時間を調整</li>
-          <li>ブロックを<b>ダブルクリック</b>すると名前・色・時間・メモを編集</li>
+          <li>ブロックを<b>ダブルクリック</b>すると名前・アイコン・時間・メモを編集。編集画面から<b>複製</b>ボタンで直後にコピーを作成</li>
           <li>ブロックを<b>ドラッグ&amp;ドロップ</b>して並び順を変更</li>
+          <li>左列セッションメニューのアイテムを<b>ダブルクリック</b>するとシリアルセッションの末尾に即追加</li>
         </ol>
       </div>
 
@@ -691,6 +692,8 @@ tbody tr:hover td{background:var(--bg2)}
           <li>時間帯を自由に設定してセッションを配置します。セッション以外にも、講師名・会場名・裏方の準備などを自由に設定してください</li>
           <li>セッションメニューから右列「フリーセッション」にドラッグして任意の時間帯に配置</li>
           <li>ブロックをドラッグして時間帯を移動、上下ハンドルで開始・終了時刻を調整</li>
+          <li>ブロックを<b>ダブルクリック</b>すると編集。編集画面から<b>複製</b>ボタンで末尾にコピーを作成</li>
+          <li>左列「フリーセッション用」のアイテムを<b>ダブルクリック</b>するとフリーセッションの末尾に即追加</li>
           <li>同じ時間帯に複数配置すると自動で2〜3列に分割表示（4つ以上は不可）</li>
         </ul>
       </div>
@@ -711,7 +714,19 @@ tbody tr:hover td{background:var(--bg2)}
           <li>「保存」現在のタイムラインを名前をつけて保存</li>
           <li>「開く」.sttファイルや過去に作成したタイムテーブルの読み込み</li>
           <li>「書き出し」現在のタイムラインをPDFまたは.sttファイルで書き出し</li>
+          <li>「複製」現在のイベントをコピーして新しいイベントとして保存</li>
         </ul>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Googleカレンダー書き出し</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
+          <li>タイムラインビューの右上「📅 GCal」ボタンから書き出し画面を開く</li>
+          <li>書き出したいセッションを選択（シリアル・フリー個別に選択可能）</li>
+          <li>「Googleカレンダーで開く」ボタンでブラウザが開き、そのままGoogleカレンダーに追加できる</li>
+          <li>日付を設定済みの場合は実際の日時で書き出し、未設定の場合は今日の日付で書き出し</li>
+        </ul>
+      </div>
       </div>
 
       <div>
@@ -922,8 +937,8 @@ const COLORS=['purple','teal','green','pink','coral','blue','amber','gray','whit
 const ICON_COLORS=['ic_check','ic_chat','ic_book','ic_coffee','ic_group','ic_pencil','ic_bulb','ic_star','ic_fork','ic_mic'];
 const ICON_SVG={
   ic_check:'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
-  ic_chat:'M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
-  ic_book:'M18 2h-2v3.5l-1.5-1-1.5 1V2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
+  ic_chat:'M14.4 6L14 4H5v17h2v-7h5.6l.4 2h7V6z',
+  ic_book:'M20 3H4c-1.1 0-2 .9-2 2v11c0 1.1.9 2 2 2h3l-1 1v2h12v-2l-1-1h3c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 13H4V5h16v11z',
   ic_coffee:'M20 3H4v10c0 2.21 1.79 4 4 4h6c2.21 0 4-1.79 4-4v-3h2c1.11 0 2-.89 2-2V5c0-1.11-.89-2-2-2zm0 5h-2V5h2v3zM4 19h16v2H4z',
   ic_group:'M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
   ic_pencil:'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
