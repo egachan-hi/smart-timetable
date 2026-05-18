@@ -45,7 +45,7 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .bl{flex:1;overflow-y:auto;padding:3px}
 .bi{display:flex;align-items:center;gap:5px;padding:6px 8px;border-radius:3px;margin-bottom:2px;cursor:grab;user-select:none}
 .bi:hover{background:var(--bg2)}
-.bd{width:9px;height:9px;border-radius:50%;flex-shrink:0}
+.bd{width:20px;height:20px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center}
 .bn{font-size:11px;font-weight:600;flex:1;color:var(--text)}
 .bdu{font-size:10px;font-weight:600;color:var(--text2)}
 .bi.any{border-top:1px solid var(--border);margin-top:2px;padding-top:5px}
@@ -78,8 +78,6 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .snm{font-size:11px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sdr{font-size:10px;white-space:nowrap;flex-shrink:0}
 .sdl{font-size:12px;cursor:pointer;opacity:.35;flex-shrink:0}.sdl:hover{opacity:1}
-.sic{display:flex;align-items:center;flex-shrink:0;opacity:.85;margin-right:1px}
-.sic{display:flex;align-items:center;flex-shrink:0;opacity:.8}
 .scm{font-size:9px;line-height:1.3;margin-top:1px;opacity:.7;overflow:hidden;word-break:break-all;flex:1}
 .il{position:absolute;left:2px;right:2px;height:2px;border-radius:1px;background:#BA7517;z-index:12;pointer-events:none;display:none}
 .now-line{position:absolute;left:0;right:0;height:1px;background:#E53E3E;z-index:15;pointer-events:none}
@@ -131,7 +129,7 @@ tbody tr:hover td{background:var(--bg2)}
 .mi{font-size:11px;padding:3px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);width:100%}
 .mi:focus{border-color:var(--accent);outline:none}
 .cr2{display:flex;gap:3px;flex-wrap:wrap}
-.csw{width:15px;height:15px;border-radius:3px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
+.csw{width:22px;height:22px;border-radius:4px;cursor:pointer;border:2px solid transparent;transition:transform .1s}
 .csw:hover{transform:scale(1.1)}.csw.sel{border-color:var(--text)}
 .mta{width:100%;height:55px;font-size:11px;padding:4px 6px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);resize:none;font-family:inherit;line-height:1.5;outline:none}
 .mft{display:flex;justify-content:space-between;align-items:center;padding:7px 12px;border-top:1px solid var(--border);flex-shrink:0}
@@ -147,14 +145,14 @@ tbody tr:hover td{background:var(--bg2)}
 .str{display:flex;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid var(--border);cursor:grab}
 .str.dg{opacity:.3}
 .sdh{font-size:12px;color:var(--text3);cursor:grab;flex-shrink:0}
-.sdot{width:20px;height:20px;border-radius:5px;flex-shrink:0;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center}
+.sdot{width:20px;height:20px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center}
 .sdot:hover{border-color:var(--border2)}
 .snin{font-size:11px;flex:1;border:1px solid var(--border);border-radius:3px;padding:2px 5px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
 .snin:focus{border-color:var(--accent)}
 .sdin{width:40px;font-size:11px;text-align:center;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);padding:2px}
 .sdel{font-size:11px;cursor:pointer;opacity:.35;padding:0 2px}.sdel:hover{opacity:.9}
 .icp{display:flex;gap:3px;flex-wrap:wrap;padding:2px 0 3px 16px}
-.isw{width:13px;height:13px;border-radius:3px;cursor:pointer;border:2px solid transparent}.isw.on{border-color:var(--text)}
+.isw{width:20px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center}.isw.on{border-color:var(--text)}
 /* ========== MOBILE VIEW ========== */
 .mv{display:none;flex-direction:column;height:100svh;overflow:hidden;background:var(--bg)}
 .mv-header{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
@@ -374,7 +372,7 @@ tbody tr:hover td{background:var(--bg2)}
     <div class="mh"><div id="scp" style="width:13px;height:13px;border-radius:3px;flex-shrink:0"></div><h3 id="slbl">セッション編集</h3><button class="mx" onclick="closeSM()">×</button></div>
     <div class="mb">
       <div class="mr"><div class="ml">名前</div><input class="mi" id="sname" maxlength="40" placeholder="セッション名"/></div>
-      <div class="mr"><div class="ml">アイコン</div><div class="cr2" id="scolors"></div></div>
+      <div class="mr"><div class="ml">色</div><div class="cr2" id="scolors"></div></div>
       <div class="mr"><div class="ml">時間（分）</div><input type="number" class="mi din" id="sdur" min="1" max="480"/></div>
       <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="scmt" maxlength="100"></textarea></div>
     </div>
@@ -923,8 +921,6 @@ tbody tr:hover td{background:var(--bg2)}
 // ================================================================
 const COLORS=['purple','teal','green','pink','coral','blue','amber','gray','white','navy'];
 const ICON_COLORS=['ic_check','ic_chat','ic_book','ic_coffee','ic_group','ic_pencil','ic_bulb','ic_star','ic_fork','ic_mic'];
-
-// アイコンSVGパス定義
 const ICON_SVG={
   ic_check:'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
   ic_chat:'M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
@@ -937,33 +933,11 @@ const ICON_SVG={
   ic_fork:'M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-2.29-1.88-3.15-4.01-3.87C9.96 10.41 8 9.67 8 8.06c0-.43.16-.82.42-1.13L15 6.98c0 .01.01.02.01.03L15.03 14.99z',
   ic_mic:'M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11z'
 };
-
-const CB={
-  white:'#F5F5F5',purple:'#EEEDFE',teal:'#E1F5EE',green:'#EAF3DE',
-  pink:'#FBEAF0',coral:'#FAECE7',blue:'#E6F1FB',amber:'#FEF3E2',
-  gray:'#F0EFED',navy:'#E8EEF5',
-  ic_check:'#EEEDFE',ic_chat:'#E1F5EE',ic_book:'#E6F1FB',ic_coffee:'#F0EFED',
-  ic_group:'#E1F5EE',ic_pencil:'#EAF3DE',ic_bulb:'#FEF3E2',ic_star:'#EAF3DE',
-  ic_fork:'#FEF3E2',ic_mic:'#FBEAF0'
-};
-const CD={white:'#CCCCCC',purple:'#AFA9EC',teal:'#5DCAA5',green:'#97C459',pink:'#ED93B1',coral:'#F0997B',blue:'#85B7EB',amber:'#EF9F27',gray:'#B4B2A9'};
-const CDot={
-  white:'#AAAAAA',purple:'#7F77DD',teal:'#1D9E75',green:'#639922',
-  pink:'#D4537E',coral:'#D85A30',blue:'#378ADD',amber:'#BA7517',
-  gray:'#888780',navy:'#3A5A8C',
-  ic_check:'#534AB7',ic_chat:'#0F6E56',ic_book:'#185FA5',ic_coffee:'#5F5E5A',
-  ic_group:'#0F6E56',ic_pencil:'#3B6D11',ic_bulb:'#854F0B',ic_star:'#3B6D11',
-  ic_fork:'#854F0B',ic_mic:'#72243E'
-};
-const CT={
-  white:'#555555',purple:'#3C3489',teal:'#085041',green:'#27500A',
-  pink:'#72243E',coral:'#993C1D',blue:'#0C447C',amber:'#6B3A0A',
-  gray:'#444441',navy:'#1A2E50',
-  ic_check:'#3C3489',ic_chat:'#085041',ic_book:'#0C447C',ic_coffee:'#444441',
-  ic_group:'#085041',ic_pencil:'#27500A',ic_bulb:'#6B3A0A',ic_star:'#27500A',
-  ic_fork:'#6B3A0A',ic_mic:'#72243E'
-};
-const ANY={id:'__any',name:'任意のセッション',dur:10,color:'amber',fixed:true};
+const CB={white:'#F5F5F5',purple:'#EEEDFE',teal:'#E1F5EE',green:'#EAF3DE',pink:'#FBEAF0',coral:'#FAECE7',blue:'#E6F1FB',amber:'#FEF3E2',gray:'#F0EFED',navy:'#E8EEF5',ic_check:'#EEEDFE',ic_chat:'#E1F5EE',ic_book:'#E6F1FB',ic_coffee:'#F0EFED',ic_group:'#E1F5EE',ic_pencil:'#EAF3DE',ic_bulb:'#FEF3E2',ic_star:'#EAF3DE',ic_fork:'#FEF3E2',ic_mic:'#FBEAF0'};
+const CD={white:'#CCCCCC',purple:'#AFA9EC',teal:'#5DCAA5',green:'#97C459',pink:'#ED93B1',coral:'#F0997B',blue:'#85B7EB',amber:'#EF9F27',gray:'#B4B2A9',navy:'#7A99C0',ic_check:'#AFA9EC',ic_chat:'#5DCAA5',ic_book:'#85B7EB',ic_coffee:'#B4B2A9',ic_group:'#5DCAA5',ic_pencil:'#97C459',ic_bulb:'#EF9F27',ic_star:'#97C459',ic_fork:'#EF9F27',ic_mic:'#ED93B1'};
+const CDot={white:'#AAAAAA',purple:'#7F77DD',teal:'#1D9E75',green:'#639922',pink:'#D4537E',coral:'#D85A30',blue:'#378ADD',amber:'#BA7517',gray:'#888780',navy:'#3A5A8C',ic_check:'#534AB7',ic_chat:'#0F6E56',ic_book:'#185FA5',ic_coffee:'#5F5E5A',ic_group:'#0F6E56',ic_pencil:'#3B6D11',ic_bulb:'#854F0B',ic_star:'#3B6D11',ic_fork:'#854F0B',ic_mic:'#72243E'};
+const CT={white:'#555555',purple:'#3C3489',teal:'#085041',green:'#27500A',pink:'#72243E',coral:'#993C1D',blue:'#0C447C',amber:'#6B3A0A',gray:'#444441',navy:'#1A2E50',ic_check:'#3C3489',ic_chat:'#085041',ic_book:'#0C447C',ic_coffee:'#444441',ic_group:'#085041',ic_pencil:'#27500A',ic_bulb:'#6B3A0A',ic_star:'#27500A',ic_fork:'#6B3A0A',ic_mic:'#72243E'};
+const ANY={id:'__any',name:'任意のセッション',dur:10,color:'coral',fixed:true};
 const BUFFER={id:'__buffer',name:'時間調整',dur:10,color:'white',fixed:true};
 
 // ================================================================
@@ -994,38 +968,38 @@ const PRESET_TPLS_VERSION=2;
 let savedTpls=[
   {name:'標準テンプレート',types:JSON.parse(JSON.stringify(TYPES))},
   {name:'シンポジウム',types:[
-    {id:'t_s1',name:'オープニング',dur:10,color:'ic_star'},
-    {id:'t_s2',name:'基調講演',dur:40,color:'ic_mic'},
-    {id:'t_s3',name:'事例発表',dur:30,color:'ic_book'},
-    {id:'t_s4',name:'コーヒーブレイク',dur:15,color:'ic_coffee'},
-    {id:'t_s5',name:'パネルディスカッション',dur:50,color:'ic_group'},
-    {id:'t_s6',name:'質疑応答',dur:20,color:'ic_chat'},
-    {id:'t_s7',name:'クロージング',dur:15,color:'ic_star'},
+    {id:'t_s1',name:'オープニング',dur:10,color:'purple'},
+    {id:'t_s2',name:'基調講演',dur:40,color:'blue'},
+    {id:'t_s3',name:'事例発表',dur:30,color:'blue'},
+    {id:'t_s4',name:'コーヒーブレイク',dur:15,color:'gray'},
+    {id:'t_s5',name:'パネルディスカッション',dur:50,color:'teal'},
+    {id:'t_s6',name:'質疑応答',dur:20,color:'teal'},
+    {id:'t_s7',name:'クロージング',dur:15,color:'green'},
   ]},
   {name:'ワールドカフェ',types:[
-    {id:'t_w1',name:'チェックイン',dur:10,color:'ic_check'},
-    {id:'t_w2',name:'テーマ説明',dur:10,color:'ic_book'},
-    {id:'t_w3',name:'対話ラウンド',dur:30,color:'ic_chat'},
-    {id:'t_w4',name:'席替え',dur:5,color:'ic_group'},
-    {id:'t_w5',name:'ハーベスト',dur:20,color:'ic_bulb'},
-    {id:'t_w6',name:'チェックアウト',dur:5,color:'ic_star'},
+    {id:'t_w1',name:'チェックイン',dur:10,color:'purple'},
+    {id:'t_w2',name:'テーマ説明',dur:10,color:'blue'},
+    {id:'t_w3',name:'対話ラウンド',dur:30,color:'teal'},
+    {id:'t_w4',name:'席替え',dur:5,color:'gray'},
+    {id:'t_w5',name:'ハーベスト',dur:20,color:'green'},
+    {id:'t_w6',name:'チェックアウト',dur:5,color:'purple'},
   ]},
   {name:'オープンスペーステクノロジー',types:[
-    {id:'t_o1',name:'オープニング',dur:10,color:'ic_star'},
-    {id:'t_o2',name:'アジェンダ・マーケット',dur:20,color:'ic_pencil'},
-    {id:'t_o3',name:'分科会',dur:60,color:'ic_group'},
-    {id:'t_o4',name:'ニュースルーム',dur:20,color:'ic_chat'},
-    {id:'t_o5',name:'クロージング',dur:10,color:'ic_star'},
+    {id:'t_o1',name:'オープニング',dur:10,color:'purple'},
+    {id:'t_o2',name:'アジェンダ・マーケット',dur:20,color:'blue'},
+    {id:'t_o3',name:'分科会',dur:60,color:'teal'},
+    {id:'t_o4',name:'ニュースルーム',dur:20,color:'green'},
+    {id:'t_o5',name:'クロージング',dur:10,color:'purple'},
   ]},
   {name:'旅行計画',types:[
-    {id:'t_t1',name:'観光',dur:60,color:'ic_star'},
-    {id:'t_t2',name:'買い物',dur:30,color:'ic_pencil'},
-    {id:'t_t3',name:'準備',dur:20,color:'ic_check'},
+    {id:'t_t1',name:'観光',dur:60,color:'teal'},
+    {id:'t_t2',name:'買い物',dur:30,color:'pink'},
+    {id:'t_t3',name:'準備',dur:20,color:'gray'},
     {id:'t_t4',name:'電車移動',dur:30,color:'blue'},
     {id:'t_t5',name:'徒歩移動',dur:10,color:'blue'},
     {id:'t_t6',name:'飛行機移動',dur:120,color:'blue'},
-    {id:'t_t7',name:'ランチ',dur:60,color:'ic_fork'},
-    {id:'t_t8',name:'夕食',dur:60,color:'ic_fork'},
+    {id:'t_t7',name:'ランチ',dur:60,color:'amber'},
+    {id:'t_t8',name:'夕食',dur:60,color:'amber'},
     {id:'t_t9',name:'温泉',dur:60,color:'teal'},
     {id:'t_t10',name:'休憩',dur:20,color:'gray'},
   ]},
@@ -1040,7 +1014,7 @@ let savedTpls=[
     {id:'t_g8',name:'プランク',dur:10,color:'green'},
     {id:'t_g9',name:'クランチ',dur:10,color:'green'},
     {id:'t_g10',name:'レッグレイズ',dur:10,color:'green'},
-    {id:'t_g11',name:'ストレッチ',dur:10,color:'ic_star'},
+    {id:'t_g11',name:'ストレッチ',dur:10,color:'gray'},
   ]},
 ];
 let savedEvs=[];
@@ -1204,21 +1178,38 @@ function rBL(){
     {id:'__standby',name:'スタンバイ',dur:10,color:'white',fixed:true},
   ];
   const FREE_LABEL='<div style="font-size:10px;font-style:italic;color:var(--text3);padding:4px 6px 1px">フリーセッション用</div>';
-  document.getElementById('bl').innerHTML=[...TYPES,BUFFER,ANY].map(t=>`
-    <div class="bi${t.fixed?' any':''}" draggable="true"
-      data-n="${esc(t.name)}" data-d="${t.dur}" data-c="${t.color}"
-      ondragstart="onMD(event,this)">
-      <div class="bd" style="background:${CDot[t.color]}"></div>
-      <span class="bn">${esc(t.name)}</span>
-      <span class="bdu">${t.dur}分</span>
-    </div>`).join('')+FREE_LABEL+FREE_ITEMS.map(t=>`
-    <div class="bi any" draggable="true"
-      data-n="${esc(t.name)}" data-d="${t.dur}" data-c="${t.color}"
-      ondragstart="onMD(event,this)">
-      <div class="bd" style="background:#CCCCCC"></div>
-      <span class="bn">${esc(t.name)}</span>
-      <span class="bdu">${t.dur}分</span>
-    </div>`).join('');
+  // セッションメニュー（DOM方式でアイコン対応）
+  const bl=document.getElementById('bl');
+  bl.innerHTML='';
+  function makeBiItem(t){
+    const div=document.createElement('div');
+    div.className='bi'+(t.fixed?' any':'');
+    div.draggable=true;
+    div.dataset.n=t.name;
+    div.dataset.d=t.dur;
+    div.dataset.c=t.color;
+    div.ondragstart=function(e){onMD(e,this);};
+    // アイコン（●またはSVG）
+    const bd=document.createElement('div');bd.className='bd';
+    if(ICON_SVG[t.color]){
+      bd.style.background='none';
+      const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','16');sv.setAttribute('height','16');
+      sv.setAttribute('fill',CDot[t.color]||'#666');
+      const pth=document.createElementNS('http://www.w3.org/2000/svg','path');
+      pth.setAttribute('d',ICON_SVG[t.color]);sv.appendChild(pth);bd.appendChild(sv);
+    } else {
+      bd.style.background=CDot[t.color]||'#999';
+      bd.style.borderRadius='50%';
+    }
+    div.appendChild(bd);
+    const bn=document.createElement('span');bn.className='bn';bn.textContent=t.name;div.appendChild(bn);
+    const bdu=document.createElement('span');bdu.className='bdu';bdu.textContent=t.dur+'分';div.appendChild(bdu);
+    return div;
+  }
+  [...TYPES,BUFFER,ANY].forEach(function(t){bl.appendChild(makeBiItem(t));});
+  const freeLabel=document.createElement('div');freeLabel.style.cssText='font-size:10px;color:var(--text3);padding:8px 6px 2px;';freeLabel.textContent='フリーセッション用';bl.appendChild(freeLabel);
+  FREE_ITEMS.forEach(function(t){bl.appendChild(makeBiItem(t));});
 }
 
 // ================================================================
@@ -1316,19 +1307,27 @@ function rTL(){
     // 内部コンテンツ
     const inner=document.createElement('div');inner.className='si';
     const hdr=document.createElement('div');hdr.className='shr';
+    {
+      const ic=document.createElement('span');ic.style.cssText='display:flex;align-items:center;flex-shrink:0;margin-right:2px';
+      if(ICON_SVG[s.color]){
+        const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','13');sv.setAttribute('height','13');sv.setAttribute('fill',CT[s.color]||'#333');
+        const pth=document.createElementNS('http://www.w3.org/2000/svg','path');pth.setAttribute('d',ICON_SVG[s.color]);sv.appendChild(pth);
+        ic.appendChild(sv);
+      } else {
+        const dot=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        dot.setAttribute('viewBox','0 0 24 24');dot.setAttribute('width','10');dot.setAttribute('height','10');
+        const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        circle.setAttribute('cx','12');circle.setAttribute('cy','12');circle.setAttribute('r','10');circle.setAttribute('fill',CDot[s.color]||'#999');
+        dot.appendChild(circle);ic.appendChild(dot);
+      }
+      hdr.appendChild(ic);
+    }
     if(!short){const tm_el=document.createElement('span');tm_el.className='stm';tm_el.textContent=hm(sm2);hdr.appendChild(tm_el);}
     const nm=document.createElement('span');nm.className='snm';nm.textContent=s.name;
     const dr=document.createElement('span');dr.className='sdr';dr.textContent=s.dur+'分';
     const dl=document.createElement('span');dl.className='sdl';dl.textContent='×';
     (function(sid){dl.addEventListener('click',function(e){e.stopPropagation();sessions=sessions.filter(x=>x.id!==sid);snap();rTL();if(cv==='tb')renderTbl();});})(s.id);
-    if(ICON_SVG[s.color]){
-      const ic=document.createElement('span');ic.className='sic';
-      const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
-      sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','13');sv.setAttribute('height','13');sv.setAttribute('fill',CT[s.color]||'#333');
-      const pth=document.createElementNS('http://www.w3.org/2000/svg','path');
-      pth.setAttribute('d',ICON_SVG[s.color]);sv.appendChild(pth);
-      ic.appendChild(sv);hdr.insertBefore(ic,nm);
-    }
     hdr.appendChild(nm);hdr.appendChild(dr);hdr.appendChild(dl);
     inner.appendChild(hdr);
     if(showC){
@@ -1606,6 +1605,22 @@ function rFR(){
     const inner=document.createElement('div');inner.className='fi';
     const fShort=ht<24;
     const fHdr=document.createElement('div');fHdr.className='shr';
+    {
+      const fic=document.createElement('span');fic.style.cssText='display:flex;align-items:center;flex-shrink:0;margin-right:2px';
+      if(ICON_SVG[ev.color]){
+        const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','13');sv.setAttribute('height','13');sv.setAttribute('fill',CT[ev.color]||'#333');
+        const pth=document.createElementNS('http://www.w3.org/2000/svg','path');pth.setAttribute('d',ICON_SVG[ev.color]);sv.appendChild(pth);
+        fic.appendChild(sv);
+      } else {
+        const dot=document.createElementNS('http://www.w3.org/2000/svg','svg');
+        dot.setAttribute('viewBox','0 0 24 24');dot.setAttribute('width','10');dot.setAttribute('height','10');
+        const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+        circle.setAttribute('cx','12');circle.setAttribute('cy','12');circle.setAttribute('r','10');circle.setAttribute('fill',CDot[ev.color]||'#999');
+        dot.appendChild(circle);fic.appendChild(dot);
+      }
+      fHdr.appendChild(fic);
+    }
     if(!fShort){const ftm=document.createElement('span');ftm.className='stm';ftm.textContent=hm(sm+ev.fromMin);fHdr.appendChild(ftm);}
     const fnm=document.createElement('span');fnm.className='snm';fnm.textContent=ev.name;
     const fdr=document.createElement('span');fdr.className='sdr';fdr.textContent=(ev.toMin-ev.fromMin)+'分';
@@ -1880,35 +1895,87 @@ function tDD(e,tid){
 // ================================================================
 let smId=null,smC='teal';
 function cp(sel,fn){
-  const ICLBL={'ic_check':'✓','ic_chat':'✉','ic_book':'▣','ic_coffee':'☕','ic_group':'⚇','ic_pencil':'✎','ic_bulb':'☼','ic_star':'★','ic_fork':'⚔','ic_mic':'♪'};
-  const row1=COLORS.map(c=>'<div class="csw'+(c===sel?' sel':'')+'" data-color="'+c+'" style="background:'+CDot[c]+';border-radius:50%" onclick="'+fn+"('"+c+"'"+')"></div>').join('');
-  const row2=ICON_COLORS.map(c=>'<div class="csw'+(c===sel?' sel':'')+'" data-color="'+c+'" style="background:'+(CB[c]||'#eee')+';border:2px solid '+(c===sel?(CDot[c]||'#666'):'transparent')+';font-size:13px;display:flex;align-items:center;justify-content:center;color:'+(CDot[c]||'#666')+'" onclick="'+fn+"('"+c+"'"+')">'+ICLBL[c]+'</div>').join('');
-  return '<div style="display:flex;gap:4px;margin-bottom:4px">'+row1+'</div><div style="display:flex;gap:4px">'+row2+'</div>';
+  var wrap=document.createElement('div');
+  // 1行目: ●10色
+  var r1=document.createElement('div');
+  r1.style.cssText='display:flex;gap:4px;margin-bottom:4px';
+  COLORS.forEach(function(col){
+    var d=document.createElement('div');
+    d.className='csw'+(col===sel?' sel':'');
+    d.dataset.color=col;
+    d.style.background=CDot[col]||'#999';
+    d.style.borderRadius='50%';
+    d.addEventListener('click',function(){
+      if(fn==='ssSC') ssSC(col);
+      else if(fn==='sfC') sfC(col);
+      else if(fn==='stSC') stSC(col);
+    });
+    r1.appendChild(d);
+  });
+  wrap.appendChild(r1);
+  // 2行目: アイコン10種
+  var r2=document.createElement('div');
+  r2.style.cssText='display:flex;gap:4px';
+  ICON_COLORS.forEach(function(col){
+    var d=document.createElement('div');
+    d.className='csw'+(col===sel?' sel':'');
+    d.dataset.color=col;
+    d.style.background='none';
+    d.style.borderRadius='4px';
+    d.style.display='flex';
+    d.style.alignItems='center';
+    d.style.justifyContent='center';
+    d.style.borderWidth='2px';
+    d.style.borderStyle='solid';
+    d.style.borderColor=col===sel?(CDot[col]||'#666'):'transparent';
+    if(ICON_SVG[col]){
+      var sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      sv.setAttribute('viewBox','0 0 24 24');
+      sv.setAttribute('width','16');
+      sv.setAttribute('height','16');
+      sv.setAttribute('fill',CDot[col]||'#666');
+      var pth=document.createElementNS('http://www.w3.org/2000/svg','path');
+      pth.setAttribute('d',ICON_SVG[col]);
+      sv.appendChild(pth);
+      d.appendChild(sv);
+    }
+    d.addEventListener('click',function(){
+      if(fn==='ssSC') ssSC(col);
+      else if(fn==='sfC') sfC(col);
+      else if(fn==='stSC') stSC(col);
+    });
+    r2.appendChild(d);
+  });
+  wrap.appendChild(r2);
+  return wrap;
 }
 function ssSC(c){
   smC=c;
-  const scp=document.getElementById('scp');
+  var scp=document.getElementById('scp');
   scp.innerHTML='';
   if(ICON_SVG[c]){
     scp.style.background=CB[c]||'#eee';
-    const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','11');sv.setAttribute('height','11');sv.setAttribute('fill',CDot[c]||'#333');
-    const pth=document.createElementNS('http://www.w3.org/2000/svg','path');
+    var sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','11');sv.setAttribute('height','11');
+    sv.setAttribute('fill',CDot[c]||'#333');
+    var pth=document.createElementNS('http://www.w3.org/2000/svg','path');
     pth.setAttribute('d',ICON_SVG[c]);sv.appendChild(pth);scp.appendChild(sv);
   } else {
     scp.style.background=CDot[c]||'#999';
   }
-  document.getElementById('scolors').querySelectorAll('.csw').forEach(el=>el.classList.toggle('sel',el.dataset.color===c));
+  document.getElementById('scolors').querySelectorAll('.csw').forEach(function(el){
+    el.classList.toggle('sel',el.dataset.color===c);
+    if(ICON_COLORS.indexOf(c)>=0&&el.dataset.color===c) el.style.borderColor=CDot[c]||'#666';
+    else if(el.dataset.color===c) el.style.borderColor='transparent';
+  });
 }
 function openSM(id){
   smId=id;const s=sessions.find(x=>x.id===id);if(!s)return;
   smC=s.color||'teal';
   document.getElementById('slbl').textContent=s.name;
   document.getElementById('sname').value=s.name;
-  const _scp=document.getElementById('scp');
-  if(ICON_SVG[smC]){_scp.style.background=CB[smC];_scp.innerHTML='<svg viewBox="0 0 24 24" width="11" height="11" fill="'+CDot[smC]+'" style="display:block"><path d="'+ICON_SVG[smC]+'"/></svg>';}
-  else{_scp.style.background=CDot[smC];_scp.innerHTML='';}
-  document.getElementById('scolors').innerHTML=cp(smC,'ssSC');
+  document.getElementById('scp').style.background=CDot[smC];
+  var _sc=document.getElementById('scolors');_sc.innerHTML='';_sc.appendChild(cp(smC,'ssSC'));
   document.getElementById('sdur').value=s.dur;
   document.getElementById('scmt').value=s.comment||'';
   document.getElementById('scc').textContent=(s.comment||'').length;
@@ -1940,7 +2007,7 @@ function openFE(id){
   document.getElementById('flbl').textContent=ev?'フリーセッション編集':'フリーセッション追加';
   document.getElementById('fname').value=ev?ev.name:'';
   document.getElementById('fcp').style.background=CDot[fmC];
-  document.getElementById('fcolors').innerHTML=cp(fmC,'sfC');
+  var _fc=document.getElementById('fcolors');_fc.innerHTML='';_fc.appendChild(cp(fmC,'sfC'));
   const sm=gSM();
   document.getElementById('ffrom').value=ev?hm(sm+ev.fromMin):hm(sm);
   document.getElementById('fto').value=ev?hm(sm+ev.toMin):hm(sm+30);
@@ -1975,78 +2042,78 @@ function closeST(){document.getElementById('stm').style.display='none';}
 function applyST(){if(stTs.length===0){alert('セッションが1つ以上必要です');return;}tplName=document.getElementById('stname').value.trim()||'デフォルト';TYPES=JSON.parse(JSON.stringify(stTs));closeST();rBL();}
 document.getElementById('stm').addEventListener('click',function(e){if(e.target===this)closeST();});
 function renderST(){
-  const rows=document.getElementById('strows');
+  var rows=document.getElementById('strows');
   rows.innerHTML='';
   stTs.forEach(function(t,i){
-    // メイン行
-    const row=document.createElement('div');
+    var row=document.createElement('div');
     row.className='str';row.id='str'+i;row.draggable=true;
     row.ondragstart=function(e){stDS(e,i);};
     row.ondragover=function(e){stDO(e,i);};
     row.ondrop=function(e){stDD(e,i);};
 
-    const dh=document.createElement('span');dh.className='sdh';dh.textContent='⠿';
+    var dh=document.createElement('span');dh.className='sdh';dh.textContent='⠿';
     row.appendChild(dh);
 
     // アイコンドット
-    const dot=document.createElement('div');
-    dot.className='sdot';
-    dot.onclick=function(){stTI(i);};
-    var ic=ICON_SVG[t.color];
-    var col=CDot[t.color]||CDot.teal;
-    var bg=ic?(CB[t.color]||'#eee'):col;
-    dot.style.background=bg;
-    dot.style.borderRadius=ic?'4px':'50%';
-    dot.style.display='flex';dot.style.alignItems='center';dot.style.justifyContent='center';
-    if(ic){
+    var dot=document.createElement('div');dot.className='sdot';
+    dot.onclick=(function(idx){return function(){stTI(idx);};})(i);
+    if(ICON_SVG[t.color]){
+      dot.style.background='none';
       var sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
-      sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','15');sv.setAttribute('height','15');sv.setAttribute('fill',col);
-      var path=document.createElementNS('http://www.w3.org/2000/svg','path');
-      path.setAttribute('d',ic);sv.appendChild(path);dot.appendChild(sv);
+      sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','16');sv.setAttribute('height','16');
+      sv.setAttribute('fill',CDot[t.color]||'#666');
+      var pth=document.createElementNS('http://www.w3.org/2000/svg','path');
+      pth.setAttribute('d',ICON_SVG[t.color]);sv.appendChild(pth);dot.appendChild(sv);
+    } else {
+      dot.style.background=CDot[t.color]||'#999';
+      dot.style.borderRadius='50%';
     }
     row.appendChild(dot);
 
-    const ni=document.createElement('input');ni.className='snin';ni.value=t.name;ni.maxLength=30;ni.placeholder='セッション名';
+    var ni=document.createElement('input');ni.className='snin';ni.value=t.name;ni.maxLength=30;ni.placeholder='セッション名';
     (function(idx){ni.oninput=function(){stTs[idx].name=this.value;};})(i);
     row.appendChild(ni);
 
-    const di=document.createElement('input');di.className='sdin';di.type='number';di.min=1;di.max=480;di.value=t.dur;
+    var di=document.createElement('input');di.className='sdin';di.type='number';di.min=1;di.max=480;di.value=t.dur;
     (function(idx){di.onchange=function(){stTs[idx].dur=Math.max(1,parseInt(this.value)||1);};})(i);
     row.appendChild(di);
 
-    const sp=document.createElement('span');sp.style.fontSize='9px';sp.style.color='var(--text3)';sp.textContent='分';
+    var sp=document.createElement('span');sp.style.cssText='font-size:9px;color:var(--text3)';sp.textContent='分';
     row.appendChild(sp);
 
-    const del=document.createElement('span');del.className='sdel';del.textContent='×';
+    var del=document.createElement('span');del.className='sdel';del.textContent='×';
     (function(idx){del.onclick=function(){stRm(idx);};})(i);
     row.appendChild(del);
     rows.appendChild(row);
 
-    // カラーピッカー（2行: ●10個＋アイコン10個）
+    // カラーピッカー（展開時）
     if(stIcp===i){
-      const icp=document.createElement('div');icp.className='icp';
+      var icp=document.createElement('div');icp.className='icp';
       // 1行目: ●
-      const r1=document.createElement('div');r1.style.cssText='display:flex;gap:4px;margin-bottom:4px';
-      COLORS.forEach(function(c){
-        const sw=document.createElement('div');sw.className='isw'+(c===t.color?' on':'');
-        sw.style.background=CDot[c];sw.style.borderRadius='50%';
-        (function(ci,idx){sw.onclick=function(){stSC(idx,ci);};})(c,i);
+      var r1=document.createElement('div');r1.style.cssText='display:flex;gap:4px;margin-bottom:4px';
+      COLORS.forEach(function(col){
+        var sw=document.createElement('div');sw.className='isw'+(col===t.color?' on':'');
+        sw.style.background=CDot[col]||'#999';sw.style.borderRadius='50%';
+        (function(c2,idx2){sw.onclick=function(){stSC(idx2,c2);};})(col,i);
         r1.appendChild(sw);
       });
       icp.appendChild(r1);
       // 2行目: アイコン
-      const r2=document.createElement('div');r2.style.cssText='display:flex;gap:4px';
-      ICON_COLORS.forEach(function(c){
-        const sw=document.createElement('div');sw.className='isw'+(c===t.color?' on':'');
-        var icol=CDot[c]||'#666';sw.style.background=CB[c]||'#eee';
-        sw.style.borderRadius='4px';sw.style.display='flex';sw.style.alignItems='center';sw.style.justifyContent='center';
-        if(ICON_SVG[c]){
+      var r2=document.createElement('div');r2.style.cssText='display:flex;gap:4px';
+      ICON_COLORS.forEach(function(col){
+        var sw=document.createElement('div');sw.className='isw'+(col===t.color?' on':'');
+        sw.style.background='none';sw.style.borderRadius='4px';
+        sw.style.display='flex';sw.style.alignItems='center';sw.style.justifyContent='center';
+        sw.style.borderWidth='2px';sw.style.borderStyle='solid';
+        sw.style.borderColor=col===t.color?(CDot[col]||'#666'):'transparent';
+        if(ICON_SVG[col]){
           var sv2=document.createElementNS('http://www.w3.org/2000/svg','svg');
-          sv2.setAttribute('viewBox','0 0 24 24');sv2.setAttribute('width','12');sv2.setAttribute('height','12');sv2.setAttribute('fill',icol);
+          sv2.setAttribute('viewBox','0 0 24 24');sv2.setAttribute('width','16');sv2.setAttribute('height','16');
+          sv2.setAttribute('fill',CDot[col]||'#666');
           var p2=document.createElementNS('http://www.w3.org/2000/svg','path');
-          p2.setAttribute('d',ICON_SVG[c]);sv2.appendChild(p2);sw.appendChild(sv2);
+          p2.setAttribute('d',ICON_SVG[col]);sv2.appendChild(p2);sw.appendChild(sv2);
         }
-        (function(ci,idx){sw.onclick=function(){stSC(idx,ci);};})(c,i);
+        (function(c2,idx2){sw.onclick=function(){stSC(idx2,c2);};})(col,i);
         r2.appendChild(sw);
       });
       icp.appendChild(r2);
@@ -2321,7 +2388,6 @@ colorの選び方: 導入・挨拶→purple 説明・講義→blue 議論・Q&A�
 ルール:
 - startは MM:SS または HH:MM:SS 形式
 - 最初は必ず "00:00" から開始
-- 1セクションの長さは必ず3分以上にすること（短い話題は前後のセクションにまとめる）
 - JSON配列のみ出力（説明文禁止）
 - コードブロック不使用`;
 
