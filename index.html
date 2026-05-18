@@ -78,6 +78,8 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .snm{font-size:11px;font-weight:600;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .sdr{font-size:10px;white-space:nowrap;flex-shrink:0}
 .sdl{font-size:12px;cursor:pointer;opacity:.35;flex-shrink:0}.sdl:hover{opacity:1}
+.sic{display:flex;align-items:center;flex-shrink:0;opacity:.85;margin-right:1px}
+.sic{display:flex;align-items:center;flex-shrink:0;opacity:.8}
 .scm{font-size:9px;line-height:1.3;margin-top:1px;opacity:.7;overflow:hidden;word-break:break-all;flex:1}
 .il{position:absolute;left:2px;right:2px;height:2px;border-radius:1px;background:#BA7517;z-index:12;pointer-events:none;display:none}
 .now-line{position:absolute;left:0;right:0;height:1px;background:#E53E3E;z-index:15;pointer-events:none}
@@ -145,7 +147,7 @@ tbody tr:hover td{background:var(--bg2)}
 .str{display:flex;align-items:center;gap:4px;padding:3px 0;border-bottom:1px solid var(--border);cursor:grab}
 .str.dg{opacity:.3}
 .sdh{font-size:12px;color:var(--text3);cursor:grab;flex-shrink:0}
-.sdot{width:9px;height:9px;border-radius:50%;flex-shrink:0;cursor:pointer;border:2px solid transparent}
+.sdot{width:20px;height:20px;border-radius:5px;flex-shrink:0;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center}
 .sdot:hover{border-color:var(--border2)}
 .snin{font-size:11px;flex:1;border:1px solid var(--border);border-radius:3px;padding:2px 5px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
 .snin:focus{border-color:var(--accent)}
@@ -372,7 +374,7 @@ tbody tr:hover td{background:var(--bg2)}
     <div class="mh"><div id="scp" style="width:13px;height:13px;border-radius:3px;flex-shrink:0"></div><h3 id="slbl">セッション編集</h3><button class="mx" onclick="closeSM()">×</button></div>
     <div class="mb">
       <div class="mr"><div class="ml">名前</div><input class="mi" id="sname" maxlength="40" placeholder="セッション名"/></div>
-      <div class="mr"><div class="ml">色</div><div class="cr2" id="scolors"></div></div>
+      <div class="mr"><div class="ml">アイコン</div><div class="cr2" id="scolors"></div></div>
       <div class="mr"><div class="ml">時間（分）</div><input type="number" class="mi din" id="sdur" min="1" max="480"/></div>
       <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="scmt" maxlength="100"></textarea></div>
     </div>
@@ -919,12 +921,49 @@ tbody tr:hover td{background:var(--bg2)}
 // ================================================================
 // CONSTANTS
 // ================================================================
-const COLORS=['purple','teal','green','pink','coral','blue','amber','gray'];
-const CB={white:'#FFFFFF',purple:'#EEEDFE',teal:'#E1F5EE',green:'#EAF3DE',pink:'#FBEAF0',coral:'#FAECE7',blue:'#E6F1FB',amber:'#FAEEDA',gray:'#F1EFE8'};
+const COLORS=['purple','teal','green','pink','coral','blue','amber','gray','white','navy'];
+const ICON_COLORS=['ic_check','ic_chat','ic_book','ic_coffee','ic_group','ic_pencil','ic_bulb','ic_star','ic_fork','ic_mic'];
+
+// アイコンSVGパス定義
+const ICON_SVG={
+  ic_check:'M19 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2zm-9 14l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z',
+  ic_chat:'M20 2H4a2 2 0 0 0-2 2v18l4-4h14a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
+  ic_book:'M18 2h-2v3.5l-1.5-1-1.5 1V2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2z',
+  ic_coffee:'M2 21h18v-2H2v2zm4-3h10l1-9H5l1 9zm9-13V3H9v2H5v4a7 7 0 0 0 14 0V5h-4z',
+  ic_group:'M16 11c1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3 1.34 3 3 3zm-8 0c1.66 0 3-1.34 3-3S9.66 5 8 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z',
+  ic_pencil:'M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04a1 1 0 0 0 0-1.41l-2.34-2.34a1 1 0 0 0-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z',
+  ic_bulb:'M12 2a7 7 0 0 0-4 12.73V17a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1v-2.27A7 7 0 0 0 12 2zm-1 18h2v1h-2z',
+  ic_star:'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
+  ic_fork:'M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-2.29-1.88-3.15-4.01-3.87C9.96 10.41 8 9.67 8 8.06c0-.43.16-.82.42-1.13L15 6.98c0 .01.01.02.01.03L15.03 14.99z',
+  ic_mic:'M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11z'
+};
+
+const CB={
+  white:'#F5F5F5',purple:'#EEEDFE',teal:'#E1F5EE',green:'#EAF3DE',
+  pink:'#FBEAF0',coral:'#FAECE7',blue:'#E6F1FB',amber:'#FEF3E2',
+  gray:'#F0EFED',navy:'#E8EEF5',
+  ic_check:'#EEEDFE',ic_chat:'#E1F5EE',ic_book:'#E6F1FB',ic_coffee:'#F0EFED',
+  ic_group:'#E1F5EE',ic_pencil:'#EAF3DE',ic_bulb:'#FEF3E2',ic_star:'#EAF3DE',
+  ic_fork:'#FEF3E2',ic_mic:'#FBEAF0'
+};
 const CD={white:'#CCCCCC',purple:'#AFA9EC',teal:'#5DCAA5',green:'#97C459',pink:'#ED93B1',coral:'#F0997B',blue:'#85B7EB',amber:'#EF9F27',gray:'#B4B2A9'};
-const CDot={white:'#AAAAAA',purple:'#7F77DD',teal:'#1D9E75',green:'#639922',pink:'#D4537E',coral:'#D85A30',blue:'#378ADD',amber:'#BA7517',gray:'#888780'};
-const CT={white:'#555555',purple:'#3C3489',teal:'#085041',green:'#27500A',pink:'#72243E',coral:'#712B13',blue:'#0C447C',amber:'#633806',gray:'#444441'};
-const ANY={id:'__any',name:'任意のセッション',dur:10,color:'coral',fixed:true};
+const CDot={
+  white:'#AAAAAA',purple:'#7F77DD',teal:'#1D9E75',green:'#639922',
+  pink:'#D4537E',coral:'#D85A30',blue:'#378ADD',amber:'#BA7517',
+  gray:'#888780',navy:'#3A5A8C',
+  ic_check:'#534AB7',ic_chat:'#0F6E56',ic_book:'#185FA5',ic_coffee:'#5F5E5A',
+  ic_group:'#0F6E56',ic_pencil:'#3B6D11',ic_bulb:'#854F0B',ic_star:'#3B6D11',
+  ic_fork:'#854F0B',ic_mic:'#72243E'
+};
+const CT={
+  white:'#555555',purple:'#3C3489',teal:'#085041',green:'#27500A',
+  pink:'#72243E',coral:'#993C1D',blue:'#0C447C',amber:'#6B3A0A',
+  gray:'#444441',navy:'#1A2E50',
+  ic_check:'#3C3489',ic_chat:'#085041',ic_book:'#0C447C',ic_coffee:'#444441',
+  ic_group:'#085041',ic_pencil:'#27500A',ic_bulb:'#6B3A0A',ic_star:'#27500A',
+  ic_fork:'#6B3A0A',ic_mic:'#72243E'
+};
+const ANY={id:'__any',name:'任意のセッション',dur:10,color:'amber',fixed:true};
 const BUFFER={id:'__buffer',name:'時間調整',dur:10,color:'white',fixed:true};
 
 // ================================================================
@@ -932,18 +971,18 @@ const BUFFER={id:'__buffer',name:'時間調整',dur:10,color:'white',fixed:true}
 // ================================================================
 let tplName='標準テンプレート';
 let TYPES=[
-  {id:'checkin',name:'チェックイン',dur:10,color:'purple'},
-  {id:'guidance',name:'ガイダンス',dur:10,color:'teal'},
-  {id:'lecture',name:'レクチャー',dur:20,color:'teal'},
-  {id:'qa',name:'質疑応答',dur:10,color:'blue'},
-  {id:'break',name:'小休止',dur:5,color:'amber'},
-  {id:'solo',name:'個人ワーク',dur:10,color:'purple'},
-  {id:'group',name:'グループワーク',dur:15,color:'green'},
-  {id:'discussion',name:'全体ディスカッション',dur:20,color:'purple'},
-  {id:'lunch',name:'ランチ',dur:60,color:'amber'},
-  {id:'workshop',name:'ワークショップ',dur:60,color:'pink'},
-  {id:'checkout',name:'チェックアウト',dur:10,color:'purple'},
-  {id:'survey',name:'アンケート',dur:5,color:'pink'},
+  {id:'checkin',name:'チェックイン',dur:10,color:'ic_check'},
+  {id:'guidance',name:'ガイダンス',dur:10,color:'ic_chat'},
+  {id:'lecture',name:'レクチャー',dur:20,color:'ic_book'},
+  {id:'qa',name:'質疑応答',dur:10,color:'ic_chat'},
+  {id:'break',name:'小休止',dur:5,color:'ic_coffee'},
+  {id:'solo',name:'個人ワーク',dur:10,color:'ic_pencil'},
+  {id:'group',name:'グループワーク',dur:15,color:'ic_group'},
+  {id:'discussion',name:'全体ディスカッション',dur:20,color:'ic_chat'},
+  {id:'lunch',name:'ランチ',dur:60,color:'ic_fork'},
+  {id:'workshop',name:'ワークショップ',dur:60,color:'ic_group'},
+  {id:'checkout',name:'チェックアウト',dur:10,color:'ic_star'},
+  {id:'survey',name:'アンケート',dur:5,color:'ic_pencil'},
 ];
 let sessions=[];
 let freeEvs=[];
@@ -955,38 +994,38 @@ const PRESET_TPLS_VERSION=2;
 let savedTpls=[
   {name:'標準テンプレート',types:JSON.parse(JSON.stringify(TYPES))},
   {name:'シンポジウム',types:[
-    {id:'t_s1',name:'オープニング',dur:10,color:'purple'},
-    {id:'t_s2',name:'基調講演',dur:40,color:'blue'},
-    {id:'t_s3',name:'事例発表',dur:30,color:'blue'},
-    {id:'t_s4',name:'コーヒーブレイク',dur:15,color:'gray'},
-    {id:'t_s5',name:'パネルディスカッション',dur:50,color:'teal'},
-    {id:'t_s6',name:'質疑応答',dur:20,color:'teal'},
-    {id:'t_s7',name:'クロージング',dur:15,color:'green'},
+    {id:'t_s1',name:'オープニング',dur:10,color:'ic_star'},
+    {id:'t_s2',name:'基調講演',dur:40,color:'ic_mic'},
+    {id:'t_s3',name:'事例発表',dur:30,color:'ic_book'},
+    {id:'t_s4',name:'コーヒーブレイク',dur:15,color:'ic_coffee'},
+    {id:'t_s5',name:'パネルディスカッション',dur:50,color:'ic_group'},
+    {id:'t_s6',name:'質疑応答',dur:20,color:'ic_chat'},
+    {id:'t_s7',name:'クロージング',dur:15,color:'ic_star'},
   ]},
   {name:'ワールドカフェ',types:[
-    {id:'t_w1',name:'チェックイン',dur:10,color:'purple'},
-    {id:'t_w2',name:'テーマ説明',dur:10,color:'blue'},
-    {id:'t_w3',name:'対話ラウンド',dur:30,color:'teal'},
-    {id:'t_w4',name:'席替え',dur:5,color:'gray'},
-    {id:'t_w5',name:'ハーベスト',dur:20,color:'green'},
-    {id:'t_w6',name:'チェックアウト',dur:5,color:'purple'},
+    {id:'t_w1',name:'チェックイン',dur:10,color:'ic_check'},
+    {id:'t_w2',name:'テーマ説明',dur:10,color:'ic_book'},
+    {id:'t_w3',name:'対話ラウンド',dur:30,color:'ic_chat'},
+    {id:'t_w4',name:'席替え',dur:5,color:'ic_group'},
+    {id:'t_w5',name:'ハーベスト',dur:20,color:'ic_bulb'},
+    {id:'t_w6',name:'チェックアウト',dur:5,color:'ic_star'},
   ]},
   {name:'オープンスペーステクノロジー',types:[
-    {id:'t_o1',name:'オープニング',dur:10,color:'purple'},
-    {id:'t_o2',name:'アジェンダ・マーケット',dur:20,color:'blue'},
-    {id:'t_o3',name:'分科会',dur:60,color:'teal'},
-    {id:'t_o4',name:'ニュースルーム',dur:20,color:'green'},
-    {id:'t_o5',name:'クロージング',dur:10,color:'purple'},
+    {id:'t_o1',name:'オープニング',dur:10,color:'ic_star'},
+    {id:'t_o2',name:'アジェンダ・マーケット',dur:20,color:'ic_pencil'},
+    {id:'t_o3',name:'分科会',dur:60,color:'ic_group'},
+    {id:'t_o4',name:'ニュースルーム',dur:20,color:'ic_chat'},
+    {id:'t_o5',name:'クロージング',dur:10,color:'ic_star'},
   ]},
   {name:'旅行計画',types:[
-    {id:'t_t1',name:'観光',dur:60,color:'teal'},
-    {id:'t_t2',name:'買い物',dur:30,color:'pink'},
-    {id:'t_t3',name:'準備',dur:20,color:'gray'},
+    {id:'t_t1',name:'観光',dur:60,color:'ic_star'},
+    {id:'t_t2',name:'買い物',dur:30,color:'ic_pencil'},
+    {id:'t_t3',name:'準備',dur:20,color:'ic_check'},
     {id:'t_t4',name:'電車移動',dur:30,color:'blue'},
     {id:'t_t5',name:'徒歩移動',dur:10,color:'blue'},
     {id:'t_t6',name:'飛行機移動',dur:120,color:'blue'},
-    {id:'t_t7',name:'ランチ',dur:60,color:'amber'},
-    {id:'t_t8',name:'夕食',dur:60,color:'amber'},
+    {id:'t_t7',name:'ランチ',dur:60,color:'ic_fork'},
+    {id:'t_t8',name:'夕食',dur:60,color:'ic_fork'},
     {id:'t_t9',name:'温泉',dur:60,color:'teal'},
     {id:'t_t10',name:'休憩',dur:20,color:'gray'},
   ]},
@@ -1001,7 +1040,7 @@ let savedTpls=[
     {id:'t_g8',name:'プランク',dur:10,color:'green'},
     {id:'t_g9',name:'クランチ',dur:10,color:'green'},
     {id:'t_g10',name:'レッグレイズ',dur:10,color:'green'},
-    {id:'t_g11',name:'ストレッチ',dur:10,color:'gray'},
+    {id:'t_g11',name:'ストレッチ',dur:10,color:'ic_star'},
   ]},
 ];
 let savedEvs=[];
@@ -1282,6 +1321,14 @@ function rTL(){
     const dr=document.createElement('span');dr.className='sdr';dr.textContent=s.dur+'分';
     const dl=document.createElement('span');dl.className='sdl';dl.textContent='×';
     (function(sid){dl.addEventListener('click',function(e){e.stopPropagation();sessions=sessions.filter(x=>x.id!==sid);snap();rTL();if(cv==='tb')renderTbl();});})(s.id);
+    if(ICON_SVG[s.color]){
+      const ic=document.createElement('span');ic.className='sic';
+      const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','13');sv.setAttribute('height','13');sv.setAttribute('fill',CT[s.color]||'#333');
+      const pth=document.createElementNS('http://www.w3.org/2000/svg','path');
+      pth.setAttribute('d',ICON_SVG[s.color]);sv.appendChild(pth);
+      ic.appendChild(sv);hdr.insertBefore(ic,nm);
+    }
     hdr.appendChild(nm);hdr.appendChild(dr);hdr.appendChild(dl);
     inner.appendChild(hdr);
     if(showC){
@@ -1832,14 +1879,31 @@ function tDD(e,tid){
 // SESSION EDIT MODAL
 // ================================================================
 let smId=null,smC='teal';
-function cp(sel,fn){return COLORS.map(c=>`<div class="csw${c===sel?' sel':''}" style="background:${CDot[c]}" onclick="${fn}('${c}')"></div>`).join('');}
-function ssSC(c){smC=c;document.getElementById('scp').style.background=CDot[c];document.getElementById('scolors').querySelectorAll('.csw').forEach(el=>el.classList.toggle('sel',el.style.background===CDot[c]));}
+function cp(sel,fn){
+  const row1=COLORS.map(c=>`<div class="csw${c===sel?' sel':''}" data-color="${c}" style="background:${CDot[c]};border-radius:50%" onclick="${fn}('${c}')"></div>`).join('');
+  const row2=ICON_COLORS.map(c=>`<div class="csw${c===sel?' sel':''}" data-color="${c}" style="background:${CB[c]};border:2px solid ${c===sel?CDot[c]:'transparent'}" onclick="${fn}('${c}')"><svg viewBox="0 0 24 24" width="12" height="12" fill="${CDot[c]}" style="display:block;margin:auto;margin-top:2px"><path d="${ICON_SVG[c]}"/></svg></div>`).join('');
+  return '<div style="display:flex;gap:4px;margin-bottom:4px">'+row1+'</div><div style="display:flex;gap:4px">'+row2+'</div>';
+}
+function ssSC(c){
+  smC=c;
+  const scp=document.getElementById('scp');
+  if(ICON_SVG[c]){
+    scp.style.background=CB[c];
+    scp.innerHTML='<svg viewBox="0 0 24 24" width="11" height="11" fill="'+CDot[c]+'" style="display:block"><path d="'+ICON_SVG[c]+'"/></svg>';
+  } else {
+    scp.style.background=CDot[c];
+    scp.innerHTML='';
+  }
+  document.getElementById('scolors').querySelectorAll('.csw').forEach(el=>el.classList.toggle('sel',el.dataset.color===c));
+}
 function openSM(id){
   smId=id;const s=sessions.find(x=>x.id===id);if(!s)return;
   smC=s.color||'teal';
   document.getElementById('slbl').textContent=s.name;
   document.getElementById('sname').value=s.name;
-  document.getElementById('scp').style.background=CDot[smC];
+  const _scp=document.getElementById('scp');
+  if(ICON_SVG[smC]){_scp.style.background=CB[smC];_scp.innerHTML='<svg viewBox="0 0 24 24" width="11" height="11" fill="'+CDot[smC]+'" style="display:block"><path d="'+ICON_SVG[smC]+'"/></svg>';}
+  else{_scp.style.background=CDot[smC];_scp.innerHTML='';}
   document.getElementById('scolors').innerHTML=cp(smC,'ssSC');
   document.getElementById('sdur').value=s.dur;
   document.getElementById('scmt').value=s.comment||'';
@@ -1907,16 +1971,84 @@ function closeST(){document.getElementById('stm').style.display='none';}
 function applyST(){if(stTs.length===0){alert('セッションが1つ以上必要です');return;}tplName=document.getElementById('stname').value.trim()||'デフォルト';TYPES=JSON.parse(JSON.stringify(stTs));closeST();rBL();}
 document.getElementById('stm').addEventListener('click',function(e){if(e.target===this)closeST();});
 function renderST(){
-  document.getElementById('strows').innerHTML=stTs.map((t,i)=>`
-    <div class="str" id="str${i}" draggable="true" ondragstart="stDS(event,${i})" ondragover="stDO(event,${i})" ondrop="stDD(event,${i})">
-      <span class="sdh">⠿</span>
-      <div class="sdot" style="background:${CDot[t.color]}" onclick="stTI(${i})"></div>
-      <input class="snin" value="${esc(t.name)}" maxlength="30" placeholder="セッション名" oninput="stTs[${i}].name=this.value"/>
-      <input class="sdin" type="number" min="1" max="480" value="${t.dur}" onchange="stTs[${i}].dur=Math.max(1,parseInt(this.value)||1)"/>
-      <span style="font-size:9px;color:var(--text3)">分</span>
-      <span class="sdel" onclick="stRm(${i})">×</span>
-    </div>
-    ${stIcp===i?`<div class="icp">${COLORS.map(c=>`<div class="isw${c===t.color?' on':''}" style="background:${CDot[c]}" onclick="stSC(${i},'${c}')"></div>`).join('')}</div>`:''}`).join('');
+  const rows=document.getElementById('strows');
+  rows.innerHTML='';
+  stTs.forEach(function(t,i){
+    // メイン行
+    const row=document.createElement('div');
+    row.className='str';row.id='str'+i;row.draggable=true;
+    row.ondragstart=function(e){stDS(e,i);};
+    row.ondragover=function(e){stDO(e,i);};
+    row.ondrop=function(e){stDD(e,i);};
+
+    const dh=document.createElement('span');dh.className='sdh';dh.textContent='⠿';
+    row.appendChild(dh);
+
+    // アイコンドット
+    const dot=document.createElement('div');
+    dot.className='sdot';
+    dot.onclick=function(){stTI(i);};
+    var ic=ICON_SVG[t.color];
+    var col=CDot[t.color]||CDot.teal;
+    var bg=ic?(CB[t.color]||'#eee'):col;
+    dot.style.background=bg;
+    dot.style.borderRadius=ic?'4px':'50%';
+    dot.style.display='flex';dot.style.alignItems='center';dot.style.justifyContent='center';
+    if(ic){
+      var sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','15');sv.setAttribute('height','15');sv.setAttribute('fill',col);
+      var path=document.createElementNS('http://www.w3.org/2000/svg','path');
+      path.setAttribute('d',ic);sv.appendChild(path);dot.appendChild(sv);
+    }
+    row.appendChild(dot);
+
+    const ni=document.createElement('input');ni.className='snin';ni.value=t.name;ni.maxLength=30;ni.placeholder='セッション名';
+    (function(idx){ni.oninput=function(){stTs[idx].name=this.value;};})(i);
+    row.appendChild(ni);
+
+    const di=document.createElement('input');di.className='sdin';di.type='number';di.min=1;di.max=480;di.value=t.dur;
+    (function(idx){di.onchange=function(){stTs[idx].dur=Math.max(1,parseInt(this.value)||1);};})(i);
+    row.appendChild(di);
+
+    const sp=document.createElement('span');sp.style.fontSize='9px';sp.style.color='var(--text3)';sp.textContent='分';
+    row.appendChild(sp);
+
+    const del=document.createElement('span');del.className='sdel';del.textContent='×';
+    (function(idx){del.onclick=function(){stRm(idx);};})(i);
+    row.appendChild(del);
+    rows.appendChild(row);
+
+    // カラーピッカー（2行: ●10個＋アイコン10個）
+    if(stIcp===i){
+      const icp=document.createElement('div');icp.className='icp';
+      // 1行目: ●
+      const r1=document.createElement('div');r1.style.cssText='display:flex;gap:4px;margin-bottom:4px';
+      COLORS.forEach(function(c){
+        const sw=document.createElement('div');sw.className='isw'+(c===t.color?' on':'');
+        sw.style.background=CDot[c];sw.style.borderRadius='50%';
+        (function(ci,idx){sw.onclick=function(){stSC(idx,ci);};})(c,i);
+        r1.appendChild(sw);
+      });
+      icp.appendChild(r1);
+      // 2行目: アイコン
+      const r2=document.createElement('div');r2.style.cssText='display:flex;gap:4px';
+      ICON_COLORS.forEach(function(c){
+        const sw=document.createElement('div');sw.className='isw'+(c===t.color?' on':'');
+        var icol=CDot[c]||'#666';sw.style.background=CB[c]||'#eee';
+        sw.style.borderRadius='4px';sw.style.display='flex';sw.style.alignItems='center';sw.style.justifyContent='center';
+        if(ICON_SVG[c]){
+          var sv2=document.createElementNS('http://www.w3.org/2000/svg','svg');
+          sv2.setAttribute('viewBox','0 0 24 24');sv2.setAttribute('width','12');sv2.setAttribute('height','12');sv2.setAttribute('fill',icol);
+          var p2=document.createElementNS('http://www.w3.org/2000/svg','path');
+          p2.setAttribute('d',ICON_SVG[c]);sv2.appendChild(p2);sw.appendChild(sv2);
+        }
+        (function(ci,idx){sw.onclick=function(){stSC(idx,ci);};})(c,i);
+        r2.appendChild(sw);
+      });
+      icp.appendChild(r2);
+      rows.appendChild(icp);
+    }
+  });
 }
 function stTI(i){stIcp=stIcp===i?null:i;renderST();}
 function stSC(i,c){stTs[i].color=c;stIcp=null;renderST();}
