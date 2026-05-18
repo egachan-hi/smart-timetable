@@ -1213,6 +1213,21 @@ function rBL(){
     div.dataset.d=t.dur;
     div.dataset.c=t.color;
     div.ondragstart=function(e){onMD(e,this);};
+    div.ondblclick=function(){
+      var isFree=FREE_ITEMS.some(function(fi){return fi.id===t.id;});
+      if(isFree){
+        // フリーセッション末尾に追加
+        var lastEv=freeEvs.length>0?freeEvs.reduce(function(a,b){return b.toMin>a.toMin?b:a;}):null;
+        var newFrom=lastEv?lastEv.toMin:gSM();
+        var newTo=newFrom+t.dur;
+        freeEvs.push({id:nid++,name:t.name,fromMin:newFrom,toMin:newTo,color:t.color,comment:''});
+        snap();rFR();if(cv==='tb')renderTbl();
+      } else {
+        // シリアルセッション末尾に追加
+        sessions.push({id:nid++,name:t.name,dur:t.dur,color:t.color,comment:''});
+        snap();rTL();if(cv==='tb')renderTbl();
+      }
+    };
     // アイコン（●またはSVG）
     const bd=document.createElement('div');bd.className='bd';
     if(ICON_SVG[t.color]){
