@@ -391,7 +391,7 @@ tbody tr:hover td{background:var(--bg2)}
       <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="fcmt" maxlength="100"></textarea></div>
     </div>
     <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="fcc">0</span>/100</span>
-      <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" onclick="dupFM()">複製</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
+      <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" id="fdup" onclick="dupFM()">複製</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
     </div>
   </div>
 </div>
@@ -1237,6 +1237,7 @@ function rBL(){
         // フリーエリア末尾に追加（fromMin/toMinはgSM()からの相対分数）
         var lastEv=freeEvs.length>0?freeEvs.reduce(function(a,b){return b.toMin>a.toMin?b:a;}):null;
         var _isSummary=this.dataset.tid==='__summary';
+        if(_isSummary&&freeEvs.some(function(e){return e.isSummary;})){alert('イベントサマリーはすでに設定されています。');return;}
         var newFrom=_isSummary?0:(lastEv?lastEv.toMin:0);
         var _dur=_isSummary?(gEM()-gSM()):parseInt(this.dataset.d||10);
         var newTo=_isSummary?(gEM()-gSM()):(newFrom+_dur);
@@ -1667,8 +1668,10 @@ function rFR(){
     // Free handles use closures with ev.id (stable)
     const htEl=document.createElement('div');htEl.className='fh t';htEl.innerHTML='<div class="fp"></div>';
     htEl.addEventListener('mousedown',e=>onFH(e,'t',ev.id,htEl));
+    if(ev.isSummary){htEl.style.display='none';}
     const hbEl=document.createElement('div');hbEl.className='fh b';hbEl.innerHTML='<div class="fp"></div>';
     hbEl.addEventListener('mousedown',e=>onFH(e,'b',ev.id,hbEl));
+    if(ev.isSummary){hbEl.style.display='none';}
     const inner=document.createElement('div');inner.className='fi';
     const fShort=ht<24;
     const fHdr=document.createElement('div');fHdr.className='shr';
@@ -1876,6 +1879,7 @@ function onFRd(e){
   hTT();
   if(gSrc==='menu'){
     if(gIsSummary){
+      if(freeEvs.some(function(e){return e.isSummary;})){alert('イベントサマリーはすでに設定されています。');return;}
       const _sd=gEM()-gSM();
       freeEvs.push({id:nid++,name:gN,fromMin:0,toMin:_sd,color:gC,comment:'会場(またはミーティングID): \n講師(または主催者): \nイベント概要: ',isSummary:true});
       snap();rFR();if(cv==='tb')renderTbl();return;
@@ -2119,6 +2123,7 @@ function openFE(id){
   document.getElementById('fcmt').value=ev?ev.comment||'':'';
   document.getElementById('fcc').textContent=(ev?.comment||'').length;
   document.getElementById('fdel').style.display=ev?'':'none';
+  document.getElementById('fdup').style.display=(ev&&ev.isSummary)?'none':'';
   document.getElementById('fm').style.display='flex';
   setTimeout(()=>document.getElementById('fname').focus(),50);
 }
