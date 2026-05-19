@@ -297,6 +297,35 @@ tbody tr:hover td{background:var(--bg2)}
         <input type="time" id="eve" value="16:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="render();autoSave();setTimeout(fitz,50);updateTotalTime();"/>
         <span id="total-time-lbl" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;margin-left:6px"></span>
       </div>
+      <!-- イベント概要ウィジェット -->
+      <div id="evinfo-widget" style="margin-top:5px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);overflow:hidden">
+        <div id="evinfo-bar" style="display:flex;align-items:center;gap:6px;padding:4px 8px;cursor:pointer;min-height:28px" onclick="toggleEvInfo()">
+          <span style="font-size:10px;font-weight:600;color:var(--text2);flex-shrink:0;white-space:nowrap">イベント概要</span>
+          <span id="evinfo-preview" style="flex:1;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)">イベントの概要を入力</span>
+          <span id="evinfo-toggle-icon" style="font-size:11px;color:var(--text2);flex-shrink:0;line-height:1;user-select:none">▾</span>
+        </div>
+        <div id="evinfo-panel" style="display:none;padding:6px 8px 8px;border-top:1px solid var(--border);flex-direction:column;gap:5px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">場所/ID</span>
+            <input id="evinfo-location" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="会議室・URL等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">オーナー</span>
+            <input id="evinfo-owner" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="イベントオーナー" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">参加者</span>
+            <input id="evinfo-members" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="参加者" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0;padding-top:4px">メモ</span>
+            <div id="evinfo-memo-wrap" style="flex:1;position:relative">
+              <textarea id="evinfo-memo" class="mta evinfo-field" style="width:100%;box-sizing:border-box;font-size:11px;padding:2px 5px;min-height:20px;resize:vertical;border-color:transparent;background:transparent;overflow:hidden" placeholder="メモ" oninput="onEvInfoChange()" onfocus="evInfoMemoFocus()" onblur="evInfoMemoBlur()"></textarea>
+              <div id="evinfo-memo-link" style="display:none;font-size:11px;padding:2px 5px;cursor:text;word-break:break-all" onclick="evInfoMemoFocus()"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="mnb" id="mnb" style="display:flex;align-items:center">テンプレート：標準テンプレート<button class="ib" onclick="openST()" title="セッションテンプレート設定" style="margin-left:auto;flex-shrink:0">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
@@ -1041,6 +1070,169 @@ let dayData=[];
 let gSrc=null,gN='',gD=0,gC='teal';
 
 // ================================================================
+// イベント概要
+// ================================================================
+let evInfo={location:'',owner:'',members:'',memo:''};
+let evInfoOpen=false;
+
+function gEvInfoPreview(){
+  const v=evInfo;
+  if(v.location.trim()) return v.location.trim();
+  if(v.owner.trim())    return v.owner.trim();
+  if(v.members.trim())  return v.members.trim();
+  if(v.memo.trim()){
+    // 1行分（約30文字）だけ表示
+    const line=v.memo.split('\n')[0];
+    return line.length>30?line.slice(0,30)+'…':line;
+  }
+  return '';
+}
+
+function updateEvInfoPreview(){
+  const p=document.getElementById('evinfo-preview');
+  if(!p) return;
+  const txt=gEvInfoPreview();
+  if(!txt){
+    p.innerHTML='';
+    p.textContent='イベントの概要を入力';
+    p.style.color='var(--text3)';
+    return;
+  }
+  p.style.color='var(--text)';
+  // HTTP(S)リンク判定
+  if(/^https?:\/\//i.test(txt.trim())){
+    const a=document.createElement('a');
+    a.href=txt.trim();
+    a.target='_blank';
+    a.rel='noopener noreferrer';
+    a.textContent=txt.trim();
+    a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:block;max-width:100%';
+    a.addEventListener('click',e=>e.stopPropagation()); // バーのtoggleを発火させない
+    p.innerHTML='';
+    p.appendChild(a);
+  } else {
+    p.innerHTML='';
+    p.textContent=txt;
+  }
+}
+
+function toggleEvInfo(){
+  evInfoOpen=!evInfoOpen;
+  const panel=document.getElementById('evinfo-panel');
+  const icon=document.getElementById('evinfo-toggle-icon');
+  if(evInfoOpen){
+    panel.style.display='flex';
+    icon.style.transform='rotate(180deg)';
+    // 入力欄に現在値を反映
+    document.getElementById('evinfo-location').value=evInfo.location;
+    document.getElementById('evinfo-owner').value=evInfo.owner;
+    document.getElementById('evinfo-members').value=evInfo.members;
+    document.getElementById('evinfo-memo').value=evInfo.memo;
+    evInfoMemoInit();
+  } else {
+    panel.style.display='none';
+    icon.style.transform='';
+  }
+}
+
+function evInfoFieldFocus(el){
+  el.style.borderColor='';
+  el.style.background='';
+}
+function evInfoFieldBlur(el){
+  el.style.borderColor='transparent';
+  el.style.background='transparent';
+}
+
+// メモ専用：URL判定してリンク表示 / textarea 切り替え
+// メモtextareaを内容に合わせた高さに自動調整（参照モード用）
+function evInfoMemoAutoHeight(ta){
+  ta.style.height='auto';
+  ta.style.height=Math.max(ta.scrollHeight, 20)+'px';
+}
+function evInfoMemoFocus(){
+  const ta=document.getElementById('evinfo-memo');
+  const lk=document.getElementById('evinfo-memo-link');
+  if(!ta||!lk) return;
+  lk.style.display='none';
+  ta.style.display='';
+  ta.style.minHeight='96px';
+  ta.style.overflow='auto';
+  ta.style.height='auto';
+  ta.style.borderColor='';
+  ta.style.background='';
+  ta.focus();
+}
+function evInfoMemoBlur(){
+  const ta=document.getElementById('evinfo-memo');
+  const lk=document.getElementById('evinfo-memo-link');
+  if(!ta||!lk) return;
+  ta.style.borderColor='transparent';
+  ta.style.background='transparent';
+  ta.style.minHeight='20px';
+  ta.style.overflow='hidden';
+  const val=ta.value.trim();
+  if(/^https?:\/\//i.test(val)){
+    ta.style.display='none';
+    lk.innerHTML='';
+    const a=document.createElement('a');
+    a.href=val; a.target='_blank'; a.rel='noopener noreferrer';
+    a.textContent=val;
+    a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;word-break:break-all';
+    a.addEventListener('click',e=>e.stopPropagation());
+    lk.appendChild(a);
+    lk.style.display='block';
+  } else {
+    ta.style.display='';
+    lk.style.display='none';
+    evInfoMemoAutoHeight(ta);
+  }
+}
+// 展開時にメモの表示状態を初期化
+function evInfoMemoInit(){
+  const ta=document.getElementById('evinfo-memo');
+  const lk=document.getElementById('evinfo-memo-link');
+  if(!ta||!lk) return;
+  ta.style.minHeight='20px';
+  ta.style.overflow='hidden';
+  ta.style.display='';
+  lk.style.display='none';
+  const val=ta.value.trim();
+  if(val && /^https?:\/\//i.test(val)){
+    ta.style.display='none';
+    lk.innerHTML='';
+    const a=document.createElement('a');
+    a.href=val; a.target='_blank'; a.rel='noopener noreferrer';
+    a.textContent=val;
+    a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;word-break:break-all';
+    a.addEventListener('click',e=>e.stopPropagation());
+    lk.appendChild(a);
+    lk.style.display='block';
+  } else {
+    evInfoMemoAutoHeight(ta);
+  }
+}
+
+function onEvInfoChange(){
+  evInfo.location =document.getElementById('evinfo-location').value;
+  evInfo.owner    =document.getElementById('evinfo-owner').value;
+  evInfo.members  =document.getElementById('evinfo-members').value;
+  evInfo.memo     =document.getElementById('evinfo-memo').value;
+  updateEvInfoPreview();
+  autoSave();
+}
+
+function loadEvInfoToWidget(){
+  if(evInfoOpen){
+    document.getElementById('evinfo-location').value=evInfo.location;
+    document.getElementById('evinfo-owner').value=evInfo.owner;
+    document.getElementById('evinfo-members').value=evInfo.members;
+    document.getElementById('evinfo-memo').value=evInfo.memo;
+  }
+  updateEvInfoPreview();
+}
+
+// ================================================================
 // UNDO / REDO
 // ================================================================
 let hist=[s0()],hi=0;
@@ -1060,6 +1252,7 @@ function autoSave(){
       dayCount: dayCount,
       currentDay: currentDay,
       dayData: dayData,
+      evInfo: evInfo,
       savedAt: Date.now()
     }));
     const userTpls=savedTpls.filter(function(t){return !t._preset;});
@@ -1129,6 +1322,7 @@ function autoLoad(){
         if(foundTpl){TYPES=JSON.parse(JSON.stringify(foundTpl.types));}
       }
     }catch(e){console.warn('tpl select restore err',e);}
+    if(data.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:''},data.evInfo);}    loadEvInfoToWidget();
     return true;
   }catch(e){ console.warn('autoload error:', e); return false; }
 }
@@ -1331,7 +1525,7 @@ function rTL(){
 
   sessions.forEach((s,i)=>{
     const top=st[i]*PPM,ht=Math.max(s.dur*PPM,18);
-    const sm2=sm+st[i],short=ht<24,showC=s.comment&&ht>=38;
+    const sm2=sm+st[i],short=(s.dur*PPM)<16,showC=s.comment&&ht>=38;
     const _dk=isDark(),_bgHex=_dk?(CB_DARK[s.color]||'rgba(60,60,60,0.6)'):(CB[s.color]||'#F1EFE8'),bg=_dk?_bgHex:hexToRgba(_bgHex,0.6),bd=CD[s.color]||'#B4B2A9',tc2=_dk?(CT_DARK[s.color]||'#E8E8E8'):(CT[s.color]||'#444');
 
     // ブロック本体
@@ -1688,7 +1882,7 @@ function rFR(){
     const hbEl=document.createElement('div');hbEl.className='fh b';hbEl.innerHTML='<div class="fp"></div>';
     hbEl.addEventListener('mousedown',e=>onFH(e,'b',ev.id,hbEl));
     const inner=document.createElement('div');inner.className='fi';
-    const fShort=ht<24;
+    const fShort=((ev.toMin-ev.fromMin)*PPM)<16;
     const fHdr=document.createElement('div');fHdr.className='shr';
     {
       const fic=document.createElement('span');fic.style.cssText='display:flex;align-items:center;flex-shrink:0;margin-right:2px';
@@ -3374,6 +3568,7 @@ setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); },
 // 自動保存データを復元
 dayData=[{sessions:[],freeEvs:[]}];
 autoLoad();
+updateEvInfoPreview();
 uUR();sv('tl');render();updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
 
 // ================================================================
