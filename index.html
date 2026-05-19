@@ -391,7 +391,7 @@ tbody tr:hover td{background:var(--bg2)}
       <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="fcmt" maxlength="100"></textarea></div>
     </div>
     <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="fcc">0</span>/100</span>
-      <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" id="fdup" onclick="dupFM()">複製</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
+      <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" onclick="dupFM()">複製</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
     </div>
   </div>
 </div>
@@ -945,13 +945,12 @@ const ICON_SVG={
   ic_bulb:'M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z',
   ic_star:'M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z',
   ic_fork:'M11 9H9V2H7v7H5V2H3v7c0 2.12 1.66 3.84 3.75 3.97V22h2.5v-9.03C11.34 12.84 13 11.12 13 9V2h-2v7zm5-3v8h2.5v8H21V2c-2.76 0-5 2.24-5 4z',
-  ic_mic:'M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11z',
-  ic_summary:'M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14H7v-2h7v2zm3-4H7v-2h10v2zm0-4H7V7h10v2z'
+  ic_mic:'M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3zM19 11a7 7 0 0 1-14 0H3a9 9 0 0 0 8 8.94V22h2v-2.06A9 9 0 0 0 21 11z'
 };
-const CB={white:'#F5F5F5',purple:'#EEEDFE',teal:'#E1F5EE',green:'#EAF3DE',pink:'#FBEAF0',coral:'#FAECE7',blue:'#E6F1FB',amber:'#FEF3E2',gray:'#F0EFED',navy:'#E8EEF5',ic_check:'#EEEDFE',ic_chat:'#E1F5EE',ic_book:'#E6F1FB',ic_coffee:'#F0EFED',ic_group:'#E1F5EE',ic_pencil:'#EAF3DE',ic_bulb:'#FEF3E2',ic_star:'#EAF3DE',ic_fork:'#FEF3E2',ic_mic:'#FBEAF0',ic_summary:'#F5F5F5'};
+const CB={white:'#F5F5F5',purple:'#EEEDFE',teal:'#E1F5EE',green:'#EAF3DE',pink:'#FBEAF0',coral:'#FAECE7',blue:'#E6F1FB',amber:'#FEF3E2',gray:'#F0EFED',navy:'#E8EEF5',ic_check:'#EEEDFE',ic_chat:'#E1F5EE',ic_book:'#E6F1FB',ic_coffee:'#F0EFED',ic_group:'#E1F5EE',ic_pencil:'#EAF3DE',ic_bulb:'#FEF3E2',ic_star:'#EAF3DE',ic_fork:'#FEF3E2',ic_mic:'#FBEAF0'};
 const CD={white:'#CCCCCC',purple:'#AFA9EC',teal:'#5DCAA5',green:'#97C459',pink:'#ED93B1',coral:'#F0997B',blue:'#85B7EB',amber:'#EF9F27',gray:'#B4B2A9',navy:'#7A99C0',ic_check:'#AFA9EC',ic_chat:'#5DCAA5',ic_book:'#85B7EB',ic_coffee:'#B4B2A9',ic_group:'#5DCAA5',ic_pencil:'#97C459',ic_bulb:'#EF9F27',ic_star:'#97C459',ic_fork:'#EF9F27',ic_mic:'#ED93B1'};
-const CDot={white:'#AAAAAA',purple:'#7F77DD',teal:'#1D9E75',green:'#639922',pink:'#D4537E',coral:'#D85A30',blue:'#378ADD',amber:'#BA7517',gray:'#888780',navy:'#3A5A8C',ic_check:'#534AB7',ic_chat:'#0F6E56',ic_book:'#185FA5',ic_coffee:'#5F5E5A',ic_group:'#0F6E56',ic_pencil:'#3B6D11',ic_bulb:'#854F0B',ic_star:'#3B6D11',ic_fork:'#854F0B',ic_mic:'#72243E',ic_summary:'#AAAAAA'};
-const CT={white:'#555555',purple:'#3C3489',teal:'#085041',green:'#27500A',pink:'#72243E',coral:'#993C1D',blue:'#0C447C',amber:'#6B3A0A',gray:'#444441',navy:'#1A2E50',ic_check:'#3C3489',ic_chat:'#085041',ic_book:'#0C447C',ic_coffee:'#444441',ic_group:'#085041',ic_pencil:'#27500A',ic_bulb:'#6B3A0A',ic_star:'#27500A',ic_fork:'#6B3A0A',ic_mic:'#72243E',ic_summary:'#AAAAAA'};
+const CDot={white:'#AAAAAA',purple:'#7F77DD',teal:'#1D9E75',green:'#639922',pink:'#D4537E',coral:'#D85A30',blue:'#378ADD',amber:'#BA7517',gray:'#888780',navy:'#3A5A8C',ic_check:'#534AB7',ic_chat:'#0F6E56',ic_book:'#185FA5',ic_coffee:'#5F5E5A',ic_group:'#0F6E56',ic_pencil:'#3B6D11',ic_bulb:'#854F0B',ic_star:'#3B6D11',ic_fork:'#854F0B',ic_mic:'#72243E'};
+const CT={white:'#555555',purple:'#3C3489',teal:'#085041',green:'#27500A',pink:'#72243E',coral:'#993C1D',blue:'#0C447C',amber:'#6B3A0A',gray:'#444441',navy:'#1A2E50',ic_check:'#3C3489',ic_chat:'#085041',ic_book:'#0C447C',ic_coffee:'#444441',ic_group:'#085041',ic_pencil:'#27500A',ic_bulb:'#6B3A0A',ic_star:'#27500A',ic_fork:'#6B3A0A',ic_mic:'#72243E'};
 const ANY={id:'__any',name:'任意のセッション',dur:10,color:'coral',fixed:true};
 const BUFFER={id:'__buffer',name:'時間調整',dur:10,color:'white',fixed:true};
 
@@ -1039,7 +1038,7 @@ let dayCount=1;     // 日程数（1〜7）
 let currentDay=1;   // 表示中の日（複数日時）
 // 複数日のセッションデータ: dayData[dayIndex] = {sessions, freeEvs}
 let dayData=[];
-let gSrc=null,gN='',gD=0,gC='teal',gIsSummary=false;
+let gSrc=null,gN='',gD=0,gC='teal';
 
 // ================================================================
 // UNDO / REDO
@@ -1154,7 +1153,7 @@ const CB_DARK={
   ic_check:'rgba(63,52,137,0.6)',ic_chat:'rgba(8,80,65,0.6)',ic_book:'rgba(12,68,124,0.6)',
   ic_coffee:'rgba(68,68,65,0.6)',ic_group:'rgba(8,80,65,0.6)',ic_pencil:'rgba(39,80,10,0.6)',
   ic_bulb:'rgba(99,56,6,0.6)',ic_star:'rgba(39,80,10,0.6)',ic_fork:'rgba(99,56,6,0.6)',
-  ic_mic:'rgba(114,36,62,0.6)',ic_summary:'rgba(80,80,80,0.6)'
+  ic_mic:'rgba(114,36,62,0.6)'
 };
 const CT_DARK={
   white:'#E8E8E8',purple:'#E8E6FF',teal:'#C8F0E4',green:'#D4EDB0',
@@ -1162,7 +1161,7 @@ const CT_DARK={
   gray:'#D3D1C7',navy:'#C5D5E8',
   ic_check:'#E8E6FF',ic_chat:'#C8F0E4',ic_book:'#B5D4F4',ic_coffee:'#D3D1C7',
   ic_group:'#C8F0E4',ic_pencil:'#D4EDB0',ic_bulb:'#FFE4B0',ic_star:'#D4EDB0',
-  ic_fork:'#FFE4B0',ic_mic:'#F4C0D1',ic_summary:'#E8E8E8'
+  ic_fork:'#FFE4B0',ic_mic:'#F4C0D1'
 };
 function isDark(){return window.matchMedia&&window.matchMedia('(prefers-color-scheme:dark)').matches;}
 function hexToRgba(hex,a){
@@ -1204,7 +1203,7 @@ function sv(v){
   if(v==='tb')renderTbl();
 }
 
-function render(){freeEvs.forEach(function(ev){if(ev.isSummary){ev.fromMin=0;ev.toMin=Math.max(1,gEM()-gSM());}});rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);}
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);}
 
 // ================================================================
 // RENDER BLOCK LIST
@@ -1212,7 +1211,6 @@ function render(){freeEvs.forEach(function(ev){if(ev.isSummary){ev.fromMin=0;ev.
 function rBL(){
   const _mnb=document.getElementById('mnb');if(_mnb){const _tn=_mnb.childNodes[0];if(_tn&&_tn.nodeType===3)_tn.nodeValue='テンプレート：'+tplName;}
   const FREE_ITEMS=[
-    {id:'__summary',name:'イベントサマリー',dur:0,color:'ic_summary',fixed:true,summary:true,defaultMemo:'会場(またはミーティングID): \n講師(または主催者): \nイベント概要: '},
     {id:'__meeting',name:'ミーティングID',dur:10,color:'white',fixed:true},
     {id:'__venue',name:'会場名',dur:10,color:'white',fixed:true},
     {id:'__instructor',name:'講師名',dur:10,color:'white',fixed:true},
@@ -1232,17 +1230,14 @@ function rBL(){
     div.dataset.tid=t.id||'';
     div.ondragstart=function(e){onMD(e,this);};
     div.ondblclick=function(){
-      var _freeIds=['__meeting','__venue','__instructor','__standby','__summary'];var isFree=_freeIds.indexOf(this.dataset.tid)>=0;
+      var _freeIds=['__meeting','__venue','__instructor','__standby'];var isFree=_freeIds.indexOf(this.dataset.tid)>=0;
       if(isFree){
         // フリーエリア末尾に追加（fromMin/toMinはgSM()からの相対分数）
         var lastEv=freeEvs.length>0?freeEvs.reduce(function(a,b){return b.toMin>a.toMin?b:a;}):null;
-        var _isSummary=this.dataset.tid==='__summary';
-        if(_isSummary&&freeEvs.some(function(e){return e.isSummary;})){alert('イベントサマリーはすでに設定されています。');return;}
-        var newFrom=_isSummary?0:(lastEv?lastEv.toMin:0);
-        var _dur=_isSummary?(gEM()-gSM()):parseInt(this.dataset.d||10);
-        var newTo=_isSummary?(gEM()-gSM()):(newFrom+_dur);
-        var _defMemo=_isSummary?'会場(またはミーティングID): \n講師(または主催者): \nイベント概要: ':'';
-        freeEvs.push({id:nid++,name:this.dataset.n,fromMin:newFrom,toMin:newTo,color:this.dataset.c,comment:_defMemo,isSummary:_isSummary});
+        var newFrom=lastEv?lastEv.toMin:0;
+        var _dur=parseInt(this.dataset.d||10);
+        var newTo=newFrom+_dur;
+        freeEvs.push({id:nid++,name:this.dataset.n,fromMin:newFrom,toMin:newTo,color:this.dataset.c,comment:''});
         snap();rFR();if(cv==='tb')renderTbl();
       } else {
         // シリアルセッション末尾に追加
@@ -1590,42 +1585,65 @@ function onFRU(){
 // RENDER FREE PANEL
 // ================================================================
 function frLy(evs){
-  // 重なりグループを構築し、グループ内の列数でwidthを決める
-  // 重なりなし → col:0, total:1 (全幅)
-  // 2つ重なり → col:0か1, total:2 (半幅)
-  // 3つ重なり → col:0,1,2, total:3 (1/3幅)
   const res={};
   if(!evs||evs.length===0)return res;
 
-  // Step1: 各イベントに列番号を割り当て
-  // colEnd[c] = 列cに最後に入れたイベントのtoMin
-  const colEnd=[];
-  const sorted=[...evs].sort((a,b)=>a.fromMin-b.fromMin);
-  sorted.forEach(ev=>{
-    let col=-1;
-    for(let i=0;i<colEnd.length;i++){
-      if(ev.fromMin>=colEnd[i]){col=i;break;}
+  // Step1: ペアワイズで重なり関係をグラフ化しBFSで連結グループを求める
+  // 重なり条件: A.fromMin < B.toMin && B.fromMin < A.toMin
+  const adj={};
+  evs.forEach(e=>{ adj[e.id]=[]; });
+  for(let i=0;i<evs.length;i++){
+    for(let j=i+1;j<evs.length;j++){
+      const a=evs[i],b=evs[j];
+      if(a.fromMin<b.toMin&&b.fromMin<a.toMin){
+        adj[a.id].push(b.id);
+        adj[b.id].push(a.id);
+      }
     }
-    if(col===-1){col=colEnd.length;}
-    if(col>2)col=2; // 最大3列
-    while(colEnd.length<=col)colEnd.push(0);
-    colEnd[col]=ev.toMin;
-    res[ev.id]={col,total:1};
+  }
+
+  // Step2: BFSで連結グループ
+  const visited=new Set();
+  const groups=[];
+  evs.forEach(startEv=>{
+    if(visited.has(startEv.id))return;
+    const group=[];
+    const queue=[startEv.id];
+    while(queue.length){
+      const cid=queue.shift();
+      if(visited.has(cid))continue;
+      visited.add(cid);
+      const cev=evs.find(x=>x.id===cid);
+      if(cev)group.push(cev);
+      (adj[cid]||[]).forEach(nid=>{ if(!visited.has(nid))queue.push(nid); });
+    }
+    groups.push(group);
   });
 
-  // Step2: 各イベントについて、同時刻に重なる全イベントを調べ
-  //        そのグループ内で使われている最大列番号+1をtotalとする
-  evs.forEach(ev=>{
-    // evと時間的に重なるイベントのリスト（自分含む）
-    const grp=evs.filter(o=>o.fromMin<ev.toMin&&o.toMin>ev.fromMin);
-    if(grp.length<=1){
-      // 重なりなし → 全幅
-      res[ev.id]={col:0,total:1};
-    } else {
-      // 重なりあり → グループ内の最大列番号+1
-      const maxCol=Math.max(...grp.map(o=>(res[o.id]||{col:0}).col));
-      res[ev.id].total=maxCol+1;
+  // Step3: グループごとに列番号を割り当て
+  groups.forEach(group=>{
+    if(group.length===1){
+      res[group[0].id]={col:0,total:1};
+      return;
     }
+    // fromMin昇順ソート
+    const sorted=[...group].sort((a,b)=>a.fromMin-b.fromMin||(a.id-b.id));
+    // colEnd[c] = 列cの現在の終端時刻（最大値で管理）
+    const colEnd=[];
+    sorted.forEach(ev=>{
+      let col=-1;
+      for(let i=0;i<colEnd.length;i++){
+        if(ev.fromMin>=colEnd[i]){ col=i; break; }
+      }
+      if(col===-1){ col=Math.min(colEnd.length,2); }
+      while(colEnd.length<=col)colEnd.push(0);
+      colEnd[col]=Math.max(colEnd[col],ev.toMin);
+      res[ev.id]={col,total:1};
+    });
+    // グループ全員に同じtotalを設定
+    const maxCol=Math.max(...group.map(o=>res[o.id].col));
+    const total=Math.min(maxCol+1,3);
+    group.forEach(o=>{ res[o.id].total=total; });
   });
 
   return res;
@@ -1663,15 +1681,12 @@ function rFR(){
     const el=document.createElement('div');
     el.className='fb';el.id='fb'+ev.id;
     el.style.cssText=`top:${top+2}px;height:${ht-2}px;left:calc(${lft}% + 1px);width:calc(${cw}% - 2px);background:${bg};color:${tc};border-left:4px solid ${bd};border-radius:6px`;
-    el.draggable=!ev.isSummary;
-    if(ev.isSummary)el.style.cursor='default';
+    el.draggable=true;
     // Free handles use closures with ev.id (stable)
     const htEl=document.createElement('div');htEl.className='fh t';htEl.innerHTML='<div class="fp"></div>';
     htEl.addEventListener('mousedown',e=>onFH(e,'t',ev.id,htEl));
-    if(ev.isSummary){htEl.style.display='none';}
     const hbEl=document.createElement('div');hbEl.className='fh b';hbEl.innerHTML='<div class="fp"></div>';
     hbEl.addEventListener('mousedown',e=>onFH(e,'b',ev.id,hbEl));
-    if(ev.isSummary){hbEl.style.display='none';}
     const inner=document.createElement('div');inner.className='fi';
     const fShort=ht<24;
     const fHdr=document.createElement('div');fHdr.className='shr';
@@ -1738,7 +1753,7 @@ function renderTbl(){
       <td style="font-size:11px;color:var(--text2);padding:6px 7px;white-space:pre-wrap;word-break:break-all">${s.comment?escLink(s.comment):'<span style="opacity:.3">—</span>'}</td>
       <td style="width:20px;text-align:center;padding:6px 4px"><span style="cursor:pointer;opacity:.3;font-size:13px" onclick="delS(event,${s.id})">×</span></td>
     </tr>`).join('');
-  const sf=[...freeEvs].sort((a,b)=>{if(a.isSummary)return -1;if(b.isSummary)return 1;return a.fromMin-b.fromMin;});
+  const sf=[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin);
   const cm=frLy(sf);
   document.getElementById('ftb').innerHTML=sf.map((ev,i)=>{
     const dur=ev.toMin-ev.fromMin,info=cm[ev.id]||{col:0,total:1};
@@ -1787,7 +1802,7 @@ function hTT(){TT.style.display='none';}
 let sD={src:null,id:null,ins:null};
 let fBD={id:null,of:0,ot:0};
 
-function onMD(e,el){gSrc='menu';gN=el.dataset.n;gD=parseInt(el.dataset.d)||10;gC=el.dataset.c||'teal';gIsSummary=el.dataset.tid==='__summary';e.dataTransfer.effectAllowed='copy';document.addEventListener('dragend',onGDE,{once:true});}
+function onMD(e,el){gSrc='menu';gN=el.dataset.n;gD=parseInt(el.dataset.d)||10;gC=el.dataset.c||'teal';e.dataTransfer.effectAllowed='copy';document.addEventListener('dragend',onGDE,{once:true});}
 function onSD(e,el){
   gSrc='serial';sD.src='serial';sD.id=parseInt(el.dataset.id);
   const s=sessions.find(x=>x.id===sD.id);
@@ -1878,12 +1893,6 @@ function onFRd(e){
   document.getElementById('fov').classList.remove('act');
   hTT();
   if(gSrc==='menu'){
-    if(gIsSummary){
-      if(freeEvs.some(function(e){return e.isSummary;})){alert('イベントサマリーはすでに設定されています。');return;}
-      const _sd=gEM()-gSM();
-      freeEvs.push({id:nid++,name:gN,fromMin:0,toMin:_sd,color:gC,comment:'会場(またはミーティングID): \n講師(または主催者): \nイベント概要: ',isSummary:true});
-      snap();rFR();if(cv==='tb')renderTbl();return;
-    }
     const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
     let cnt=0;freeEvs.forEach(ev=>{if(ev.fromMin<fm+gD&&ev.toMin>fm)cnt++;});
     if(cnt>=3){alert('同じ時間帯に4つ以上のイベントは配置できません。');return;}
@@ -2086,7 +2095,6 @@ function dupSM(){
 function dupFM(){
   const ev=freeEvs.find(x=>x.id===fmId);
   if(!ev) return;
-  if(ev.isSummary){alert('イベントサマリーは複製できません。');return;}
   const dur=ev.toMin-ev.fromMin;
   // 元セッションの直後に配置（重なりがあれば最後にずらす）
   let newFrom=ev.toMin;
@@ -2123,7 +2131,6 @@ function openFE(id){
   document.getElementById('fcmt').value=ev?ev.comment||'':'';
   document.getElementById('fcc').textContent=(ev?.comment||'').length;
   document.getElementById('fdel').style.display=ev?'':'none';
-  document.getElementById('fdup').style.display=(ev&&ev.isSummary)?'none':'';
   document.getElementById('fm').style.display='flex';
   setTimeout(()=>document.getElementById('fname').focus(),50);
 }
@@ -3476,7 +3483,7 @@ function mvRenderSerial(nowMin,sm){
 
 function mvRenderFree(nowMin,sm){
   document.getElementById('mv-now').style.display='none';
-  const sf=[...freeEvs].sort((a,b)=>{if(a.isSummary)return -1;if(b.isSummary)return 1;return a.fromMin-b.fromMin;});
+  const sf=[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin);
   const body=document.getElementById('mv-body');body.innerHTML='';
   if(sf.length===0){body.innerHTML='<div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">フリーエリアはありません</div>';return;}
   sf.forEach(ev=>{
