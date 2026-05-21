@@ -1061,6 +1061,27 @@ let savedTpls=[
   ]},
 ];
 let savedEvs=[];
+
+// ================================================================
+// SAVED EVS — ルーム単位 localStorage 永続化
+// ================================================================
+function getSavedKey(){
+  // URLのroomパラメータ優先、なければlocalStorageのroom-id、なければ'default'
+  var p=new URLSearchParams(window.location.search);
+  var room=p.get('room')||localStorage.getItem('stt-room-id')||'default';
+  return 'stt-saved-'+room;
+}
+function persistSavedEvs(){
+  try{ localStorage.setItem(getSavedKey(), JSON.stringify(savedEvs)); }
+  catch(e){ console.warn('savedEvs persist error:', e); }
+}
+function restoreSavedEvs(){
+  try{
+    var raw=localStorage.getItem(getSavedKey());
+    savedEvs=raw?JSON.parse(raw):[];
+  } catch(e){ savedEvs=[]; }
+}
+
 let cv='tl';
 let noDate=false;   // 日付を特定しない
 let dayCount=1;     // 日程数（1〜7）
@@ -1077,42 +1098,45 @@ let evInfoOpen=false;
 
 function gEvInfoPreview(){
   const v=evInfo;
-  if(v.location.trim()) return v.location.trim();
-  if(v.owner.trim())    return v.owner.trim();
-  if(v.members.trim())  return v.members.trim();
+  if(v.location.trim()) return {label:'場所/ID', text:v.location.trim()};
+  if(v.owner.trim())    return {label:'オーナー', text:v.owner.trim()};
+  if(v.members.trim())  return {label:'参加者', text:v.members.trim()};
   if(v.memo.trim()){
-    // 1行分（約30文字）だけ表示
     const line=v.memo.split('\n')[0];
-    return line.length>30?line.slice(0,30)+'…':line;
+    return {label:'メモ', text:line.length>30?line.slice(0,30)+'…':line};
   }
-  return '';
+  return null;
 }
 
 function updateEvInfoPreview(){
   const p=document.getElementById('evinfo-preview');
   if(!p) return;
-  const txt=gEvInfoPreview();
-  if(!txt){
-    p.innerHTML='';
+  const item=gEvInfoPreview();
+  p.innerHTML='';
+  if(!item){
     p.textContent='イベントの概要を入力';
     p.style.color='var(--text3)';
     return;
   }
   p.style.color='var(--text)';
-  // HTTP(S)リンク判定
-  if(/^https?:\/\//i.test(txt.trim())){
+  // ラベル部分（薄く小さく）
+  const lbl=document.createElement('span');
+  lbl.textContent=item.label+': ';
+  lbl.style.cssText='font-size:10px;color:var(--text3);flex-shrink:0;margin-right:2px';
+  p.appendChild(lbl);
+  // テキスト or リンク
+  if(/^https?:\/\//i.test(item.text)){
     const a=document.createElement('a');
-    a.href=txt.trim();
-    a.target='_blank';
-    a.rel='noopener noreferrer';
-    a.textContent=txt.trim();
-    a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;display:block;max-width:100%';
-    a.addEventListener('click',e=>e.stopPropagation()); // バーのtoggleを発火させない
-    p.innerHTML='';
+    a.href=item.text; a.target='_blank'; a.rel='noopener noreferrer';
+    a.textContent=item.text;
+    a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
+    a.addEventListener('click',e=>e.stopPropagation());
     p.appendChild(a);
   } else {
-    p.innerHTML='';
-    p.textContent=txt;
+    const val=document.createElement('span');
+    val.textContent=item.text;
+    val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px';
+    p.appendChild(val);
   }
 }
 
@@ -1323,6 +1347,7 @@ function autoLoad(){
       }
     }catch(e){console.warn('tpl select restore err',e);}
     if(data.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:''},data.evInfo);}    loadEvInfoToWidget();
+    restoreSavedEvs();
     return true;
   }catch(e){ console.warn('autoload error:', e); return false; }
 }
@@ -1782,16 +1807,17 @@ function frLy(evs){
   const res={};
   if(!evs||evs.length===0)return res;
 
-  // Step1: ペアワイズで重なり関係をグラフ化しBFSで連結グループを求める
-  // 重なり条件: A.fromMin < B.toMin && B.fromMin < A.toMin
+  // 重なり判定
+  function overlaps(a,b){ return a.fromMin<b.toMin && b.fromMin<a.toMin; }
+
+  // Step1: ペアワイズ隣接グラフ構築
   const adj={};
   evs.forEach(e=>{ adj[e.id]=[]; });
   for(let i=0;i<evs.length;i++){
     for(let j=i+1;j<evs.length;j++){
-      const a=evs[i],b=evs[j];
-      if(a.fromMin<b.toMin&&b.fromMin<a.toMin){
-        adj[a.id].push(b.id);
-        adj[b.id].push(a.id);
+      if(overlaps(evs[i],evs[j])){
+        adj[evs[i].id].push(evs[j].id);
+        adj[evs[j].id].push(evs[i].id);
       }
     }
   }
@@ -1815,26 +1841,28 @@ function frLy(evs){
   });
 
   // Step3: グループごとに列番号を割り当て
+  // colEnd方式ではなく「列に入っている全イベントと重ならない」を直接チェック
   groups.forEach(group=>{
     if(group.length===1){
       res[group[0].id]={col:0,total:1};
       return;
     }
-    // fromMin昇順ソート
     const sorted=[...group].sort((a,b)=>a.fromMin-b.fromMin||(a.id-b.id));
-    // colEnd[c] = 列cの現在の終端時刻（最大値で管理）
-    const colEnd=[];
+    // cols[c] = その列に割り当て済みのイベント配列
+    const cols=[];
     sorted.forEach(ev=>{
+      // 重ならない最小列を探す
       let col=-1;
-      for(let i=0;i<colEnd.length;i++){
-        if(ev.fromMin>=colEnd[i]){ col=i; break; }
+      for(let i=0;i<cols.length;i++){
+        // この列の全イベントと重ならなければ使える
+        const safe=cols[i].every(o=>!overlaps(ev,o));
+        if(safe){ col=i; break; }
       }
-      if(col===-1){ col=Math.min(colEnd.length,2); }
-      while(colEnd.length<=col)colEnd.push(0);
-      colEnd[col]=Math.max(colEnd[col],ev.toMin);
+      if(col===-1){ col=Math.min(cols.length,2); }
+      while(cols.length<=col)cols.push([]);
+      cols[col].push(ev);
       res[ev.id]={col,total:1};
     });
-    // グループ全員に同じtotalを設定
     const maxCol=Math.max(...group.map(o=>res[o.id].col));
     const total=Math.min(maxCol+1,3);
     group.forEach(o=>{ res[o.id].total=total; });
@@ -2961,13 +2989,13 @@ async function extractPptxText(file){
 // ================================================================
 // EVENT MANAGER
 // ================================================================
-function openEV(){document.getElementById('evname').value=document.getElementById('evt').value||'';renderEVL();document.getElementById('evm').style.display='flex';}
+function openEV(){restoreSavedEvs();document.getElementById('evname').value=document.getElementById('evt').value||'';renderEVL();document.getElementById('evm').style.display='flex';}
 function closeEV(){document.getElementById('evm').style.display='none';}
 document.getElementById('evm').addEventListener('click',function(e){if(e.target===this)closeEV();});
 function renderEVL(){document.getElementById('evlist').innerHTML=savedEvs.length===0?'<div style="font-size:11px;color:var(--text3)">保存されたイベントはありません</div>':savedEvs.map((ev,i)=>`<div class="eli"><span style="flex:1;font-size:11px">${esc(ev.name)}</span><span style="font-size:10px;color:var(--text2)">${ev.date||''}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="loadEV(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="delEV(${i})">×</span></div>`).join('');}
-function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();alert(`「${name}」として保存しました`);}
+function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();persistSavedEvs();alert(`「${name}」として保存しました`);}
 function loadEV(i){const ev=savedEvs[i];document.getElementById('evt').value=ev.title||'';document.getElementById('evd').value=ev.date||'';document.getElementById('evs').value=ev.start||'13:00';document.getElementById('eve').value=ev.end||'16:00';sessions=JSON.parse(JSON.stringify(ev.sessions));freeEvs=JSON.parse(JSON.stringify(ev.freeEvs));closeEV();snap();render();if(typeof mvRender==='function')mvRender();}
-function delEV(i){if(confirm('削除しますか？')){savedEvs.splice(i,1);renderEVL();}}
+function delEV(i){if(confirm('削除しますか？')){savedEvs.splice(i,1);renderEVL();persistSavedEvs();}}
 function quickSaveEV(){
   logEvent('save');
   const title=(document.getElementById('evt').value||'').trim();
@@ -2978,8 +3006,8 @@ function quickSaveEV(){
   }
   const idx=savedEvs.findIndex(e=>e.name===title);
   const d={name:title,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
-  if(idx>=0){savedEvs[idx]=d;alert(`「${title}」を上書き保存しました`);}
-  else{savedEvs.push(d);alert(`「${title}」として保存しました`);}
+  if(idx>=0){savedEvs[idx]=d;persistSavedEvs();alert(`「${title}」を上書き保存しました`);}
+  else{savedEvs.push(d);persistSavedEvs();alert(`「${title}」として保存しました`);}
 }
 function duplicateEV(){
   logEvent('duplicate');
@@ -3568,6 +3596,7 @@ setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); },
 // 自動保存データを復元
 dayData=[{sessions:[],freeEvs:[]}];
 autoLoad();
+restoreSavedEvs();
 updateEvInfoPreview();
 uUR();sv('tl');render();updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
 
