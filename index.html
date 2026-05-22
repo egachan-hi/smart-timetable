@@ -923,12 +923,14 @@ tbody tr:hover td{background:var(--bg2)}
       <div>
         <div class="mv-modal-label">時間</div>
         <div class="mv-dur-row">
-          <button class="mv-dur-btn" onclick="mvDurChange(-5)">−</button>
+          <button class="mv-dur-btn" onclick="mvDurChange(-5)" style="font-size:18px">−</button>
+          <button class="mv-dur-btn" onclick="mvDurChange(-1)" style="font-size:13px;width:32px;min-width:32px">-1</button>
           <div>
             <div class="mv-dur-val" id="mv-sm-dur">30</div>
             <div class="mv-dur-sub">分</div>
           </div>
-          <button class="mv-dur-btn" onclick="mvDurChange(5)">＋</button>
+          <button class="mv-dur-btn" onclick="mvDurChange(1)" style="font-size:13px;width:32px;min-width:32px">+1</button>
+          <button class="mv-dur-btn" onclick="mvDurChange(5)" style="font-size:18px">＋</button>
         </div>
         <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
           <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(5)">5分</button>
@@ -3722,32 +3724,51 @@ function mvRenderSerial(nowMin,sm){
   }else if(nowMin<sm){nowEl.style.display='flex';nowTxt.textContent=`開始まであと${sm-nowMin}分`;}
   else{nowEl.style.display='none';}
   const body=document.getElementById('mv-body');body.innerHTML='';
+  const dk=isDark();
   sessions.forEach((s,i)=>{
     const start=sm+st[i],end=start+s.dur,isActive=nowMin>=start&&nowMin<end;
     const card=document.createElement('div');
     card.className='mv-card'+(isActive?' active':'');
     card.dataset.id=s.id;
+
+    // アイコンHTML（PCと同様）
+    let iconHtml='';
+    if(ICON_SVG[s.color]){
+      const fill=dk?(CT_DARK[s.color]||'#E8E8E8'):(CT[s.color]||'#333');
+      iconHtml=`<svg viewBox="0 0 24 24" width="15" height="15" fill="${fill}" style="flex-shrink:0"><path d="${ICON_SVG[s.color]}"/></svg>`;
+    } else {
+      iconHtml=`<span style="width:10px;height:10px;border-radius:50%;background:${CD[s.color]||'#B4B2A9'};display:inline-block;flex-shrink:0"></span>`;
+    }
+
     card.innerHTML=`
       <div class="mv-card-bar" style="background:${CD[s.color]||'#B4B2A9'}"></div>
-      <div class="mv-card-body" style="flex:1">
+      <div class="mv-card-body" style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px">
-          <div style="flex:1">
+          ${iconHtml}
+          <div style="flex:1;min-width:0">
             <div class="mv-card-name">${esc(s.name)}</div>
             <div class="mv-card-time">${hm(start)}〜${hm(end)} (${s.dur}分)</div>
           </div>
-          ${s.comment?'<div class="mv-card-chevron">›</div>':''}
+          ${s.comment?'<span class="mv-card-chevron" style="font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0">›</span>':''}
+          <button class="mv-edit-icon-btn" title="編集" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" ontouchstart="this.style.background='var(--bg3)'" ontouchend="this.style.background=''">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
         </div>
         ${isActive?`<div class="mv-card-remain" style="color:var(--accent);margin-top:4px">▶ 進行中 — あと${end-nowMin}分</div>`:''}
-        
         ${s.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(s.comment)}</div>`:''}
       </div>`;
-    // タップ: メモ展開＋モーダル / 長押し: 移動
+
+    // 鉛筆ボタン → 編集モーダル
+    const editBtn=card.querySelector('.mv-edit-icon-btn');
+    editBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenSM(s.id);},{passive:false});
+    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
+
+    // タップ → メモ展開のみ（編集モーダルは開かない）
     let tapMoved=false,tapStartY=0,tapStartTime=0;
     card.addEventListener('touchstart',e=>{
       tapMoved=false;tapStartY=e.touches[0].clientY;tapStartTime=Date.now();
       mvLongPressTimer=setTimeout(()=>{
         if(!tapMoved){
-          e.target.blur&&e.target.blur();
           navigator.vibrate&&navigator.vibrate(30);
           mvStartDrag(e,s.id,card);
         }
@@ -3761,55 +3782,79 @@ function mvRenderSerial(nowMin,sm){
       clearTimeout(mvLongPressTimer);
       if(mvDragId){mvEndDrag(e);return;}
       if(!tapMoved&&Date.now()-tapStartTime<500){
-        if(s.comment)card.classList.toggle('open');
-        setTimeout(()=>mvOpenSM(s.id),s.comment?0:0);
+        if(s.comment){
+          const open=card.classList.toggle('open');
+          const chev=card.querySelector('.mv-card-chevron');
+          if(chev)chev.style.transform=open?'rotate(90deg)':'';
+        }
       }
     });
     body.appendChild(card);
   });
 }
+
 
 function mvRenderFree(nowMin,sm){
   document.getElementById('mv-now').style.display='none';
   const sf=[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin);
   const body=document.getElementById('mv-body');body.innerHTML='';
   if(sf.length===0){body.innerHTML='<div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">フリーエリアはありません</div>';return;}
+  const dk=isDark();
   sf.forEach(ev=>{
-    const start=sm+ev.fromMin,end=sm+ev.toMin,dur=ev.toMin-ev.fromMin;
-    const isDone=nowMin>=end,isActive=nowMin>=start&&nowMin<end;
+    const start=ev.fromMin,end=ev.toMin,dur=ev.toMin-ev.fromMin;
+    const isActive=nowMin>=start&&nowMin<end;
     const card=document.createElement('div');
     card.className='mv-card'+(isActive?' active':'');
+
+    // アイコンHTML（PCと同様）
+    let iconHtml='';
+    if(ICON_SVG[ev.color]){
+      const fill=dk?(CT_DARK[ev.color]||'#E8E8E8'):(CT[ev.color]||'#085041');
+      iconHtml=`<svg viewBox="0 0 24 24" width="15" height="15" fill="${fill}" style="flex-shrink:0"><path d="${ICON_SVG[ev.color]}"/></svg>`;
+    } else {
+      iconHtml=`<span style="width:10px;height:10px;border-radius:50%;background:${CD[ev.color]||'#5DCAA5'};display:inline-block;flex-shrink:0"></span>`;
+    }
+
     card.innerHTML=`
       <div class="mv-card-bar" style="background:${CD[ev.color]||'#5DCAA5'}"></div>
-      <div class="mv-card-body" style="flex:1">
+      <div class="mv-card-body" style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px">
-          <div style="flex:1">
+          ${iconHtml}
+          <div style="flex:1;min-width:0">
             <div class="mv-card-name">${esc(ev.name)}</div>
             <div class="mv-card-time">${hm(start)}〜${hm(end)} (${dur}分)</div>
           </div>
-          ${ev.comment?'<div class="mv-card-chevron">›</div>':''}
+          ${ev.comment?'<span class="mv-card-chevron" style="font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0">›</span>':''}
+          <button class="mv-edit-icon-btn" title="編集" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" ontouchstart="this.style.background='var(--bg3)'" ontouchend="this.style.background=''">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
         </div>
         ${isActive?`<div class="mv-card-remain" style="color:var(--accent);margin-top:4px">▶ 進行中</div>`:''}
-        
         ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(ev.comment)}</div>`:''}
       </div>`;
-    let fTapMoved=false,fTapStart=0;
-    card.addEventListener('touchstart',e=>{fTapMoved=false;fTapStart=Date.now();},{passive:true});
-    card.addEventListener('touchmove',()=>{fTapMoved=true;},{passive:true});
+
+    // 鉛筆ボタン → 編集モーダル
+    const editBtn=card.querySelector('.mv-edit-icon-btn');
+    editBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenFM(ev.id);},{passive:false});
+    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenFM(ev.id);});
+
+    // タップ → メモ展開のみ
+    let fTapMoved=false,fTapStart=0,fTapStartY=0;
+    card.addEventListener('touchstart',e=>{fTapMoved=false;fTapStart=Date.now();fTapStartY=e.touches[0].clientY;},{passive:true});
+    card.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientY-fTapStartY)>8)fTapMoved=true;},{passive:true});
     card.addEventListener('touchend',e=>{
       if(!fTapMoved&&Date.now()-fTapStart<500){
-        if(ev.comment)card.classList.toggle('open');
-        mvOpenFM(ev.id);
+        if(ev.comment){
+          const open=card.classList.toggle('open');
+          const chev=card.querySelector('.mv-card-chevron');
+          if(chev)chev.style.transform=open?'rotate(90deg)':'';
+        }
       }
     });
-    card.addEventListener('click',()=>mvOpenFM(ev.id));
     body.appendChild(card);
   });
 }
 
-// ---- ドラッグ（長押し → 全カード動的移動UI）----
-let mvDragFromIdx=-1, mvDragOverIdx=-1, mvDragGhostTop=0;
-let mvCardHeights=[];  // 各カードの高さキャッシュ
 
 function mvStartDrag(e,id,card){
   mvDragId=id;
@@ -3946,7 +3991,7 @@ function mvSelectColor(c){
   });
 }
 function mvCloseSM(){document.getElementById('mv-sm').style.display='none';mvEditId=null;}
-function mvDurChange(d){mvDurVal=Math.max(5,mvDurVal+d);document.getElementById('mv-sm-dur').textContent=mvDurVal;}
+function mvDurChange(d){mvDurVal=Math.max(1,mvDurVal+d);document.getElementById('mv-sm-dur').textContent=mvDurVal;}
 function mvDurSet(v){mvDurVal=v;document.getElementById('mv-sm-dur').textContent=mvDurVal;}
 function mvSaveSM(){
   if(!mvEditId)return;
