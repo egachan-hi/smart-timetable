@@ -307,20 +307,20 @@ tbody tr:hover td{background:var(--bg2)}
         <div id="evinfo-panel" style="display:none;padding:6px 8px 8px;border-top:1px solid var(--border);flex-direction:column;gap:5px">
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">場所/ID</span>
-            <input id="evinfo-location" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="会議室・URL等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+            <input id="evinfo-location" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="開催場所・URL等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">オーナー</span>
-            <input id="evinfo-owner" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="イベントオーナー" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+            <input id="evinfo-owner" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="主催者・講師・組織名等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">参加者</span>
-            <input id="evinfo-members" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="参加者" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+            <input id="evinfo-members" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="お名前・人数等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
           </div>
           <div style="display:flex;align-items:flex-start;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0;padding-top:4px">メモ</span>
             <div id="evinfo-memo-wrap" style="flex:1;position:relative">
-              <textarea id="evinfo-memo" class="mta evinfo-field" style="width:100%;box-sizing:border-box;font-size:11px;padding:2px 5px;min-height:20px;resize:vertical;border-color:transparent;background:transparent;overflow:hidden" placeholder="メモ" oninput="onEvInfoChange()" onfocus="evInfoMemoFocus()" onblur="evInfoMemoBlur()"></textarea>
+              <textarea id="evinfo-memo" class="mta evinfo-field" style="width:100%;box-sizing:border-box;font-size:11px;padding:2px 5px;min-height:20px;resize:vertical;border-color:transparent;background:transparent;overflow:hidden" placeholder="" oninput="onEvInfoChange()" onfocus="evInfoMemoFocus()" onblur="evInfoMemoBlur()"></textarea>
               <div id="evinfo-memo-link" style="display:none;font-size:11px;padding:2px 5px;cursor:text;word-break:break-all" onclick="evInfoMemoFocus()"></div>
             </div>
           </div>
@@ -1806,66 +1806,41 @@ function onFRU(){
 function frLy(evs){
   const res={};
   if(!evs||evs.length===0)return res;
-
-  // 重なり判定
   function overlaps(a,b){ return a.fromMin<b.toMin && b.fromMin<a.toMin; }
+  const sorted=[...evs].sort((a,b)=>a.fromMin-b.fromMin||(a.id-b.id));
 
-  // Step1: ペアワイズ隣接グラフ構築
-  const adj={};
-  evs.forEach(e=>{ adj[e.id]=[]; });
-  for(let i=0;i<evs.length;i++){
-    for(let j=i+1;j<evs.length;j++){
-      if(overlaps(evs[i],evs[j])){
-        adj[evs[i].id].push(evs[j].id);
-        adj[evs[j].id].push(evs[i].id);
-      }
-    }
-  }
-
-  // Step2: BFSで連結グループ
-  const visited=new Set();
-  const groups=[];
-  evs.forEach(startEv=>{
-    if(visited.has(startEv.id))return;
-    const group=[];
-    const queue=[startEv.id];
-    while(queue.length){
-      const cid=queue.shift();
-      if(visited.has(cid))continue;
-      visited.add(cid);
-      const cev=evs.find(x=>x.id===cid);
-      if(cev)group.push(cev);
-      (adj[cid]||[]).forEach(nid=>{ if(!visited.has(nid))queue.push(nid); });
-    }
-    groups.push(group);
+  // Step1: 列割り当て（colEnd方式）
+  const colEnd=[];
+  sorted.forEach(ev=>{
+    let col=-1;
+    for(let i=0;i<colEnd.length;i++){ if(ev.fromMin>=colEnd[i]){col=i;break;} }
+    if(col===-1){ col=Math.min(colEnd.length,2); }
+    while(colEnd.length<=col)colEnd.push(0);
+    colEnd[col]=ev.toMin;
+    res[ev.id]={col};
   });
 
-  // Step3: グループごとに列番号を割り当て
-  // colEnd方式ではなく「列に入っている全イベントと重ならない」を直接チェック
-  groups.forEach(group=>{
-    if(group.length===1){
-      res[group[0].id]={col:0,total:1};
-      return;
-    }
-    const sorted=[...group].sort((a,b)=>a.fromMin-b.fromMin||(a.id-b.id));
-    // cols[c] = その列に割り当て済みのイベント配列
-    const cols=[];
-    sorted.forEach(ev=>{
-      // 重ならない最小列を探す
-      let col=-1;
-      for(let i=0;i<cols.length;i++){
-        // この列の全イベントと重ならなければ使える
-        const safe=cols[i].every(o=>!overlaps(ev,o));
-        if(safe){ col=i; break; }
-      }
-      if(col===-1){ col=Math.min(cols.length,2); }
-      while(cols.length<=col)cols.push([]);
-      cols[col].push(ev);
-      res[ev.id]={col,total:1};
-    });
-    const maxCol=Math.max(...group.map(o=>res[o.id].col));
-    const total=Math.min(maxCol+1,3);
-    group.forEach(o=>{ res[o.id].total=total; });
+  // Step2: left_pct を各自独立で計算（伝播なし）
+  // 自分と直接重なるピアのcolだけを見てtotal決定
+  sorted.forEach(ev=>{
+    const peers=sorted.filter(o=>o.id!==ev.id&&overlaps(ev,o));
+    const myCol=res[ev.id].col;
+    if(!peers.length){ res[ev.id].col=0; res[ev.id].left_pct=0; res[ev.id].total=1; return; }
+    const allCols=[myCol,...peers.map(o=>res[o.id].col)];
+    const total=Math.min(Math.max(...allCols)+1,3);
+    res[ev.id].total=total;
+    res[ev.id].left_pct=myCol/total*100;
+  });
+
+  // Step3: width_pct = 「右隣ピアのleft_pct」 - 自分のleft_pct（右隣なければ100まで）
+  sorted.forEach(ev=>{
+    const peers=sorted.filter(o=>o.id!==ev.id&&overlaps(ev,o));
+    const myCol=res[ev.id].col;
+    const myLeft=res[ev.id].left_pct;
+    if(!peers.length){ res[ev.id].width_pct=100; return; }
+    const rightLefts=peers.filter(o=>res[o.id].col>myCol).map(o=>res[o.id].left_pct);
+    const nextLeft=rightLefts.length>0?Math.min(...rightLefts):100;
+    res[ev.id].width_pct=nextLeft-myLeft;
   });
 
   return res;
@@ -1898,7 +1873,7 @@ function rFR(){
   freeEvs.forEach(ev=>{
     const info=cm[ev.id]||{col:0,total:1};
     const top=ev.fromMin*PPM,ht=Math.max((ev.toMin-ev.fromMin)*PPM,18);
-    const tot=Math.max(info.total,1),cw=100/tot,lft=info.col*cw;
+    const lft=info.left_pct??0,cw=info.width_pct??100;
     const _fdk=isDark(),_fBgHex=_fdk?(CB_DARK[ev.color]||'rgba(60,60,60,0.6)'):(CB[ev.color]||'#E1F5EE'),bg=_fdk?_fBgHex:hexToRgba(_fBgHex,0.6),bd=CD[ev.color]||'#5DCAA5',tc=_fdk?(CT_DARK[ev.color]||'#E8E8E8'):(CT[ev.color]||'#085041');
     const el=document.createElement('div');
     el.className='fb';el.id='fb'+ev.id;
@@ -1979,7 +1954,7 @@ function renderTbl(){
   const cm=frLy(sf);
   document.getElementById('ftb').innerHTML=sf.map((ev,i)=>{
     const dur=ev.toMin-ev.fromMin,info=cm[ev.id]||{col:0,total:1};
-    const badge=info.total>1?` <span style="font-size:9px;color:var(--text2)">(${info.col+1}/${info.total}列)</span>`:'';
+    const badge=(info.width_pct??100)<99?` <span style="font-size:9px;color:var(--text2)">(複数列)</span>`:'';
     return`<tr class="tbl-row">
       <td style="width:6px;padding:0;vertical-align:stretch">
         <div style="width:4px;background:${CD[ev.color]||'#5DCAA5'};border-radius:4px;height:100%;min-height:36px;margin:2px 0"></div>
@@ -3413,6 +3388,19 @@ function exportPDF(){
   }
 
   // 全日程分のHTMLを生成
+  // イベント概要ブロック（入力があるものだけ）
+  function buildEvInfoHtml(){
+    const v=evInfo;
+    const rows=[];
+    if(v.location.trim()) rows.push({label:'場所/ID', val:v.location.trim()});
+    if(v.owner.trim())    rows.push({label:'オーナー', val:v.owner.trim()});
+    if(v.members.trim())  rows.push({label:'参加者',   val:v.members.trim()});
+    if(v.memo.trim())     rows.push({label:'メモ',     val:v.memo.trim()});
+    if(rows.length===0) return '';
+    const inner=rows.map(r=>`<span class="ei-row"><span class="ei-lbl">${esc(r.label)}</span><span class="ei-val">${esc(r.val).replace(/\n/g,'<br>')}</span></span>`).join('');
+    return `<div class="ev-info-block">${inner}</div>`;
+  }
+
   let bodyHtml='';
   const targetDays=dayCount>1?dayCount:1;
   for(let di=0;di<targetDays;di++){
@@ -3423,6 +3411,7 @@ function exportPDF(){
     bodyHtml+=`
   ${di>0?'<div style="page-break-before:always"></div>':''}
   <h1>${esc(title)}</h1>
+  ${di===0?buildEvInfoHtml():''}
   ${dayLabel?`<div class="meta">${dayLabel} ${hm(sm)}〜${hm(em)}</div>`:`<div class="meta">${hm(sm)}〜${hm(em)}</div>`}
   <h2>シリアルセッション</h2>
   <table>
@@ -3458,6 +3447,10 @@ function exportPDF(){
     .time-cell{width:70px;white-space:nowrap;color:#000}
     .dur-cell{width:40px;white-space:nowrap;color:#000}
     .cmt-cell{color:#444;font-size:10px}
+    .ev-info-block{display:flex;flex-wrap:wrap;gap:4px 16px;margin-bottom:14px;padding:8px 12px;border:1px solid #ddd;border-radius:4px;background:#fafafa}
+    .ei-row{display:flex;align-items:baseline;gap:5px;white-space:nowrap}
+    .ei-lbl{font-size:9px;font-weight:600;color:#888;white-space:nowrap}
+    .ei-val{font-size:11px;color:#000;white-space:pre-wrap;word-break:break-all}
     @media print{body{padding:12px 16px}tr{page-break-inside:avoid}}
   </style></head><body>${bodyHtml}
   <script>window.onload=function(){window.print();}<\/script>
