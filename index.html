@@ -854,6 +854,31 @@ tbody tr:hover td{background:var(--bg2)}
       </div>
       <button id="mv-save-btn" style="width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">保存</button>
     </div>
+    <!-- スマホ イベント概要 1行 -->
+    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:6px;margin-top:8px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);cursor:pointer;min-height:28px" onclick="mvToggleEvInfo()">
+      <span style="font-size:10px;font-weight:600;color:var(--text2);flex-shrink:0;white-space:nowrap">イベント概要</span>
+      <span id="evinfo-preview-mv" style="flex:1;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)">イベントの概要を入力</span>
+      <span id="evinfo-toggle-icon-mv" style="font-size:11px;color:var(--text2);flex-shrink:0;line-height:1;user-select:none">▾</span>
+    </div>
+    <!-- スマホ用 イベント概要パネル -->
+    <div id="mv-evinfo-panel" style="display:none;flex-direction:column;gap:6px;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2)">
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0">場所/ID</span>
+        <input id="mv-evinfo-location" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="開催場所・URL等" oninput="mvOnEvInfoChange()"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0">オーナー</span>
+        <input id="mv-evinfo-owner" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="主催者・講師・組織名等" oninput="mvOnEvInfoChange()"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:6px">
+        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0">参加者</span>
+        <input id="mv-evinfo-members" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="お名前・人数等" oninput="mvOnEvInfoChange()"/>
+      </div>
+      <div style="display:flex;align-items:flex-start;gap:6px">
+        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0;padding-top:6px">メモ</span>
+        <textarea id="mv-evinfo-memo" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);min-height:60px;resize:vertical" placeholder="" oninput="mvOnEvInfoChange()"></textarea>
+      </div>
+    </div>
     <div class="mv-progress" style="margin-top:10px"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
   </div>
   <div class="mv-clock" id="mv-clock">--:--</div>
@@ -1109,45 +1134,47 @@ function gEvInfoPreview(){
 }
 
 function updateEvInfoPreview(){
-  const p=document.getElementById('evinfo-preview');
-  if(!p) return;
-  const item=gEvInfoPreview();
-  p.innerHTML='';
-  if(!item){
-    p.textContent='イベントの概要を入力';
-    p.style.color='var(--text3)';
-    return;
-  }
-  p.style.color='var(--text)';
-  // ラベル部分（薄く小さく）
-  const lbl=document.createElement('span');
-  lbl.textContent=item.label+': ';
-  lbl.style.cssText='font-size:10px;color:var(--text3);flex-shrink:0;margin-right:2px';
-  p.appendChild(lbl);
-  // テキスト or リンク
-  if(/^https?:\/\//i.test(item.text)){
-    const a=document.createElement('a');
-    a.href=item.text; a.target='_blank'; a.rel='noopener noreferrer';
-    a.textContent=item.text;
-    a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
-    a.addEventListener('click',e=>e.stopPropagation());
-    p.appendChild(a);
-  } else {
-    const val=document.createElement('span');
-    val.textContent=item.text;
-    val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px';
-    p.appendChild(val);
-  }
+  // PC と スマホ両方のpreviewを更新
+  ['evinfo-preview','evinfo-preview-mv'].forEach(id=>{
+    const p=document.getElementById(id);
+    if(!p) return;
+    const item=gEvInfoPreview();
+    p.innerHTML='';
+    if(!item){
+      p.textContent='イベントの概要を入力';
+      p.style.color='var(--text3)';
+      return;
+    }
+    p.style.color='var(--text)';
+    const lbl=document.createElement('span');
+    lbl.textContent=item.label+': ';
+    lbl.style.cssText='font-size:10px;color:var(--text3);flex-shrink:0;margin-right:2px';
+    p.appendChild(lbl);
+    if(/^https?:\/\//i.test(item.text)){
+      const a=document.createElement('a');
+      a.href=item.text; a.target='_blank'; a.rel='noopener noreferrer';
+      a.textContent=item.text;
+      a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
+      a.addEventListener('click',e=>e.stopPropagation());
+      p.appendChild(a);
+    } else {
+      const val=document.createElement('span');
+      val.textContent=item.text;
+      val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px';
+      p.appendChild(val);
+    }
+  });
 }
 
 function toggleEvInfo(){
   evInfoOpen=!evInfoOpen;
   const panel=document.getElementById('evinfo-panel');
   const icon=document.getElementById('evinfo-toggle-icon');
+  const iconMv=document.getElementById('evinfo-toggle-icon-mv');
   if(evInfoOpen){
     panel.style.display='flex';
-    icon.style.transform='rotate(180deg)';
-    // 入力欄に現在値を反映
+    if(icon) icon.style.transform='rotate(180deg)';
+    if(iconMv) iconMv.style.transform='rotate(180deg)';
     document.getElementById('evinfo-location').value=evInfo.location;
     document.getElementById('evinfo-owner').value=evInfo.owner;
     document.getElementById('evinfo-members').value=evInfo.members;
@@ -1155,10 +1182,53 @@ function toggleEvInfo(){
     evInfoMemoInit();
   } else {
     panel.style.display='none';
-    icon.style.transform='';
+    if(icon) icon.style.transform='';
+    if(iconMv) iconMv.style.transform='';
   }
 }
 
+function mvToggleEvInfo(){
+  const panel=document.getElementById('mv-evinfo-panel');
+  const icon=document.getElementById('evinfo-toggle-icon-mv');
+  const open=panel.style.display==='none'||panel.style.display==='';
+  if(open){
+    panel.style.display='flex';
+    if(icon)icon.style.transform='rotate(180deg)';
+    // 現在値を反映
+    const loc=document.getElementById('mv-evinfo-location');
+    const own=document.getElementById('mv-evinfo-owner');
+    const mem=document.getElementById('mv-evinfo-members');
+    const mmo=document.getElementById('mv-evinfo-memo');
+    if(loc)loc.value=evInfo.location;
+    if(own)own.value=evInfo.owner;
+    if(mem)mem.value=evInfo.members;
+    if(mmo)mmo.value=evInfo.memo;
+  } else {
+    panel.style.display='none';
+    if(icon)icon.style.transform='';
+  }
+}
+function mvOnEvInfoChange(){
+  const loc=document.getElementById('mv-evinfo-location');
+  const own=document.getElementById('mv-evinfo-owner');
+  const mem=document.getElementById('mv-evinfo-members');
+  const mmo=document.getElementById('mv-evinfo-memo');
+  if(loc)evInfo.location=loc.value;
+  if(own)evInfo.owner=own.value;
+  if(mem)evInfo.members=mem.value;
+  if(mmo)evInfo.memo=mmo.value;
+  // PC側の入力欄にも反映
+  const pcLoc=document.getElementById('evinfo-location');
+  const pcOwn=document.getElementById('evinfo-owner');
+  const pcMem=document.getElementById('evinfo-members');
+  const pcMmo=document.getElementById('evinfo-memo');
+  if(pcLoc)pcLoc.value=evInfo.location;
+  if(pcOwn)pcOwn.value=evInfo.owner;
+  if(pcMem)pcMem.value=evInfo.members;
+  if(pcMmo)pcMmo.value=evInfo.memo;
+  updateEvInfoPreview();
+  snap();
+}
 function evInfoFieldFocus(el){
   el.style.borderColor='';
   el.style.background='';
@@ -3624,6 +3694,7 @@ function mvRender(){
     `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
   if(mvTab==='s')mvRenderSerial(isToday?nowMin:-1,sm);
   else mvRenderFree(isToday?nowMin:-1,sm);
+  updateEvInfoPreview();
 
   const editBtn=document.getElementById('mv-edit-btn');
   if(editBtn&&!editBtn._bound){
