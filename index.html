@@ -26,7 +26,7 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .tb{height:25px;min-width:25px;padding:0 6px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:11px;gap:3px;white-space:nowrap}
 .tb:hover{background:var(--bg2)}
 .tb:disabled{opacity:.35;cursor:default}
-.tb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0}
+.tb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;pointer-events:none}
 .tb.danger:hover{background:#FCEBEB;color:#A32D2D;border-color:#F7C1C1}
 .tb.ai{background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;border:none;font-weight:600;padding:0 10px}
 .sep{width:1px;height:14px;background:var(--border);margin:0 2px;flex-shrink:0}
@@ -244,6 +244,7 @@ tbody tr:hover td{background:var(--bg2)}
   <button class="tb" id="btn-next-day" onclick="shiftDay(1)" title="翌日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
   <div class="spacer"></div>
   <button class="tb ai" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成</button>
+  <button class="tb" id="btn-time-adj" onclick="openTimeAdj()" title="時間調整"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>時間調整</button>
   <div class="sep"></div>
   <button class="tb" onclick="newEV()" title="新規"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>新規</button>
   <button class="tb" onclick="duplicateEV()" title="複製"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>複製</button>
@@ -271,7 +272,7 @@ tbody tr:hover td{background:var(--bg2)}
       <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
         <div style="display:flex;align-items:center;gap:4px">
-          <input type="date" id="evd" value="2026-05-13" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();autoSave();"/>
+          <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();autoSave();"/>
           <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
           <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:auto">から</span>
           <select id="day-count-sel" style="font-size:11px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0" onchange="onDayCountChange()">
@@ -1420,6 +1421,7 @@ function autoLoad(){
     }catch(e){console.warn('tpl select restore err',e);}
     if(data.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:''},data.evInfo);}    loadEvInfoToWidget();
     restoreSavedEvs();
+    setTimeout(updateBtnTimeAdj,0);
     return true;
   }catch(e){ console.warn('autoload error:', e); return false; }
 }
@@ -1494,7 +1496,7 @@ function sv(v){
   if(v==='tb')renderTbl();
 }
 
-function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);}
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();}
 
 // ================================================================
 // RENDER BLOCK LIST
@@ -1768,6 +1770,7 @@ function updateNowLine(){
     frsLine.style.cssText=`position:absolute;left:0;right:0;height:1px;background:${lineColor};z-index:15;pointer-events:none;top:${px}px`;
     fcan.appendChild(frsLine);
   }
+  updateBtnTimeAdj();
 }
 
 // ================================================================
@@ -2567,6 +2570,185 @@ function openAI(){
     if(!k.value)k.focus();
     else document.getElementById('aiprompt').focus();
   },100);
+}
+
+// ================================================================
+// 時間調整機能
+// ================================================================
+function updateBtnTimeAdj(){
+  const btn=document.getElementById('btn-time-adj');
+  if(!btn)return;
+  let active=false;
+  // noDate変数（日付設定なし）または当日であれば有効
+  if(typeof noDate!=='undefined'&&noDate){
+    active=true;
+  } else {
+    const evd=document.getElementById('evd').value;
+    if(!evd){
+      active=true;
+    } else {
+      const now=new Date();
+      const [y,m,d]=evd.split('-').map(Number);
+      if(now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d) active=true;
+    }
+  }
+  btn.disabled=!active;
+  btn.style.opacity=active?'1':'0.4';
+  btn.style.cursor=active?'pointer':'not-allowed';
+}
+
+function openTimeAdj(){
+  const list=document.getElementById('time-adj-session-list');
+  list.innerHTML='';
+
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const sm=gSM(), st=gSt();
+
+  // 現在時刻が属するセッションを自動判定
+  let autoCurrentIdx=-1;
+  sessions.forEach((s,i)=>{
+    const start=sm+st[i], end=start+s.dur;
+    if(nowMin>=start&&nowMin<end) autoCurrentIdx=i;
+  });
+
+  // セッションリスト構築（ラジオボタン、現在時刻以降は非表示）
+  sessions.forEach((s,i)=>{
+    const start=sm+st[i];
+    // 現在時刻以降のセッションは非表示
+    if(autoCurrentIdx>=0 && i>=autoCurrentIdx) return;
+    // autoCurrentIdxが-1（全終了）の場合は全セッション表示
+    const row=document.createElement('label');
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer';
+    const rb=document.createElement('input');
+    rb.type='radio';rb.name='time-adj-current';rb.value=i;
+    rb.style.cssText='width:15px;height:15px;cursor:pointer';
+    rb.addEventListener('change',calcTimeAdj);
+    const nm=document.createElement('span');
+    nm.style.cssText='font-size:12px;color:var(--text)';
+    nm.textContent=`${s.name}（${s.dur}分）`;
+    row.appendChild(rb);row.appendChild(nm);
+    list.appendChild(row);
+  });
+
+  const remEl=document.getElementById('time-adj-remain');
+  remEl.value=0;
+  remEl.disabled=true;
+  remEl.style.opacity='0.4';
+  calcTimeAdj();
+  document.getElementById('time-adj-overlay').style.display='flex';
+}
+
+function closeTimeAdj(){
+  document.getElementById('time-adj-overlay').style.display='none';
+}
+
+function calcTimeAdj(){
+  const result=document.getElementById('time-adj-result');
+  const okBtn=document.getElementById('time-adj-ok');
+
+  // 選択されたラジオボタン
+  const selected=document.querySelector('#time-adj-session-list input[type=radio]:checked');
+  if(!selected){
+    result.innerHTML='<span style="color:var(--text3)">現在進行中のセッションを選択してください</span>';
+    okBtn.disabled=true;okBtn.style.opacity='0.4';
+    return;
+  }
+
+  const currentIdx=parseInt(selected.value);
+  // 残り時間inputを活性化 + maxをセッション時間に制限
+  const remEl=document.getElementById('time-adj-remain');
+  const selectedDur=sessions[currentIdx]?sessions[currentIdx].dur:999;
+  if(remEl.disabled){
+    remEl.disabled=false;
+    remEl.style.opacity='1';
+    remEl.value=0;
+  }
+  remEl.max=selectedDur;
+  // 現在の値がmaxを超えていたら補正
+  if(parseInt(remEl.value)>selectedDur) remEl.value=selectedDur;
+  const remain=parseInt(remEl.value)||0;
+  const sm=gSM(), st=gSt();
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const evd=document.getElementById('evd').value;
+  const noDateMode=!evd||(typeof noDate!=='undefined'&&noDate);
+
+  // 現在時刻が属するセッションを自動判定
+  let autoCurrentIdx=-1;
+  sessions.forEach((s,i)=>{
+    const start=sm+st[i], end=start+s.dur;
+    if(nowMin>=start&&nowMin<end) autoCurrentIdx=i;
+  });
+
+  // 後続セッション合計（currentIdx+1 〜 autoCurrentIdx-1）
+  let followDur=0;
+  if(autoCurrentIdx>currentIdx+1){
+    for(let i=currentIdx+1;i<autoCurrentIdx;i++) followDur+=sessions[i].dur;
+  }
+
+  // 現在時刻が属するセッションの経過時間
+  let elapsedInCurrent=0;
+  if(!noDateMode){
+    if(autoCurrentIdx>=0){
+      const start=sm+st[autoCurrentIdx];
+      elapsedInCurrent=Math.max(0,nowMin-start);
+    } else {
+      // 全セッション終了: 最終セッション終了時刻〜現在時刻を加算
+      const lastIdx=sessions.length-1;
+      if(lastIdx>=0){
+        const lastEnd=sm+st[lastIdx]+sessions[lastIdx].dur;
+        elapsedInCurrent=Math.max(0,nowMin-lastEnd);
+      }
+      // 後続セッション = currentIdx+1 〜 lastIdx の合計
+      followDur=0;
+      for(let i=currentIdx+1;i<=lastIdx;i++) followDur+=sessions[i].dur;
+    }
+  }
+
+  const total=remain+followDur+elapsedInCurrent;
+  const insertBefore=currentIdx;
+
+  // 設定時間内に収まるか
+  const em=gEM();
+  const totalSessionDur=sessions.reduce((a,s)=>a+s.dur,0);
+  const willOverflow=(totalSessionDur+total)>(em-sm);
+
+  let html=`<div style="color:#E53E3E;font-weight:600">${total}分遅れています。<br>時間調整のセッションを追加しますか？</div>`;
+  if(willOverflow){
+    html+=`<div style="color:#E53E3E;font-size:11px;margin-top:4px">(設定時間内に終了するには<br>後続のセッションの修正が必要です。)</div>`;
+  }
+
+  // 内訳
+  let detail=`残り時間: ${remain}分`;
+  if(followDur>0) detail+=`<br>後続セッション合計: ${followDur}分`;
+  if(elapsedInCurrent>0&&!noDateMode) detail+=`<br>現セッション経過: ${elapsedInCurrent}分`;
+  html+=`<div style="font-size:11px;color:var(--text3);margin-top:6px">${detail}</div>`;
+
+  result.innerHTML=html;
+  okBtn.disabled=total<=0;
+  okBtn.style.opacity=total>0?'1':'0.4';
+  okBtn._insertBefore=insertBefore;
+  okBtn._adjMin=total;
+}
+
+function applyTimeAdj(){
+  const okBtn=document.getElementById('time-adj-ok');
+  const insertBefore=okBtn._insertBefore;
+  const adjMin=okBtn._adjMin;
+  if(adjMin==null||adjMin<=0){closeTimeAdj();return;}
+
+  // 重複適用防止
+  okBtn.disabled=true;
+  okBtn.style.opacity='0.4';
+
+  const newId=nid++;
+  const adjSession={id:newId,name:'時間調整',dur:adjMin,color:'white',comment:''};
+  sessions.splice(insertBefore,0,adjSession);
+  snap();rTL();
+  const _cv=document.getElementById('cv');
+  if(_cv&&_cv.value==='tb') renderTbl();
+  closeTimeAdj();
 }
 function closeAI(){document.getElementById('aim').style.display='none';}
 document.getElementById('aim').addEventListener('click',function(e){if(e.target===this)closeAI();});
@@ -4321,5 +4503,39 @@ if(document.readyState === 'loading'){
   setTimeout(fbAutoStart, 800);
 }
 </script>
+
+<!-- ============================================================ -->
+<!-- 時間調整ダイアログ -->
+<!-- ============================================================ -->
+<div id="time-adj-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:24px 28px;min-width:340px;max-width:480px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:14px">
+    <div style="font-size:14px;font-weight:700;color:var(--text)">遅れているタイムラインの時間調整を行います</div>
+
+    <!-- 現在進行中のセッション選択 -->
+    <div>
+      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">現在進行中のセッション</div>
+      <div id="time-adj-session-list" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto"></div>
+    </div>
+
+    <!-- 残り時間入力 -->
+    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+      <span style="font-size:12px;color:var(--text2)">現在進行中のセッションがあと</span>
+      <input id="time-adj-remain" type="number" min="0" max="999" value="0" disabled
+        style="width:60px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-size:13px;text-align:center;opacity:0.4"
+        oninput="calcTimeAdj()"/>
+      <span style="font-size:12px;color:var(--text2)">分で終了見込み</span>
+    </div>
+
+    <!-- 計算結果 -->
+    <div id="time-adj-result" style="font-size:13px;color:var(--text2)"></div>
+
+    <!-- フッター -->
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+      <button onclick="closeTimeAdj()" style="padding:7px 18px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer">キャンセル</button>
+      <button id="time-adj-ok" onclick="applyTimeAdj()" style="padding:7px 18px;border:none;border-radius:8px;background:var(--accent,#5DCAA5);color:#fff;font-size:13px;font-weight:600;cursor:pointer">OK</button>
+    </div>
+  </div>
+</div>
+
 </body>
 </html>
