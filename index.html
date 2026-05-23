@@ -2805,6 +2805,12 @@ function openTimeAdj(){
   remEl.value=0;
   remEl.disabled=true;
   remEl.style.opacity='0.4';
+  // 自動調整リセット
+  const autoChk=document.getElementById('time-adj-auto-chk');
+  if(autoChk){ autoChk.checked=false; }
+  const autoPanel=document.getElementById('time-adj-auto-panel');
+  if(autoPanel){ autoPanel.style.display='none'; }
+  _adjFollowModes={};
   calcTimeAdj();
   document.getElementById('time-adj-overlay').style.display='flex';
 }
@@ -2928,6 +2934,9 @@ function calcTimeAdj(){
   okBtn.style.opacity=total>0?'1':'0.4';
   okBtn._insertBefore=currentIdx;
   okBtn._adjMin=total;
+  // 自動調整パネルが開いていれば再構築
+  const _autoChk=document.getElementById('time-adj-auto-chk');
+  if(_autoChk&&_autoChk.checked) buildAutoAdjRows();
 }
 
 function applyTimeAdj(){
@@ -2940,14 +2949,238 @@ function applyTimeAdj(){
   okBtn.disabled=true;
   okBtn.style.opacity='0.4';
 
+  // 自動調整が有効な場合
+  const chk=document.getElementById('time-adj-auto-chk');
+  if(chk&&chk.checked){
+    const result=calcAutoAdjResult();
+    if(result.error){
+      alert('⚠ '+result.error);
+      okBtn.disabled=false;
+      okBtn.style.opacity='1';
+      return;
+    }
+    // 後続セッションの時間を更新
+    const {newDurs}=result;
+    Object.entries(newDurs).forEach(([sid,dur])=>{
+      const s=sessions.find(x=>x.id===parseInt(sid));
+      if(s) s.dur=dur;
+    });
+    // delete（dur=0）のセッションを削除
+    sessions=sessions.filter(s=>s.dur>0);
+  }
+
+  // 時間調整セッションを挿入
+  // ※後続セッション削除後にinsertBeforeのインデックスが変わらないよう、先に計算
+  const actualInsert=sessions.findIndex((s,i)=>{
+    // insertBefore番目のセッションの直前に挿入
+    // 元のinsertBeforeを基準にする
+    return i===insertBefore;
+  });
+  const insertIdx=actualInsert>=0?actualInsert:insertBefore;
+
   const newId=nid++;
   const adjSession={id:newId,name:'時間調整',dur:adjMin,color:'white',comment:''};
-  sessions.splice(insertBefore,0,adjSession);
+  sessions.splice(insertIdx,0,adjSession);
   snap();rTL();
   const _cv=document.getElementById('cv');
   if(_cv&&_cv.value==='tb') renderTbl();
   closeTimeAdj();
 }
+
+// ================================================================
+// 時間調整：後続セッション自動調整
+// ================================================================
+
+// 後続セッションの調整状態を保持
+let _adjFollowModes = {}; // {sessionId: 'stretch'|'keep'|'delete'}
+
+function toggleAutoAdj(){
+  const chk = document.getElementById('time-adj-auto-chk');
+  const panel = document.getElementById('time-adj-auto-panel');
+  if(!chk||!panel) return;
+  if(chk.checked){
+    panel.style.display='flex';
+    buildAutoAdjRows();
+  } else {
+    panel.style.display='none';
+  }
+  updateAdjBalance();
+}
+
+function buildAutoAdjRows(){
+  const okBtn = document.getElementById('time-adj-ok');
+  const insertBefore = okBtn._insertBefore ?? 0;
+  const rowsEl = document.getElementById('time-adj-session-rows');
+  if(!rowsEl) return;
+  rowsEl.innerHTML='';
+  _adjFollowModes = {};
+
+  // 後続セッション = insertBefore 以降のセッション
+  // autoCurrentIdx（現在時刻が属するセッション）以降を含む
+  const sm=gSM(), st=gSt();
+  const followSessions = sessions.slice(insertBefore);
+
+  followSessions.forEach(s=>{
+    _adjFollowModes[s.id] = 'stretch'; // デフォルト伸縮
+    const row = document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:6px;padding:4px 0;border-bottom:1px solid var(--border)';
+    row.id = 'adj-row-'+s.id;
+
+    // セッション名 + 時間（変更前→変更後）
+    const nameDiv = document.createElement('div');
+    nameDiv.style.cssText='flex:1;min-width:0;font-size:12px';
+    nameDiv.innerHTML=`<span style="color:var(--text);font-weight:600">${esc(s.name)}</span><br><span style="color:var(--text2)">${s.dur}分→</span><span id="adj-newdur-${s.id}" style="color:#E53E3E;font-weight:600">${s.dur}分</span>`;
+
+    // ボタン群
+    const btnGroup = document.createElement('div');
+    btnGroup.style.cssText='display:flex;gap:3px;flex-shrink:0';
+    ['stretch','delete','keep'].forEach(mode=>{
+      const btn = document.createElement('button');
+      btn.textContent = mode==='keep'?'維持':mode==='delete'?'削除':'伸縮';
+      btn.dataset.sid = s.id;
+      btn.dataset.mode = mode;
+      const isActive = mode==='stretch';
+      btn.style.cssText=`padding:3px 8px;border-radius:5px;font-size:11px;cursor:pointer;border:1px solid var(--border);background:${isActive?'var(--accent)':'var(--bg2)'};color:${isActive?'#fff':'var(--text)'}`;
+      btn.onclick=()=>setAdjMode(s.id, mode);
+      btnGroup.appendChild(btn);
+    });
+
+    row.appendChild(nameDiv);
+    row.appendChild(btnGroup);
+    rowsEl.appendChild(row);
+  });
+
+  updateAdjBalance();
+}
+
+function setAdjMode(sid, mode){
+  _adjFollowModes[sid] = mode;
+  // ボタン見た目更新
+  const row = document.getElementById('adj-row-'+sid);
+  if(!row) return;
+  row.querySelectorAll('button').forEach(btn=>{
+    const active = btn.dataset.mode === mode;
+    btn.style.background = active?'var(--accent)':'var(--bg2)';
+    btn.style.color = active?'#fff':'var(--text)';
+  });
+  updateAdjBalance();
+}
+
+function calcAutoAdjResult(){
+  // 必要情報
+  const okBtn = document.getElementById('time-adj-ok');
+  const insertBefore = okBtn._insertBefore ?? 0;
+  const adjMin = okBtn._adjMin ?? 0;
+  const sm=gSM(), em=gEM();
+  const totalCapacity = em - sm; // イベント全体の設定時間
+
+  // 時間調整セッション追加後の合計時間
+  const currentTotal = sessions.reduce((a,s)=>a+s.dur,0) + adjMin;
+  // 後続セッション以外（調整対象外）の合計
+  const followSessions = sessions.slice(insertBefore);
+  const nonFollowDur = sessions.slice(0, insertBefore).reduce((a,s)=>a+s.dur,0) + adjMin;
+  // 後続セッションに使える残り時間
+  const availableForFollow = totalCapacity - nonFollowDur;
+
+  // delete対象の合計
+  const deleteDur = followSessions.filter(s=>_adjFollowModes[s.id]==='delete').reduce((a,s)=>a+s.dur,0);
+  // keep対象の合計
+  const keepDur = followSessions.filter(s=>_adjFollowModes[s.id]==='keep').reduce((a,s)=>a+s.dur,0);
+  // stretch対象
+  const stretchSessions = followSessions.filter(s=>_adjFollowModes[s.id]==='stretch');
+  const stretchOrigTotal = stretchSessions.reduce((a,s)=>a+s.dur,0);
+
+  // stretchに割り当てられる時間
+  const stretchAvailable = availableForFollow - keepDur; // deleteは0扱いなので除外
+
+  // エラーチェック
+  if(availableForFollow < 0){
+    return {error:'設定時間を超えています。セッションを削除してください。'};
+  }
+  if(keepDur > availableForFollow){
+    return {error:'「維持」の合計が残り時間を超えています。'};
+  }
+  if(stretchSessions.length === 0){
+    // stretchなし → 設定時間内に収まらない場合も許容（オーバーのみエラー）
+  }
+  if(stretchSessions.length > 0 && stretchAvailable < 0){
+    return {error:'「維持」の合計が残り時間を超えています。「削除」か「維持」の調整が必要です。'};
+  }
+
+  // 各セッションの新しい時間を計算
+  const newDurs = {};
+  followSessions.forEach(s=>{
+    const mode = _adjFollowModes[s.id];
+    if(mode==='delete') newDurs[s.id]=0;
+    else if(mode==='keep') newDurs[s.id]=s.dur;
+    else newDurs[s.id]=null; // stretch後計算
+  });
+
+  // stretch按分計算
+  if(stretchSessions.length > 0){
+    if(stretchOrigTotal === 0){
+      // 元の合計が0 → 均等割
+      const each = Math.round(stretchAvailable / stretchSessions.length);
+      stretchSessions.forEach(s=>{ newDurs[s.id]=Math.max(1,each); });
+    } else {
+      // 比率を維持して按分（四捨五入）
+      let allocated = 0;
+      stretchSessions.forEach((s,i)=>{
+        if(i === stretchSessions.length-1){
+          // 最後のセッションで端数調整
+          newDurs[s.id] = Math.max(1, stretchAvailable - allocated);
+        } else {
+          const d = Math.max(1, Math.round(s.dur / stretchOrigTotal * stretchAvailable));
+          newDurs[s.id] = d;
+          allocated += d;
+        }
+      });
+    }
+  }
+
+  // 合計チェック
+  const newTotal = Object.values(newDurs).reduce((a,b)=>a+(b||0),0);
+  const diff = availableForFollow - newTotal;
+
+  return {newDurs, diff, availableForFollow, stretchAvailable};
+}
+
+function updateAdjBalance(){
+  const chk = document.getElementById('time-adj-auto-chk');
+  if(!chk||!chk.checked) return;
+
+  const result = calcAutoAdjResult();
+  const balanceEl = document.getElementById('time-adj-balance');
+  if(!balanceEl) return;
+
+  if(result.error){
+    balanceEl.innerHTML=`<span style="color:#E53E3E">⚠ ${result.error}</span>`;
+    // 新時間表示をリセット
+    const okBtn = document.getElementById('time-adj-ok');
+    const insertBefore = okBtn._insertBefore ?? 0;
+    sessions.slice(insertBefore).forEach(s=>{
+      const el=document.getElementById('adj-newdur-'+s.id);
+      if(el) el.textContent=s.dur+'分';
+    });
+    return;
+  }
+
+  const {newDurs, diff} = result;
+
+  // 各行の「→新時間」を更新
+  Object.entries(newDurs).forEach(([sid,dur])=>{
+    const el=document.getElementById('adj-newdur-'+sid);
+    if(el) el.textContent=(dur===0?'削除':(dur+'分'));
+  });
+
+  // バランス表示
+  if(diff===0){
+    balanceEl.innerHTML='<span style="color:var(--accent);font-weight:600">✓ ぴったり</span>';
+  } else {
+    balanceEl.innerHTML=`<span style="color:#E53E3E">差：${diff>0?'+':''}${diff}分</span>`;
+  }
+}
+
 function closeAI(){document.getElementById('aim').style.display='none';}
 document.getElementById('aim').addEventListener('click',function(e){if(e.target===this)closeAI();});
 function aiKeyInput(){
@@ -4882,21 +5115,21 @@ if(document.readyState === 'loading'){
 <!-- ============================================================ -->
 <!-- 時間調整ダイアログ -->
 <!-- ============================================================ -->
-<div id="time-adj-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;align-items:center;justify-content:center">
-  <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:24px 28px;min-width:340px;max-width:480px;width:90%;box-shadow:0 8px 32px rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:14px">
-    <div style="font-size:14px;font-weight:700;color:var(--text)">遅れているタイムラインの時間調整を行います</div>
+<div id="time-adj-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px 24px;min-width:340px;max-width:520px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:12px;margin:auto">
+    <div style="font-size:14px;font-weight:700;color:var(--text)">遅れているタイムラインの時間調整</div>
 
     <!-- 現在進行中のセッション選択 -->
     <div>
-      <div style="font-size:12px;font-weight:600;color:var(--text2);margin-bottom:6px">現在進行中のセッション</div>
-      <div id="time-adj-session-list" style="display:flex;flex-direction:column;gap:4px;max-height:160px;overflow-y:auto"></div>
+      <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px">現在進行中のセッション</div>
+      <div id="time-adj-session-list" style="display:flex;flex-direction:column;gap:3px;max-height:140px;overflow-y:auto"></div>
     </div>
 
     <!-- 残り時間入力 -->
     <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span id="time-adj-remain-label" style="font-size:12px;color:var(--text2)">現在進行中のセッションがあと</span>
       <input id="time-adj-remain" type="number" min="0" max="999" value="0" disabled
-        style="width:60px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-size:13px;text-align:center;opacity:0.4"
+        style="width:56px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-size:13px;text-align:center;opacity:0.4"
         oninput="calcTimeAdj()"/>
       <span style="font-size:12px;color:var(--text2)">分で終了見込み</span>
     </div>
@@ -4904,8 +5137,23 @@ if(document.readyState === 'loading'){
     <!-- 計算結果 -->
     <div id="time-adj-result" style="font-size:13px;color:var(--text2)"></div>
 
+    <!-- 後続セッション自動調整チェックボックス -->
+    <div style="border-top:1px solid var(--border);padding-top:10px">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:13px;color:var(--text)">
+        <input type="checkbox" id="time-adj-auto-chk" onchange="toggleAutoAdj()" style="width:16px;height:16px;cursor:pointer"/>
+        後続のセッションを設定時間内で自動調整
+      </label>
+    </div>
+
+    <!-- 後続セッション調整パネル -->
+    <div id="time-adj-auto-panel" style="display:none;flex-direction:column;gap:6px">
+      <div style="font-size:11px;font-weight:600;color:var(--text2)">後続セッションの調整方法</div>
+      <div id="time-adj-session-rows" style="display:flex;flex-direction:column;gap:4px;max-height:220px;overflow-y:auto"></div>
+      <div id="time-adj-balance" style="font-size:12px;padding:6px 8px;border-radius:6px;background:var(--bg2)"></div>
+    </div>
+
     <!-- フッター -->
-    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:4px">
+    <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:2px">
       <button onclick="closeTimeAdj()" style="padding:7px 18px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer">キャンセル</button>
       <button id="time-adj-ok" onclick="applyTimeAdj()" style="padding:7px 18px;border:none;border-radius:8px;background:var(--accent,#5DCAA5);color:#fff;font-size:13px;font-weight:600;cursor:pointer">OK</button>
     </div>
