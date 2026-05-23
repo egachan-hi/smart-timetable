@@ -842,86 +842,33 @@ tbody tr:hover td{background:var(--bg2)}
 
 <!-- ========== MOBILE VIEW ========== -->
 <div class="mv" id="mv">
-  <!-- ヘッダー -->
+  <!-- ヘッダー：タイトル＋日時（参照のみ）＋概要1行 -->
   <div class="mv-header">
-    <div style="display:flex;align-items:flex-start;gap:6px">
+    <div style="display:flex;align-items:center;gap:6px">
       <div style="flex:1;min-width:0">
         <div class="mv-title" id="mv-title">タイムテーブル</div>
-        <div class="mv-meta" id="mv-meta"></div>
+        <div class="mv-meta" id="mv-meta" style="font-size:11px;color:var(--text2);margin-top:1px"></div>
       </div>
-      <!-- DAY切替（複数日時のみ表示） -->
+      <!-- DAY切替 -->
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
-      <!-- 編集ボタン -->
-      <button id="mv-edit-btn" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text2);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px">
-        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
     </div>
-
-    <!-- 編集エリア -->
-    <div id="mv-edit-area" style="display:none;flex-direction:column;gap:8px;margin-top:8px">
-      <input type="text" id="mv-evt" placeholder="イベントタイトル"
-        style="width:100%;font-size:15px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;box-sizing:border-box"/>
-      <div style="display:flex;gap:8px;align-items:center">
-        <input type="date" id="mv-evd"
-          style="flex:1;font-size:14px;padding:9px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
-        <span id="mv-dow" style="font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap"></span>
-      </div>
-      <div style="display:flex;gap:8px">
-        <div style="flex:1;display:flex;align-items:center;gap:5px">
-          <span style="font-size:11px;color:var(--text2);white-space:nowrap">開始</span>
-          <input type="time" id="mv-evs" style="flex:1;font-size:14px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
-        </div>
-        <div style="flex:1;display:flex;align-items:center;gap:5px">
-          <span style="font-size:11px;color:var(--text2);white-space:nowrap">終了</span>
-          <input type="time" id="mv-eve" style="flex:1;font-size:14px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
-        </div>
-      </div>
-      <button id="mv-save-btn" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">保存</button>
-    </div>
-
-    <!-- イベント概要 -->
-    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:6px;margin-top:6px;padding:4px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);cursor:pointer;min-height:28px" onclick="mvToggleEvInfo()">
+    <!-- イベント概要1行（参照モード） -->
+    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:6px;margin-top:5px;padding:3px 8px;border-radius:6px;background:var(--bg2);min-height:24px;overflow:hidden">
       <span style="font-size:10px;font-weight:600;color:var(--text2);flex-shrink:0;white-space:nowrap">概要</span>
-      <span id="evinfo-preview-mv" style="flex:1;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)">タップして入力</span>
-      <span id="evinfo-toggle-icon-mv" style="font-size:11px;color:var(--text2);flex-shrink:0;line-height:1">▾</span>
+      <span id="evinfo-preview-mv" style="flex:1;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)">—</span>
     </div>
-    <div id="mv-evinfo-panel" style="display:none;flex-direction:column;gap:5px;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)">
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">場所/ID</span>
-        <input id="mv-evinfo-location" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="開催場所・URL等" oninput="mvOnEvInfoChange()"/>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">オーナー</span>
-        <input id="mv-evinfo-owner" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="主催者・講師等" oninput="mvOnEvInfoChange()"/>
-      </div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">参加者</span>
-        <input id="mv-evinfo-members" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="お名前・人数等" oninput="mvOnEvInfoChange()"/>
-      </div>
-      <div style="display:flex;align-items:flex-start;gap:6px">
-        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0;padding-top:5px">メモ</span>
-        <textarea id="mv-evinfo-memo" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);min-height:50px;resize:vertical" oninput="mvOnEvInfoChange()"></textarea>
-      </div>
-    </div>
-
     <!-- 進行バー＋時刻 -->
-    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+    <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
       <div class="mv-progress" style="flex:1;margin-top:0"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
-      <span class="mv-clock" id="mv-clock" style="display:none;padding:0;margin:0;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;white-space:nowrap"></span>
+      <span id="mv-clock" style="display:none;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
     </div>
   </div>
 
   <!-- 遅延バナー -->
   <div class="mv-delay-bar" id="mv-delay-bar">
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span id="mv-delay-text"></span>
-    <button onclick="openTimeAdj()" style="margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border:1px solid #E53E3E;border-radius:6px;background:transparent;color:#E53E3E;cursor:pointer;white-space:nowrap">時間調整</button>
-  </div>
-
-  <!-- 進行中バナー -->
-  <div class="mv-now" id="mv-now" style="margin:4px 12px 0;display:none">
-    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    <span id="mv-now-text" style="flex:1"></span>
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;pointer-events:none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="mv-delay-text" style="flex:1"></span>
+    <button onclick="openTimeAdj()" style="font-size:10px;font-weight:700;padding:3px 8px;border:1px solid #E53E3E;border-radius:6px;background:transparent;color:#E53E3E;cursor:pointer;white-space:nowrap;pointer-events:auto">時間調整</button>
   </div>
 
   <!-- タブ -->
@@ -936,59 +883,115 @@ tbody tr:hover td{background:var(--bg2)}
 
   <!-- 下部ツールバー -->
   <div class="mv-toolbar">
+    <!-- 鉛筆（イベント編集） -->
+    <button class="mv-tbtn" onclick="mvOpenEventEdit()" title="イベント編集">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      編集
+    </button>
     <!-- 時間調整 -->
     <button id="mv-btn-time-adj" class="mv-tbtn primary" onclick="openTimeAdj()" style="display:none">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
       時間調整
     </button>
     <!-- Undo -->
     <button id="mv-bundo" class="mv-tbtn" onclick="mvUndo()" disabled>
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-      元に戻す
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      戻す
     </button>
     <!-- Redo -->
     <button id="mv-bredo" class="mv-tbtn" onclick="mvRedo()" disabled>
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>
       やり直す
     </button>
     <!-- 共有 -->
-    <button class="mv-tbtn" onclick="mvOpenShare()">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
-      共有
-    </button>
-    <!-- QR -->
     <button class="mv-tbtn" onclick="if(typeof fbShowRoom==='function')fbShowRoom()">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="4" height="4"/></svg>
-      QR共有
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      共有
     </button>
     <!-- その他 -->
     <button class="mv-tbtn" onclick="mvOpenMore()">
-      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="5" cy="12" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="19" cy="12" r="1"/></svg>
       その他
     </button>
   </div>
 </div>
 
-<!-- スマホ「その他」メニュー -->
+<!-- イベント編集シート -->
+<div class="mv-modal-bg" id="mv-event-edit" style="display:none" onclick="if(event.target===this)mvCloseEventEdit()">
+  <div class="mv-modal" style="max-height:95vh">
+    <div class="mv-modal-handle"></div>
+    <div class="mv-modal-title">イベント編集</div>
+    <div class="mv-modal-body">
+      <div>
+        <div class="mv-modal-label">タイトル</div>
+        <input class="mv-modal-input" id="mv-evt" type="text" maxlength="60" placeholder="イベントタイトル"/>
+      </div>
+      <div>
+        <div class="mv-modal-label">日付・時間</div>
+        <div style="display:flex;gap:8px;align-items:center;margin-bottom:8px">
+          <input type="date" id="mv-evd" style="flex:1;font-size:14px;padding:10px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+          <span id="mv-dow" style="font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap"></span>
+        </div>
+        <div style="display:flex;gap:8px">
+          <div style="flex:1;display:flex;align-items:center;gap:5px">
+            <span style="font-size:11px;color:var(--text2);white-space:nowrap">開始</span>
+            <input type="time" id="mv-evs" style="flex:1;font-size:14px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+          </div>
+          <div style="flex:1;display:flex;align-items:center;gap:5px">
+            <span style="font-size:11px;color:var(--text2);white-space:nowrap">終了</span>
+            <input type="time" id="mv-eve" style="flex:1;font-size:14px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="mv-modal-label">イベント概要</div>
+        <div style="display:flex;flex-direction:column;gap:6px">
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;color:var(--text2);width:52px;flex-shrink:0">場所/ID</span>
+            <input id="mv-evinfo-location" class="mv-modal-input" style="padding:8px 10px;font-size:13px" placeholder="開催場所・URL等" oninput="mvOnEvInfoChange()"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;color:var(--text2);width:52px;flex-shrink:0">オーナー</span>
+            <input id="mv-evinfo-owner" class="mv-modal-input" style="padding:8px 10px;font-size:13px" placeholder="主催者・講師等" oninput="mvOnEvInfoChange()"/>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span style="font-size:11px;color:var(--text2);width:52px;flex-shrink:0">参加者</span>
+            <input id="mv-evinfo-members" class="mv-modal-input" style="padding:8px 10px;font-size:13px" placeholder="お名前・人数等" oninput="mvOnEvInfoChange()"/>
+          </div>
+          <div style="display:flex;align-items:flex-start;gap:6px">
+            <span style="font-size:11px;color:var(--text2);width:52px;flex-shrink:0;padding-top:9px">メモ</span>
+            <textarea id="mv-evinfo-memo" class="mv-modal-textarea" style="padding:8px 10px;font-size:13px;min-height:60px" oninput="mvOnEvInfoChange()"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="mv-modal-footer">
+      <button class="mv-btn cancel" onclick="mvCloseEventEdit()">キャンセル</button>
+      <button class="mv-btn primary" onclick="mvSaveEventInfo()">保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- その他メニュー -->
 <div id="mv-more-menu" style="display:none;position:fixed;inset:0;z-index:190;background:rgba(0,0,0,.4)" onclick="if(event.target===this)mvCloseMore()">
   <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg);border-radius:18px 18px 0 0;padding:16px 16px max(env(safe-area-inset-bottom),20px);display:flex;flex-direction:column;gap:8px">
-    <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 8px"></div>
-    <button onclick="openAI();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;border-radius:12px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left">
+    <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 4px"></div>
+    <button onclick="openAI();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;border-radius:12px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:14px;font-weight:600;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
     </button>
-    <button onclick="newEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+    <button onclick="newEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>新規
     </button>
-    <button onclick="quickSaveEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+    <button onclick="quickSaveEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>保存
     </button>
-    <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+    <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
     </button>
-    <button onclick="openExport();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+    <button onclick="openExport();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し
     </button>
-    <button onclick="resetAll();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #F7C1C1;border-radius:12px;background:#FEF2F2;color:#A32D2D;font-size:14px;cursor:pointer;text-align:left">
+    <button onclick="resetAll();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #F7C1C1;border-radius:12px;background:#FEF2F2;color:#A32D2D;font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>全削除
     </button>
   </div>
@@ -1005,8 +1008,8 @@ tbody tr:hover td{background:var(--bg2)}
         <input class="mv-modal-input" id="mv-sm-name" type="text" maxlength="40"/>
       </div>
       <div>
-        <div class="mv-modal-label">色</div>
-        <div id="mv-sm-colors" style="display:flex;gap:10px;flex-wrap:wrap;padding:4px 0"></div>
+        <div class="mv-modal-label">色・アイコン</div>
+        <div id="mv-sm-colors" style="display:flex;gap:8px;flex-wrap:wrap;padding:4px 0"></div>
       </div>
       <div>
         <div class="mv-modal-label">時間</div>
@@ -1314,7 +1317,8 @@ function mvOnEvInfoChange(){
   if(pcMem)pcMem.value=evInfo.members;
   if(pcMmo)pcMmo.value=evInfo.memo;
   updateEvInfoPreview();
-  snap();
+  autoSave();
+  if(typeof fbPush==='function') fbPush();
 }
 function evInfoFieldFocus(el){
   el.style.borderColor='';
@@ -3987,7 +3991,6 @@ function mvRender(){
   const isMobile=window.innerWidth<=600;
   if(!isMobile)return;
 
-  // タイトル・日付
   const title=document.getElementById('evt').value||'タイムテーブル';
   const date=document.getElementById('evd').value;
   const days=['日','月','火','水','木','金','土'];
@@ -4006,7 +4009,7 @@ function mvRender(){
     return now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d;
   })();
 
-  // meta（日付・時刻）
+  // meta
   const metaEl=document.getElementById('mv-meta');
   if(metaEl) metaEl.textContent=`${dateStr} ${hm(sm)}〜${hm(em)}`;
 
@@ -4014,7 +4017,7 @@ function mvRender(){
   const clockEl=document.getElementById('mv-clock');
   if(clockEl){
     if(isToday){
-      clockEl.style.display='block';
+      clockEl.style.display='inline';
       clockEl.textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     } else {
       clockEl.style.display='none';
@@ -4025,7 +4028,7 @@ function mvRender(){
   const prog=isToday&&nowMin>=sm&&nowMin<=em?Math.max(0,Math.min(100,(nowMin-sm)/(em-sm)*100)):0;
   document.getElementById('mv-bar').style.width=prog+'%';
 
-  // DAY切替セレクト
+  // DAY切替
   const daySel=document.getElementById('mv-day-sel');
   if(daySel){
     if(dayCount>1){
@@ -4035,7 +4038,6 @@ function mvRender(){
         for(let i=1;i<=dayCount;i++){
           const opt=document.createElement('option');
           opt.value=i;opt.textContent=`DAY${i}`;
-          if(i===currentDay)opt.selected=true;
           daySel.appendChild(opt);
         }
       }
@@ -4045,11 +4047,11 @@ function mvRender(){
     }
   }
 
-  // セッションリスト描画
+  // セッション描画
   if(mvTab==='s') mvRenderSerial(isToday?nowMin:-1,sm);
   else mvRenderFree(isToday?nowMin:-1,sm);
 
-  // 遅延バナー（時間調整ボタン有効時のみ）
+  // 遅延バナー
   const delayBar=document.getElementById('mv-delay-bar');
   if(delayBar){
     const st=gSt();
@@ -4058,11 +4060,10 @@ function mvRender(){
       const start=sm+st[i],end=start+s.dur;
       if(nowMin>=start&&nowMin<end)autoCurrentIdx=i;
     });
-    // 遅延検出: 現在時刻が属するセッションの予定開始より遅れているか
     let delayMin=0;
     if(isToday&&autoCurrentIdx>=0){
       const expectedStart=sm+st[autoCurrentIdx];
-      if(nowMin>expectedStart) delayMin=nowMin-expectedStart;
+      if(nowMin>expectedStart+1) delayMin=nowMin-expectedStart;
     }
     if(isToday&&nowMin>=sm&&delayMin>2){
       delayBar.style.display='flex';
@@ -4072,39 +4073,20 @@ function mvRender(){
     }
   }
 
-  // 時間調整ボタン表示制御
+  // 時間調整ボタン
   const adjBtn=document.getElementById('mv-btn-time-adj');
   if(adjBtn){
     const btnActive=isToday&&nowMin>=sm;
     adjBtn.style.display=btnActive?'flex':'none';
   }
 
-  // Undo/Redo ボタン状態更新
+  // Undo/Redo
   mvUpdateUR();
 
-  // イベント概要プレビュー更新
+  // イベント概要プレビュー
   updateEvInfoPreview();
-
-  // 編集ボタンバインド
-  const editBtn=document.getElementById('mv-edit-btn');
-  if(editBtn&&!editBtn._bound){
-    editBtn._bound=true;
-    editBtn.addEventListener('touchend',e=>{e.preventDefault();mvToggleEdit();},{passive:false});
-    editBtn.addEventListener('click',()=>mvToggleEdit());
-  }
-  const saveBtn=document.getElementById('mv-save-btn');
-  if(saveBtn&&!saveBtn._bound){
-    saveBtn._bound=true;
-    saveBtn.addEventListener('touchend',e=>{e.preventDefault();mvSaveEventInfo();},{passive:false});
-    saveBtn.addEventListener('click',()=>mvSaveEventInfo());
-  }
-
-  // 当日の場合、現在セッションへ自動スクロール（初回のみ）
-  if(isToday&&!mvRender._scrolled){
-    mvRender._scrolled=true;
-    setTimeout(mvScrollToCurrent,300);
-  }
 }
+
 
 function mvScrollToCurrent(){
   const body=document.getElementById('mv-body');
@@ -4147,23 +4129,12 @@ function mvRenderSerial(nowMin,sm){
     if(nowMin>=start&&nowMin<end)currentIdx=i;
   });
 
-  // 進行中バナー
+  // mv-now バナーは削除済み（自動スクロールで代替）
   const nowEl=document.getElementById('mv-now');
-  const nowTxt=document.getElementById('mv-now-text');
-  if(nowMin<0){nowEl.style.display='none';}
-  else if(currentIdx>=0){
-    const cs=sessions[currentIdx];
-    const remain=(sm+st[currentIdx]+cs.dur)-nowMin;
-    nowEl.style.display='flex';
-    nowTxt.textContent=`${cs.name} — あと${remain}分`;
-  } else if(nowMin<sm){
-    nowEl.style.display='flex';
-    nowTxt.textContent=`開始まであと${sm-nowMin}分`;
-  } else {
-    nowEl.style.display='none';
-  }
+  if(nowEl) nowEl.style.display='none';
 
-  const body=document.getElementById('mv-body');body.innerHTML='';
+  const body=document.getElementById('mv-body');
+  body.innerHTML='';
   const dk=isDark();
 
   sessions.forEach((s,i)=>{
@@ -4183,44 +4154,30 @@ function mvRenderSerial(nowMin,sm){
       iconHtml=`<span style="width:9px;height:9px;border-radius:50%;background:${CD[s.color]||'#B4B2A9'};display:inline-block;flex-shrink:0"></span>`;
     }
 
-    // 差分バッジ（進行中セッションに遅延があれば表示）
-    let diffBadge='';
-    if(isActive&&nowMin>start){
-      const elapsed=nowMin-start;
-      const overRun=elapsed-(s.dur-((sm+st[i]+s.dur)-nowMin));
-      // 予定開始からの経過が想定される場合
-      if(nowMin>start+5){
-        const delay=nowMin-start;
-        if(delay>2) diffBadge=`<span class="mv-diff-badge late">+${delay}分経過</span>`;
-      }
-    }
-
     card.innerHTML=`
       <div class="mv-card-bar" style="background:${CD[s.color]||'#B4B2A9'}"></div>
-      <div class="mv-card-body" style="min-width:0">
+      <div class="mv-card-body" style="min-width:0;padding:9px 8px 9px 10px">
         <div style="display:flex;align-items:center;gap:6px">
           ${iconHtml}
           <div style="flex:1;min-width:0">
-            <div class="mv-card-name" style="${isPast?'opacity:0.5':''}">
-              ${esc(s.name)}${diffBadge}
-            </div>
+            <div class="mv-card-name" style="${isPast?'opacity:0.5':''}">${esc(s.name)}</div>
             <div class="mv-card-time">${hm(start)}〜${hm(end)} (${s.dur}分)</div>
           </div>
-          ${s.comment?`<span class="mv-card-chevron">›</span>`:''}
-          <button class="mv-edit-icon-btn" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" ontouchstart="this.style.background='var(--bg3)'" ontouchend="this.style.background=''">
+          ${s.comment?`<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>`:''}
+          <button class="mv-edit-icon-btn" style="background:none;border:none;padding:7px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px" ontouchstart="this.style.background='var(--bg3)'" ontouchend="this.style.background=''">
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
         </div>
         ${isActive?`<div class="mv-card-remain">▶ 進行中 — あと${end-nowMin}分</div>`:''}
-        ${s.comment?`<div class="mv-card-comment">${esc(s.comment)}</div>`:''}
+        ${s.comment?`<div class="mv-card-comment" style="display:none;padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">${esc(s.comment)}</div>`:''}
       </div>`;
 
-    // 鉛筆ボタン
+    // 鉛筆ボタン → 編集モーダル
     const editBtn=card.querySelector('.mv-edit-icon-btn');
     editBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenSM(s.id);},{passive:false});
     editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
 
-    // タップ → メモ展開
+    // タップ → メモアコーディオン展開
     let tapMoved=false,tapStartY=0,tapStartTime=0;
     card.addEventListener('touchstart',e=>{
       tapMoved=false;tapStartY=e.touches[0].clientY;tapStartTime=Date.now();
@@ -4235,13 +4192,27 @@ function mvRenderSerial(nowMin,sm){
     card.addEventListener('touchend',e=>{
       clearTimeout(mvLongPressTimer);
       if(mvDragId){mvEndDrag(e);return;}
-      if(!tapMoved&&Date.now()-tapStartTime<500&&s.comment){
-        card.classList.toggle('open');
+      if(!tapMoved&&Date.now()-tapStartTime<500){
+        const commentEl=card.querySelector('.mv-card-comment');
+        const chevron=card.querySelector('.mv-card-chevron');
+        if(commentEl){
+          const open=commentEl.style.display==='none'||commentEl.style.display==='';
+          commentEl.style.display=open?'block':'none';
+          if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
+        }
       }
     });
     body.appendChild(card);
   });
+
+  // 当日：現在セッションへスクロール
+  if(nowMin>0&&currentIdx>=0){
+    const cards=[...body.querySelectorAll('.mv-card')];
+    const activeCard=cards[currentIdx];
+    if(activeCard) setTimeout(()=>activeCard.scrollIntoView({behavior:'smooth',block:'start'}),100);
+  }
 }
+
 
 function mvRenderFree(nowMin,sm){
   document.getElementById('mv-now').style.display='none';
@@ -4415,17 +4386,25 @@ function mvOpenSM(id){
   document.getElementById('mv-sm-name').value=s.name;
   document.getElementById('mv-sm-dur').textContent=s.dur;
   document.getElementById('mv-sm-comment').value=s.comment||'';
-  // 色選択
+  // 色・アイコン選択（PCと同様）
   const colorsEl=document.getElementById('mv-sm-colors');
-  colorsEl.innerHTML=COLORS.map(c=>`
-    <div onclick="mvSelectColor('${c}')" id="mv-color-${c}"
-      style="width:32px;height:32px;border-radius:50%;background:${CDot[c]};
-      border:3px solid ${s.color===c?'#333':'transparent'};
-      box-shadow:${s.color===c?'0 0 0 2px #fff inset':'none'};
-      cursor:pointer;transition:transform .1s;flex-shrink:0"
-      ontouchstart="this.style.transform='scale(1.2)'"
-      ontouchend="this.style.transform=''">
-    </div>`).join('');
+  colorsEl.innerHTML='';
+  const allColors=[...COLORS,...ICON_COLORS];
+  const dk=isDark();
+  allColors.forEach(col=>{
+    const div=document.createElement('div');
+    const isSel=s.color===col;
+    div.id='mv-color-'+col;
+    div.style.cssText=`width:34px;height:34px;border-radius:50%;background:${CDot[col]};border:3px solid ${isSel?'var(--text)':'transparent'};box-shadow:${isSel?'0 0 0 2px var(--bg) inset':'none'};cursor:pointer;transition:transform .1s;flex-shrink:0;display:flex;align-items:center;justify-content:center`;
+    if(ICON_SVG[col]){
+      const fill=dk?(CT_DARK[col]||'#E8E8E8'):(CT[col]||'#fff');
+      div.innerHTML=`<svg viewBox="0 0 24 24" width="16" height="16" fill="${fill}" style="pointer-events:none"><path d="${ICON_SVG[col]}"/></svg>`;
+    }
+    div.ontouchstart=function(){this.style.transform='scale(1.15)';};
+    div.ontouchend=function(){this.style.transform='';};
+    div.onclick=function(){mvSelectColor(col);};
+    colorsEl.appendChild(div);
+  });
   mvSelectedColor=s.color||'teal';
   document.getElementById('mv-sm').style.display='flex';
 }
@@ -4523,14 +4502,35 @@ function mvToggleEdit(){
     area.style.flexDirection='column';
   }
 }
+
+function mvOpenEventEdit(){
+  // PC側の値をシートに反映
+  document.getElementById('mv-evt').value=document.getElementById('evt').value||'';
+  document.getElementById('mv-evd').value=document.getElementById('evd').value||'';
+  document.getElementById('mv-evs').value=document.getElementById('evs').value||'13:00';
+  document.getElementById('mv-eve').value=document.getElementById('eve').value||'16:00';
+  // DOW
+  const evd=document.getElementById('mv-evd').value;
+  if(evd){const[y,m,d]=evd.split('-').map(Number);const days=['日','月','火','水','木','金','土'];document.getElementById('mv-dow').textContent=days[new Date(y,m-1,d).getDay()]+'曜';}
+  // イベント概要
+  document.getElementById('mv-evinfo-location').value=evInfo.location||'';
+  document.getElementById('mv-evinfo-owner').value=evInfo.owner||'';
+  document.getElementById('mv-evinfo-members').value=evInfo.members||'';
+  document.getElementById('mv-evinfo-memo').value=evInfo.memo||'';
+  document.getElementById('mv-event-edit').style.display='flex';
+}
+function mvCloseEventEdit(){
+  document.getElementById('mv-event-edit').style.display='none';
+}
 function mvSaveEventInfo(){
-  document.getElementById('evt').value=document.getElementById('mv-evt').value;
-  document.getElementById('evd').value=document.getElementById('mv-evd').value;
-  document.getElementById('evs').value=document.getElementById('mv-evs').value;
-  document.getElementById('eve').value=document.getElementById('mv-eve').value;
+  document.getElementById('evt').value=document.getElementById('mv-evt').value||'';
+  document.getElementById('evd').value=document.getElementById('mv-evd').value||'';
+  document.getElementById('evs').value=document.getElementById('mv-evs').value||'13:00';
+  document.getElementById('eve').value=document.getElementById('mv-eve').value||'16:00';
   updateDow();render();
+  autoSave();
   if(typeof fbPush==='function') fbPush();
-  mvToggleEdit();
+  mvCloseEventEdit();
   mvRender();
 }
 function mvSwitchTab(tab){
@@ -4628,7 +4628,7 @@ window.fbShowRoom = function(){
 window.fbPush = function(){
   if(!_fbDB || _fbSyncing) return;
   var now = Date.now();
-  if(now - _fbLastPush < 500) return;
+  if(now - _fbLastPush < 200) return;
   _fbLastPush = now;
   try{
     var data = {
