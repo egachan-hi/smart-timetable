@@ -155,57 +155,70 @@ tbody tr:hover td{background:var(--bg2)}
 .isw{width:20px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center}.isw.on{border-color:var(--text)}
 /* ========== MOBILE VIEW ========== */
 .mv{display:none;flex-direction:column;height:100svh;overflow:hidden;background:var(--bg)}
-.mv-header{padding:12px 16px;border-bottom:1px solid var(--border);flex-shrink:0}
-.mv-title{font-size:16px;font-weight:700;color:var(--text)}
-.mv-meta{font-size:12px;color:var(--text2);margin-top:2px}
-.mv-progress{height:3px;background:var(--bg3);margin-top:10px;border-radius:2px;overflow:hidden}
+.mv-header{padding:max(env(safe-area-inset-top),12px) 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.mv-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.2}
+.mv-meta{font-size:11px;color:var(--text2);margin-top:1px}
+.mv-progress{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:6px}
 .mv-progress-bar{height:100%;background:var(--accent);border-radius:2px;transition:width .5s}
-.mv-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0}
-.mv-tab{flex:1;padding:10px;text-align:center;font-size:12px;font-weight:600;color:var(--text2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent}
+.mv-tabs{display:flex;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.mv-tab{flex:1;padding:9px 4px;text-align:center;font-size:12px;font-weight:600;color:var(--text2);border:none;background:transparent;cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
 .mv-tab.on{color:var(--accent);border-bottom-color:var(--accent)}
-.mv-body{flex:1;overflow-y:auto;padding:10px 12px;display:flex;flex-direction:column;gap:6px;-webkit-user-select:none;user-select:none;align-content:flex-start}
-.mv-now{background:#EFF6FF;border:1px solid #BFDBFE;border-radius:8px;padding:8px 12px;font-size:11px;color:#1D4ED8;display:flex;align-items:center;gap:6px;flex-shrink:0}
-.mv-card{border-radius:8px;overflow:hidden;display:flex;border:none;box-shadow:0 1px 4px rgba(0,0,0,0.08);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .15s,opacity .15s;flex-shrink:0}
-.mv-card-bar{width:5px;flex-shrink:0}
-.mv-card-body{flex:1;padding:10px 12px;background:var(--bg2);color:var(--text)}
-.mv-card.active .mv-card-body{background:var(--bg-info)}
-.mv-card-name{font-size:14px;font-weight:700;color:var(--text);opacity:1}
-.mv-card-time{font-size:12px;color:var(--text2);margin-top:2px;opacity:1}
-.mv-card-remain{font-size:11px;font-weight:600;margin-top:4px}
-.mv-card-comment{font-size:11px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:none}
+.mv-body{flex:1;overflow-y:auto;padding:8px 12px 12px;display:flex;flex-direction:column;gap:5px;-webkit-user-select:none;user-select:none;align-content:flex-start;-webkit-overflow-scrolling:touch;scroll-behavior:smooth}
+/* 現在進行中バナー */
+.mv-now{background:linear-gradient(135deg,rgba(93,202,165,0.15),rgba(93,202,165,0.05));border:1px solid var(--accent);border-radius:10px;padding:8px 12px;font-size:12px;color:var(--accent);display:flex;align-items:center;gap:6px;flex-shrink:0;font-weight:600}
+/* カード */
+.mv-card{border-radius:10px;overflow:hidden;display:flex;border:1px solid var(--border);background:var(--bg2);-webkit-user-select:none;user-select:none;-webkit-touch-callout:none;transition:transform .15s,opacity .15s;flex-shrink:0}
+.mv-card.active{border-color:var(--accent);box-shadow:0 0 0 2px rgba(93,202,165,0.25)}
+.mv-card-bar{width:4px;flex-shrink:0}
+.mv-card-body{flex:1;padding:9px 10px;min-width:0}
+.mv-card-name{font-size:14px;font-weight:700;color:var(--text)}
+.mv-card-time{font-size:11px;color:var(--text2);margin-top:1px}
+.mv-card-remain{font-size:11px;font-weight:600;margin-top:3px;color:var(--accent)}
+.mv-card-comment{font-size:11px;color:var(--text2);margin-top:6px;padding-top:6px;border-top:1px solid var(--border);display:none;line-height:1.5}
 .mv-card.open .mv-card-comment{display:block}
-.mv-done{opacity:.45}
-.mv-clock{display:none;padding:16px 0 8px;flex-shrink:0}
-@media(max-width:600px){
-  .body,.top-bar{display:none!important}
-  .mv{display:flex}
-}
-/* Mobile modal */
-.mv-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:flex-end;justify-content:center}
-.mv-modal{background:var(--bg);border-radius:16px 16px 0 0;width:100%;max-width:600px;padding:0 0 env(safe-area-inset-bottom,16px);max-height:90vh;display:flex;flex-direction:column;overflow:hidden}
-.mv-modal-handle{width:40px;height:4px;background:var(--border2);border-radius:2px;margin:12px auto 8px}
-.mv-modal-title{font-size:15px;font-weight:700;padding:0 16px 12px;color:var(--text)}
-.mv-modal-body{padding:0 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:12px}
-.mv-modal-label{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px}
-.mv-modal-input{width:100%;font-size:15px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none}
-.mv-modal-input:focus{border-color:var(--accent)}
-.mv-modal-textarea{width:100%;font-size:14px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:none;min-height:80px}
-.mv-dur-row{display:flex;align-items:center;gap:12px}
-.mv-dur-btn{width:44px;height:44px;border:1px solid var(--border);border-radius:22px;background:var(--bg2);font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0}
-.mv-dur-val{flex:1;text-align:center;font-size:22px;font-weight:700;color:var(--text)}
+.mv-done{opacity:.4}
+/* 差分バッジ */
+.mv-diff-badge{display:inline-flex;align-items:center;font-size:10px;font-weight:700;padding:1px 5px;border-radius:4px;margin-left:4px}
+.mv-diff-badge.late{background:rgba(229,62,62,0.15);color:#E53E3E}
+.mv-diff-badge.ok{background:rgba(93,202,165,0.15);color:var(--accent)}
+/* 時刻表示 */
+.mv-clock{display:none;font-size:13px;font-weight:700;color:var(--text2);padding:6px 14px 2px;flex-shrink:0}
+/* 遅延バナー */
+.mv-delay-bar{display:none;margin:4px 12px 0;padding:6px 10px;border-radius:8px;background:rgba(229,62,62,0.1);border:1px solid rgba(229,62,62,0.3);font-size:11px;color:#E53E3E;font-weight:600;align-items:center;gap:6px;flex-shrink:0}
+/* 下部ツールバー */
+.mv-toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px max(env(safe-area-inset-bottom),10px);border-top:1px solid var(--border);background:var(--bg);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mv-toolbar::-webkit-scrollbar{display:none}
+.mv-tbtn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 10px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-size:10px;font-weight:600;cursor:pointer;white-space:nowrap;flex-shrink:0;min-width:44px}
+.mv-tbtn svg{flex-shrink:0}
+.mv-tbtn.primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.mv-tbtn.danger{background:#FEF2F2;color:#A32D2D;border-color:#F7C1C1}
+.mv-tbtn:disabled{opacity:0.35}
+/* DAY切替 */
+.mv-day-sel{font-size:12px;font-weight:700;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer}
+/* モーダル */
+.mv-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center}
+.mv-modal{background:var(--bg);border-radius:18px 18px 0 0;width:100%;max-width:600px;padding:0 0 env(safe-area-inset-bottom,16px);max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+.mv-modal-handle{width:36px;height:4px;background:var(--border2,var(--border));border-radius:2px;margin:10px auto 6px}
+.mv-modal-title{font-size:16px;font-weight:700;padding:0 16px 10px;color:var(--text)}
+.mv-modal-body{padding:0 16px;overflow-y:auto;flex:1;display:flex;flex-direction:column;gap:14px}
+.mv-modal-label{font-size:11px;color:var(--text2);font-weight:600;margin-bottom:4px;text-transform:uppercase;letter-spacing:.03em}
+.mv-modal-input{width:100%;font-size:15px;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none;box-sizing:border-box}
+.mv-modal-textarea{width:100%;font-size:14px;padding:11px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;outline:none;resize:none;min-height:80px;box-sizing:border-box}
+.mv-dur-row{display:flex;align-items:center;gap:10px;justify-content:center}
+.mv-dur-btn{width:42px;height:42px;border:1px solid var(--border);border-radius:21px;background:var(--bg2);font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);flex-shrink:0}
+.mv-dur-val{min-width:48px;text-align:center;font-size:24px;font-weight:700;color:var(--text)}
 .mv-dur-sub{font-size:11px;color:var(--text2);text-align:center}
-.mv-modal-footer{display:flex;gap:8px;padding:12px 16px 4px}
+.mv-modal-footer{display:flex;gap:8px;padding:12px 16px 4px;flex-shrink:0}
 .mv-btn{flex:1;padding:13px;border-radius:12px;border:none;font-size:14px;font-weight:600;cursor:pointer}
 .mv-btn.primary{background:var(--accent);color:#fff}
-.mv-btn.danger{background:#FCEBEB;color:#A32D2D}
-.mv-btn.cancel{background:var(--bg2);color:var(--text)}
-.mv-card-chevron{font-size:12px;color:var(--text3);flex-shrink:0;transition:transform .2s}
+.mv-btn.cancel{background:var(--bg2);color:var(--text);border:1px solid var(--border)}
+.mv-btn.danger{background:#FEF2F2;color:#A32D2D;border:1px solid #F7C1C1}
+.mv-card-chevron{font-size:14px;color:var(--text3);flex-shrink:0;transition:transform .2s;display:inline-block}
 .mv-card.open .mv-card-chevron{transform:rotate(90deg)}
-.mv-card-drag{opacity:.5;transform:scale(0.97);transition:all .1s}
-.mv-drag-ghost{position:fixed;left:12px;right:12px;border-radius:8px;opacity:.85;pointer-events:none;z-index:150;box-shadow:0 8px 24px rgba(0,0,0,.2)}
+.mv-card-drag{opacity:.5;transform:scale(0.97)}
+.mv-drag-ghost{position:fixed;left:12px;right:12px;border-radius:10px;opacity:.88;pointer-events:none;z-index:150;box-shadow:0 8px 24px rgba(0,0,0,.2)}
 .mv-drop-line{height:0;display:none;margin:0}
-.mv-drop-line.show{display:block;height:48px;background:rgba(79,70,229,.06);border:2px solid rgba(79,70,229,.3);border-radius:8px;margin:3px 0}
-.mv-time-row{display:flex;gap:8px}
+.mv-time-row{display:flex;gap:8px;align-items:center}
 .mv-time-input{flex:1;font-size:16px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);text-align:center;font-family:inherit;outline:none}
 /* Table row with color bar */
 .tbl-row{border:none;border-bottom:1px solid var(--border)}
@@ -272,7 +285,7 @@ tbody tr:hover td{background:var(--bg2)}
       <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
         <div style="display:flex;align-items:center;gap:4px">
-          <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();autoSave();"/>
+          <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();"/>
           <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
           <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:auto">から</span>
           <select id="day-count-sel" style="font-size:11px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0" onchange="onDayCountChange()">
@@ -824,86 +837,155 @@ tbody tr:hover td{background:var(--bg2)}
 
 <!-- ========== MOBILE VIEW ========== -->
 <div class="mv" id="mv">
-  <div class="mv-header" style="padding:max(env(safe-area-inset-top),20px) 16px 12px">
-    <div style="display:flex;align-items:flex-start;gap:8px;margin-top:8px">
-      <div style="flex:1">
-        <div class="mv-title" id="mv-title" style="font-size:18px;font-weight:700;margin-bottom:4px">タイムテーブル</div>
-        <div class="mv-meta" id="mv-meta" style="font-size:13px"></div>
+  <!-- ヘッダー -->
+  <div class="mv-header">
+    <div style="display:flex;align-items:flex-start;gap:6px">
+      <div style="flex:1;min-width:0">
+        <div class="mv-title" id="mv-title">タイムテーブル</div>
+        <div class="mv-meta" id="mv-meta"></div>
       </div>
-      <button id="mv-edit-btn" style="background:none;border:none;padding:8px;cursor:pointer;color:var(--text2);flex-shrink:0;margin-top:2px;min-width:44px;min-height:44px">
-        <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <!-- DAY切替（複数日時のみ表示） -->
+      <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
+      <!-- 編集ボタン -->
+      <button id="mv-edit-btn" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text2);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px">
+        <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
       </button>
     </div>
 
-    <div id="mv-edit-area" style="display:none;flex-direction:column;gap:8px;margin-top:10px">
+    <!-- 編集エリア -->
+    <div id="mv-edit-area" style="display:none;flex-direction:column;gap:8px;margin-top:8px">
       <input type="text" id="mv-evt" placeholder="イベントタイトル"
         style="width:100%;font-size:15px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);font-family:inherit;box-sizing:border-box"/>
       <div style="display:flex;gap:8px;align-items:center">
         <input type="date" id="mv-evd"
-          style="flex:1;font-size:15px;padding:10px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
-        <span id="mv-dow" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap"></span>
+          style="flex:1;font-size:14px;padding:9px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+        <span id="mv-dow" style="font-size:13px;font-weight:600;color:var(--text2);white-space:nowrap"></span>
       </div>
       <div style="display:flex;gap:8px">
-        <div style="flex:1;display:flex;align-items:center;gap:6px">
-          <span style="font-size:12px;color:var(--text2);white-space:nowrap">開始</span>
-          <input type="time" id="mv-evs" style="flex:1;font-size:15px;padding:10px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+        <div style="flex:1;display:flex;align-items:center;gap:5px">
+          <span style="font-size:11px;color:var(--text2);white-space:nowrap">開始</span>
+          <input type="time" id="mv-evs" style="flex:1;font-size:14px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
         </div>
-        <div style="flex:1;display:flex;align-items:center;gap:6px">
-          <span style="font-size:12px;color:var(--text2);white-space:nowrap">終了</span>
-          <input type="time" id="mv-eve" style="flex:1;font-size:15px;padding:10px 8px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
+        <div style="flex:1;display:flex;align-items:center;gap:5px">
+          <span style="font-size:11px;color:var(--text2);white-space:nowrap">終了</span>
+          <input type="time" id="mv-eve" style="flex:1;font-size:14px;padding:9px 6px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);box-sizing:border-box"/>
         </div>
       </div>
-      <button id="mv-save-btn" style="width:100%;padding:13px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:15px;font-weight:600;cursor:pointer">保存</button>
+      <button id="mv-save-btn" style="width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:14px;font-weight:600;cursor:pointer">保存</button>
     </div>
-    <!-- スマホ イベント概要 1行 -->
-    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:6px;margin-top:8px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);cursor:pointer;min-height:28px" onclick="mvToggleEvInfo()">
-      <span style="font-size:10px;font-weight:600;color:var(--text2);flex-shrink:0;white-space:nowrap">イベント概要</span>
-      <span id="evinfo-preview-mv" style="flex:1;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)">イベントの概要を入力</span>
-      <span id="evinfo-toggle-icon-mv" style="font-size:11px;color:var(--text2);flex-shrink:0;line-height:1;user-select:none">▾</span>
+
+    <!-- イベント概要 -->
+    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:6px;margin-top:6px;padding:4px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);cursor:pointer;min-height:28px" onclick="mvToggleEvInfo()">
+      <span style="font-size:10px;font-weight:600;color:var(--text2);flex-shrink:0;white-space:nowrap">概要</span>
+      <span id="evinfo-preview-mv" style="flex:1;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)">タップして入力</span>
+      <span id="evinfo-toggle-icon-mv" style="font-size:11px;color:var(--text2);flex-shrink:0;line-height:1">▾</span>
     </div>
-    <!-- スマホ用 イベント概要パネル -->
-    <div id="mv-evinfo-panel" style="display:none;flex-direction:column;gap:6px;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:6px;background:var(--bg2)">
+    <div id="mv-evinfo-panel" style="display:none;flex-direction:column;gap:5px;margin-top:4px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)">
       <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0">場所/ID</span>
-        <input id="mv-evinfo-location" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="開催場所・URL等" oninput="mvOnEvInfoChange()"/>
+        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">場所/ID</span>
+        <input id="mv-evinfo-location" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="開催場所・URL等" oninput="mvOnEvInfoChange()"/>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0">オーナー</span>
-        <input id="mv-evinfo-owner" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="主催者・講師・組織名等" oninput="mvOnEvInfoChange()"/>
+        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">オーナー</span>
+        <input id="mv-evinfo-owner" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="主催者・講師等" oninput="mvOnEvInfoChange()"/>
       </div>
       <div style="display:flex;align-items:center;gap:6px">
-        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0">参加者</span>
-        <input id="mv-evinfo-members" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="お名前・人数等" oninput="mvOnEvInfoChange()"/>
+        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">参加者</span>
+        <input id="mv-evinfo-members" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="お名前・人数等" oninput="mvOnEvInfoChange()"/>
       </div>
       <div style="display:flex;align-items:flex-start;gap:6px">
-        <span style="font-size:11px;color:var(--text2);width:56px;flex-shrink:0;padding-top:6px">メモ</span>
-        <textarea id="mv-evinfo-memo" style="flex:1;font-size:12px;padding:5px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);min-height:60px;resize:vertical" placeholder="" oninput="mvOnEvInfoChange()"></textarea>
+        <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0;padding-top:5px">メモ</span>
+        <textarea id="mv-evinfo-memo" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);min-height:50px;resize:vertical" oninput="mvOnEvInfoChange()"></textarea>
       </div>
     </div>
-    <div class="mv-progress" style="margin-top:10px"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
+
+    <!-- 進行バー＋時刻 -->
+    <div style="display:flex;align-items:center;gap:8px;margin-top:6px">
+      <div class="mv-progress" style="flex:1;margin-top:0"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
+      <span class="mv-clock" id="mv-clock" style="display:none;padding:0;margin:0;font-size:12px;font-weight:700;color:var(--text2);flex-shrink:0;white-space:nowrap"></span>
+    </div>
   </div>
-  <div class="mv-clock" id="mv-clock">--:--</div>
-  <div class="mv-now" id="mv-now" style="margin:0 12px 4px;display:none">
-    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-    <span id="mv-now-text">現在のセッション</span>
+
+  <!-- 遅延バナー -->
+  <div class="mv-delay-bar" id="mv-delay-bar">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+    <span id="mv-delay-text"></span>
+    <button onclick="openTimeAdj()" style="margin-left:auto;font-size:10px;font-weight:700;padding:3px 8px;border:1px solid #E53E3E;border-radius:6px;background:transparent;color:#E53E3E;cursor:pointer;white-space:nowrap">時間調整</button>
   </div>
+
+  <!-- 進行中バナー -->
+  <div class="mv-now" id="mv-now" style="margin:4px 12px 0;display:none">
+    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    <span id="mv-now-text" style="flex:1"></span>
+  </div>
+
+  <!-- タブ -->
   <div class="mv-tabs">
     <button class="mv-tab on" id="mv-tab-s" onclick="mvSwitchTab('s')">シリアル</button>
     <button class="mv-tab" id="mv-tab-f" onclick="mvSwitchTab('f')">フリー</button>
-    <button class="mv-tab" onclick="mvAddSession()" style="max-width:52px;font-size:18px;color:var(--accent);padding:8px">＋</button>
+    <button class="mv-tab" onclick="mvAddSession()" style="flex:none;padding:9px 14px;font-size:18px;color:var(--accent);font-weight:300">＋</button>
   </div>
+
+  <!-- セッションリスト -->
   <div class="mv-body" id="mv-body"></div>
-  <!-- スマホ用ツールバー（下部固定） -->
-  <div style="display:flex;gap:6px;padding:10px 12px 16px;overflow-x:auto;-webkit-overflow-scrolling:touch;border-top:1px solid var(--border);background:var(--bg);flex-shrink:0">
-      <button onclick="openAI()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:none;border-radius:8px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:12px;font-weight:600;white-space:nowrap;cursor:pointer;flex-shrink:0">
-        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
-      </button>
-      <button onclick="newEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">新規</button>
-      <button onclick="duplicateEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">複製</button>
-      <button onclick="quickSaveEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">保存</button>
-      <button onclick="openEV()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">開く</button>
-      <button onclick="openExport()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">書き出し</button>
-      <button onclick="resetAll()" style="display:flex;align-items:center;gap:4px;padding:7px 10px;border:1px solid #F7C1C1;border-radius:8px;background:#FEF2F2;color:#A32D2D;font-size:12px;white-space:nowrap;cursor:pointer;flex-shrink:0">削除</button>
+
+  <!-- 下部ツールバー -->
+  <div class="mv-toolbar">
+    <!-- 時間調整 -->
+    <button id="mv-btn-time-adj" class="mv-tbtn primary" onclick="openTimeAdj()" style="display:none">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      時間調整
+    </button>
+    <!-- Undo -->
+    <button id="mv-bundo" class="mv-tbtn" onclick="mvUndo()" disabled>
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+      元に戻す
+    </button>
+    <!-- Redo -->
+    <button id="mv-bredo" class="mv-tbtn" onclick="mvRedo()" disabled>
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>
+      やり直す
+    </button>
+    <!-- 共有 -->
+    <button class="mv-tbtn" onclick="mvOpenShare()">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+      共有
+    </button>
+    <!-- QR -->
+    <button class="mv-tbtn" onclick="if(typeof fbShowRoom==='function')fbShowRoom()">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="4" height="4"/></svg>
+      QR共有
+    </button>
+    <!-- その他 -->
+    <button class="mv-tbtn" onclick="mvOpenMore()">
+      <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none"><circle cx="12" cy="5" r="1"/><circle cx="12" cy="12" r="1"/><circle cx="12" cy="19" r="1"/></svg>
+      その他
+    </button>
+  </div>
+</div>
+
+<!-- スマホ「その他」メニュー -->
+<div id="mv-more-menu" style="display:none;position:fixed;inset:0;z-index:190;background:rgba(0,0,0,.4)" onclick="if(event.target===this)mvCloseMore()">
+  <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg);border-radius:18px 18px 0 0;padding:16px 16px max(env(safe-area-inset-bottom),20px);display:flex;flex-direction:column;gap:8px">
+    <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 8px"></div>
+    <button onclick="openAI();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;border-radius:12px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:14px;font-weight:600;cursor:pointer;text-align:left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
+    </button>
+    <button onclick="newEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>新規
+    </button>
+    <button onclick="quickSaveEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>保存
+    </button>
+    <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
+    </button>
+    <button onclick="openExport();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;text-align:left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し
+    </button>
+    <button onclick="resetAll();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #F7C1C1;border-radius:12px;background:#FEF2F2;color:#A32D2D;font-size:14px;cursor:pointer;text-align:left">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>全削除
+    </button>
   </div>
 </div>
 
@@ -925,21 +1007,18 @@ tbody tr:hover td{background:var(--bg2)}
         <div class="mv-modal-label">時間</div>
         <div class="mv-dur-row">
           <button class="mv-dur-btn" onclick="mvDurChange(-5)" style="font-size:18px">−</button>
-          <button class="mv-dur-btn" onclick="mvDurChange(-1)" style="font-size:13px;width:32px;min-width:32px">-1</button>
-          <div>
-            <div class="mv-dur-val" id="mv-sm-dur">30</div>
-            <div class="mv-dur-sub">分</div>
-          </div>
-          <button class="mv-dur-btn" onclick="mvDurChange(1)" style="font-size:13px;width:32px;min-width:32px">+1</button>
+          <button class="mv-dur-btn" onclick="mvDurChange(-1)" style="font-size:13px;width:36px;min-width:36px">-1</button>
+          <div><div class="mv-dur-val" id="mv-sm-dur">30</div><div class="mv-dur-sub">分</div></div>
+          <button class="mv-dur-btn" onclick="mvDurChange(1)" style="font-size:13px;width:36px;min-width:36px">+1</button>
           <button class="mv-dur-btn" onclick="mvDurChange(5)" style="font-size:18px">＋</button>
         </div>
-        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap">
-          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(5)">5分</button>
-          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(10)">10分</button>
-          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(15)">15分</button>
-          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(30)">30分</button>
-          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(45)">45分</button>
-          <button class="mv-btn cancel" style="flex:none;padding:6px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(60)">60分</button>
+        <div style="display:flex;gap:6px;margin-top:10px;flex-wrap:wrap">
+          <button class="mv-btn cancel" style="flex:none;padding:7px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(5)">5分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:7px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(10)">10分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:7px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(15)">15分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:7px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(30)">30分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:7px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(45)">45分</button>
+          <button class="mv-btn cancel" style="flex:none;padding:7px 12px;font-size:12px;border-radius:8px" onclick="mvDurSet(60)">60分</button>
         </div>
       </div>
       <div>
@@ -969,7 +1048,7 @@ tbody tr:hover td{background:var(--bg2)}
         <div class="mv-modal-label">時間帯</div>
         <div class="mv-time-row">
           <input class="mv-time-input" id="mv-fm-from" type="time"/>
-          <span style="display:flex;align-items:center;color:var(--text2);font-size:16px">〜</span>
+          <span style="color:var(--text2);font-size:16px">〜</span>
           <input class="mv-time-input" id="mv-fm-to" type="time"/>
         </div>
       </div>
@@ -3902,104 +3981,246 @@ let mvDragId=null, mvDragStartY=0, mvDragEl=null, mvDragGhost=null, mvLongPressT
 function mvRender(){
   const isMobile=window.innerWidth<=600;
   if(!isMobile)return;
+
+  // タイトル・日付
   const title=document.getElementById('evt').value||'タイムテーブル';
   const date=document.getElementById('evd').value;
   const days=['日','月','火','水','木','金','土'];
-  let dateStr=date;
+  let dateStr='';
   if(date){const[y,m,d]=date.split('-').map(Number);dateStr=`${y}/${m}/${d}(${days[new Date(y,m-1,d).getDay()]})`;}
   document.getElementById('mv-title').textContent=title;
-  document.getElementById('mv-meta').textContent=`${dateStr} ${hm(gSM())}〜${hm(gEM())}`;
+
   const now=new Date();
   const nowMin=now.getHours()*60+now.getMinutes();
   const sm=gSM(),em=gEM();
   const evDate=document.getElementById('evd').value;
   const isToday=(()=>{
+    if(typeof noDate!=='undefined'&&noDate)return true;
     if(!evDate)return false;
     const[y,m,d]=evDate.split('-').map(Number);
     return now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d;
   })();
-  const prog=isToday?Math.max(0,Math.min(100,(nowMin-sm)/(em-sm)*100)):0;
+
+  // meta（日付・時刻）
+  const metaEl=document.getElementById('mv-meta');
+  if(metaEl) metaEl.textContent=`${dateStr} ${hm(sm)}〜${hm(em)}`;
+
+  // 時計
+  const clockEl=document.getElementById('mv-clock');
+  if(clockEl){
+    if(isToday){
+      clockEl.style.display='block';
+      clockEl.textContent=`${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    } else {
+      clockEl.style.display='none';
+    }
+  }
+
+  // プログレスバー
+  const prog=isToday&&nowMin>=sm&&nowMin<=em?Math.max(0,Math.min(100,(nowMin-sm)/(em-sm)*100)):0;
   document.getElementById('mv-bar').style.width=prog+'%';
-  document.getElementById('mv-clock').textContent=
-    `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-  if(mvTab==='s')mvRenderSerial(isToday?nowMin:-1,sm);
+
+  // DAY切替セレクト
+  const daySel=document.getElementById('mv-day-sel');
+  if(daySel){
+    if(dayCount>1){
+      daySel.style.display='block';
+      if(daySel.options.length!==dayCount){
+        daySel.innerHTML='';
+        for(let i=1;i<=dayCount;i++){
+          const opt=document.createElement('option');
+          opt.value=i;opt.textContent=`DAY${i}`;
+          if(i===currentDay)opt.selected=true;
+          daySel.appendChild(opt);
+        }
+      }
+      daySel.value=String(currentDay);
+    } else {
+      daySel.style.display='none';
+    }
+  }
+
+  // セッションリスト描画
+  if(mvTab==='s') mvRenderSerial(isToday?nowMin:-1,sm);
   else mvRenderFree(isToday?nowMin:-1,sm);
+
+  // 遅延バナー（時間調整ボタン有効時のみ）
+  const delayBar=document.getElementById('mv-delay-bar');
+  if(delayBar){
+    const st=gSt();
+    let autoCurrentIdx=-1;
+    sessions.forEach((s,i)=>{
+      const start=sm+st[i],end=start+s.dur;
+      if(nowMin>=start&&nowMin<end)autoCurrentIdx=i;
+    });
+    // 遅延検出: 現在時刻が属するセッションの予定開始より遅れているか
+    let delayMin=0;
+    if(isToday&&autoCurrentIdx>=0){
+      const expectedStart=sm+st[autoCurrentIdx];
+      if(nowMin>expectedStart) delayMin=nowMin-expectedStart;
+    }
+    if(isToday&&nowMin>=sm&&delayMin>2){
+      delayBar.style.display='flex';
+      document.getElementById('mv-delay-text').textContent=`${delayMin}分遅れています`;
+    } else {
+      delayBar.style.display='none';
+    }
+  }
+
+  // 時間調整ボタン表示制御
+  const adjBtn=document.getElementById('mv-btn-time-adj');
+  if(adjBtn){
+    const btnActive=isToday&&nowMin>=sm;
+    adjBtn.style.display=btnActive?'flex':'none';
+  }
+
+  // Undo/Redo ボタン状態更新
+  mvUpdateUR();
+
+  // イベント概要プレビュー更新
   updateEvInfoPreview();
 
+  // 編集ボタンバインド
   const editBtn=document.getElementById('mv-edit-btn');
   if(editBtn&&!editBtn._bound){
     editBtn._bound=true;
-    editBtn.addEventListener('touchend',function(e){e.preventDefault();mvToggleEdit();},{passive:false});
-    editBtn.addEventListener('click',function(){mvToggleEdit();});
+    editBtn.addEventListener('touchend',e=>{e.preventDefault();mvToggleEdit();},{passive:false});
+    editBtn.addEventListener('click',()=>mvToggleEdit());
   }
   const saveBtn=document.getElementById('mv-save-btn');
   if(saveBtn&&!saveBtn._bound){
     saveBtn._bound=true;
-    saveBtn.addEventListener('touchend',function(e){e.preventDefault();mvSaveEventInfo();},{passive:false});
-    saveBtn.addEventListener('click',function(){mvSaveEventInfo();});
+    saveBtn.addEventListener('touchend',e=>{e.preventDefault();mvSaveEventInfo();},{passive:false});
+    saveBtn.addEventListener('click',()=>mvSaveEventInfo());
+  }
+
+  // 当日の場合、現在セッションへ自動スクロール（初回のみ）
+  if(isToday&&!mvRender._scrolled){
+    mvRender._scrolled=true;
+    setTimeout(mvScrollToCurrent,300);
   }
 }
+
+function mvScrollToCurrent(){
+  const body=document.getElementById('mv-body');
+  if(!body)return;
+  const active=body.querySelector('.mv-card.active');
+  if(active){
+    active.scrollIntoView({behavior:'smooth',block:'center'});
+  }
+}
+
+function mvUpdateUR(){
+  const bu=document.getElementById('mv-bundo');
+  const br=document.getElementById('mv-bredo');
+  if(bu) bu.disabled=hi<=0;
+  if(br) br.disabled=hi>=hist.length-1;
+}
+
+function mvUndo(){undo();mvUpdateUR();}
+function mvRedo(){redo();mvUpdateUR();}
+
+function mvSwitchDayUI(){
+  const sel=document.getElementById('mv-day-sel');
+  if(!sel)return;
+  const d=parseInt(sel.value);
+  switchDay(d-currentDay);
+  mvRender._scrolled=false;
+}
+
+function mvOpenShare(){
+  if(typeof fbShowRoom==='function') fbShowRoom();
+}
+function mvOpenMore(){document.getElementById('mv-more-menu').style.display='flex';}
+function mvCloseMore(){document.getElementById('mv-more-menu').style.display='none';}
 
 function mvRenderSerial(nowMin,sm){
   const st=gSt();
   let currentIdx=-1;
-  sessions.forEach((s,i)=>{const start=sm+st[i],end=start+s.dur;if(nowMin>=start&&nowMin<end)currentIdx=i;});
-  const nowEl=document.getElementById('mv-now'),nowTxt=document.getElementById('mv-now-text');
+  sessions.forEach((s,i)=>{
+    const start=sm+st[i],end=start+s.dur;
+    if(nowMin>=start&&nowMin<end)currentIdx=i;
+  });
+
+  // 進行中バナー
+  const nowEl=document.getElementById('mv-now');
+  const nowTxt=document.getElementById('mv-now-text');
   if(nowMin<0){nowEl.style.display='none';}
   else if(currentIdx>=0){
-    const cs=sessions[currentIdx],remain=(sm+st[currentIdx]+cs.dur)-nowMin;
-    nowEl.style.display='flex';nowTxt.textContent=`${cs.name} — あと${remain}分`;
-  }else if(nowMin<sm){nowEl.style.display='flex';nowTxt.textContent=`開始まであと${sm-nowMin}分`;}
-  else{nowEl.style.display='none';}
+    const cs=sessions[currentIdx];
+    const remain=(sm+st[currentIdx]+cs.dur)-nowMin;
+    nowEl.style.display='flex';
+    nowTxt.textContent=`${cs.name} — あと${remain}分`;
+  } else if(nowMin<sm){
+    nowEl.style.display='flex';
+    nowTxt.textContent=`開始まであと${sm-nowMin}分`;
+  } else {
+    nowEl.style.display='none';
+  }
+
   const body=document.getElementById('mv-body');body.innerHTML='';
   const dk=isDark();
+
   sessions.forEach((s,i)=>{
-    const start=sm+st[i],end=start+s.dur,isActive=nowMin>=start&&nowMin<end;
+    const start=sm+st[i],end=start+s.dur;
+    const isPast=nowMin>0&&nowMin>=end;
+    const isActive=nowMin>=start&&nowMin<end;
     const card=document.createElement('div');
-    card.className='mv-card'+(isActive?' active':'');
+    card.className='mv-card'+(isActive?' active':'')+(isPast?' mv-done':'');
     card.dataset.id=s.id;
 
-    // アイコンHTML（PCと同様）
+    // アイコン
     let iconHtml='';
     if(ICON_SVG[s.color]){
       const fill=dk?(CT_DARK[s.color]||'#E8E8E8'):(CT[s.color]||'#333');
-      iconHtml=`<svg viewBox="0 0 24 24" width="15" height="15" fill="${fill}" style="flex-shrink:0"><path d="${ICON_SVG[s.color]}"/></svg>`;
+      iconHtml=`<svg viewBox="0 0 24 24" width="15" height="15" fill="${fill}" style="flex-shrink:0;pointer-events:none"><path d="${ICON_SVG[s.color]}"/></svg>`;
     } else {
-      iconHtml=`<span style="width:10px;height:10px;border-radius:50%;background:${CD[s.color]||'#B4B2A9'};display:inline-block;flex-shrink:0"></span>`;
+      iconHtml=`<span style="width:9px;height:9px;border-radius:50%;background:${CD[s.color]||'#B4B2A9'};display:inline-block;flex-shrink:0"></span>`;
+    }
+
+    // 差分バッジ（進行中セッションに遅延があれば表示）
+    let diffBadge='';
+    if(isActive&&nowMin>start){
+      const elapsed=nowMin-start;
+      const overRun=elapsed-(s.dur-((sm+st[i]+s.dur)-nowMin));
+      // 予定開始からの経過が想定される場合
+      if(nowMin>start+5){
+        const delay=nowMin-start;
+        if(delay>2) diffBadge=`<span class="mv-diff-badge late">+${delay}分経過</span>`;
+      }
     }
 
     card.innerHTML=`
       <div class="mv-card-bar" style="background:${CD[s.color]||'#B4B2A9'}"></div>
-      <div class="mv-card-body" style="flex:1;min-width:0">
+      <div class="mv-card-body" style="min-width:0">
         <div style="display:flex;align-items:center;gap:6px">
           ${iconHtml}
           <div style="flex:1;min-width:0">
-            <div class="mv-card-name">${esc(s.name)}</div>
+            <div class="mv-card-name" style="${isPast?'opacity:0.5':''}">
+              ${esc(s.name)}${diffBadge}
+            </div>
             <div class="mv-card-time">${hm(start)}〜${hm(end)} (${s.dur}分)</div>
           </div>
-          ${s.comment?'<span class="mv-card-chevron" style="font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0">›</span>':''}
-          <button class="mv-edit-icon-btn" title="編集" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" ontouchstart="this.style.background='var(--bg3)'" ontouchend="this.style.background=''">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          ${s.comment?`<span class="mv-card-chevron">›</span>`:''}
+          <button class="mv-edit-icon-btn" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" ontouchstart="this.style.background='var(--bg3)'" ontouchend="this.style.background=''">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
         </div>
-        ${isActive?`<div class="mv-card-remain" style="color:var(--accent);margin-top:4px">▶ 進行中 — あと${end-nowMin}分</div>`:''}
-        ${s.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(s.comment)}</div>`:''}
+        ${isActive?`<div class="mv-card-remain">▶ 進行中 — あと${end-nowMin}分</div>`:''}
+        ${s.comment?`<div class="mv-card-comment">${esc(s.comment)}</div>`:''}
       </div>`;
 
-    // 鉛筆ボタン → 編集モーダル
+    // 鉛筆ボタン
     const editBtn=card.querySelector('.mv-edit-icon-btn');
     editBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenSM(s.id);},{passive:false});
     editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
 
-    // タップ → メモ展開のみ（編集モーダルは開かない）
+    // タップ → メモ展開
     let tapMoved=false,tapStartY=0,tapStartTime=0;
     card.addEventListener('touchstart',e=>{
       tapMoved=false;tapStartY=e.touches[0].clientY;tapStartTime=Date.now();
       mvLongPressTimer=setTimeout(()=>{
-        if(!tapMoved){
-          navigator.vibrate&&navigator.vibrate(30);
-          mvStartDrag(e,s.id,card);
-        }
+        if(!tapMoved){navigator.vibrate&&navigator.vibrate(30);mvStartDrag(e,s.id,card);}
       },500);
     },{passive:false});
     card.addEventListener('touchmove',e=>{
@@ -4009,18 +4230,13 @@ function mvRenderSerial(nowMin,sm){
     card.addEventListener('touchend',e=>{
       clearTimeout(mvLongPressTimer);
       if(mvDragId){mvEndDrag(e);return;}
-      if(!tapMoved&&Date.now()-tapStartTime<500){
-        if(s.comment){
-          const open=card.classList.toggle('open');
-          const chev=card.querySelector('.mv-card-chevron');
-          if(chev)chev.style.transform=open?'rotate(90deg)':'';
-        }
+      if(!tapMoved&&Date.now()-tapStartTime<500&&s.comment){
+        card.classList.toggle('open');
       }
     });
     body.appendChild(card);
   });
 }
-
 
 function mvRenderFree(nowMin,sm){
   document.getElementById('mv-now').style.display='none';
