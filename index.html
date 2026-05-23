@@ -887,6 +887,10 @@ tbody tr:hover td{background:var(--bg2)}
     <button class="mv-tbtn" onclick="quickSaveEV()" style="flex:1">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
     </button>
+    <!-- AI生成 -->
+    <button class="mv-tbtn" onclick="openAI()" style="flex:1">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><line x1="18" y1="6" x2="8" y2="16" stroke-width="2.2"/><line x1="8" y1="3" x2="8" y2="6"/><line x1="5" y1="6" x2="8" y2="6"/><line x1="5.5" y1="3.5" x2="4" y2="2"/><line x1="18" y1="10" x2="18" y2="8.5"/><line x1="21" y1="6" x2="19.5" y2="6"/><line x1="19.5" y1="7.5" x2="20.5" y2="8.5"/></svg>
+    </button>
     <!-- 時間調整 -->
     <button id="mv-btn-time-adj" class="mv-tbtn" onclick="openTimeAdj()" style="flex:1;display:none">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -4055,11 +4059,14 @@ function mvRender(){
 
 
 function mvScrollToCurrent(){
+  // モーダルが開いている間はスクロールしない
+  const modals=['mv-sm','mv-fm','mv-event-edit'];
+  if(modals.some(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';})) return;
   const body=document.getElementById('mv-body');
   if(!body)return;
   const active=body.querySelector('.mv-card.active');
   if(active){
-    active.scrollIntoView({behavior:'smooth',block:'center'});
+    active.scrollIntoView({behavior:'smooth',block:'start'});
   }
 }
 
@@ -4180,11 +4187,15 @@ function mvRenderSerial(nowMin,sm){
     body.appendChild(card);
   });
 
-  // 当日：現在セッションへスクロール
+  // 当日：現在セッションへスクロール（モーダルが開いていない場合のみ）
   if(nowMin>0&&currentIdx>=0){
-    const cards=[...body.querySelectorAll('.mv-card')];
-    const activeCard=cards[currentIdx];
-    if(activeCard) setTimeout(()=>activeCard.scrollIntoView({behavior:'smooth',block:'start'}),100);
+    const modals=['mv-sm','mv-fm','mv-event-edit'];
+    const anyOpen=modals.some(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';});
+    if(!anyOpen){
+      const cards=[...body.querySelectorAll('.mv-card')];
+      const activeCard=cards[currentIdx];
+      if(activeCard) setTimeout(()=>activeCard.scrollIntoView({behavior:'smooth',block:'start'}),100);
+    }
   }
 }
 
@@ -4365,6 +4376,11 @@ function mvEndDrag(e){
 // ---- シリアルセッション編集モーダル ----
 function mvOpenSM(id){
   const s=sessions.find(x=>x.id===id);if(!s)return;
+  // 他のモーダルを全部閉じる
+  ['mv-sm','mv-fm','mv-event-edit'].forEach(mid=>{
+    const el=document.getElementById(mid);
+    if(el)el.style.display='none';
+  });
   mvEditId=id;mvDurVal=s.dur;
   document.getElementById('mv-sm-title').textContent=s.name;
   document.getElementById('mv-sm-name').value=s.name;
