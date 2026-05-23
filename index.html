@@ -851,10 +851,33 @@ tbody tr:hover td{background:var(--bg2)}
       <!-- DAY切替 -->
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
     </div>
-    <!-- イベント概要1行（参照モード） -->
-    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:5px;margin-top:4px;min-height:20px;overflow:hidden">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2);pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      <span id="evinfo-preview-mv" style="flex:1;font-size:14px;font-weight:400;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text2)">イベント概要を入力</span>
+    <!-- イベント概要（アコーディオン） -->
+    <div id="mv-evinfo-bar" style="margin-top:5px">
+      <!-- ヘッダー行（タップで開閉） -->
+      <div id="mv-evinfo-header" onclick="mvToggleEvInfoBar()" style="display:flex;align-items:center;gap:5px;cursor:pointer;min-height:22px">
+        <svg id="mv-evinfo-pencil" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2);pointer-events:none;display:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+        <span id="evinfo-preview-mv" style="flex:1;font-size:14px;font-weight:400;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text2)"></span>
+        <svg id="mv-evinfo-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text3);pointer-events:none;display:none;transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+      </div>
+      <!-- 展開パネル -->
+      <div id="mv-evinfo-expanded" style="display:none;flex-direction:column;gap:5px;margin-top:6px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)">
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">場所/ID</span>
+          <input id="mv-evinfo-location" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="開催場所・URL等" oninput="mvOnEvInfoChange()"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">オーナー</span>
+          <input id="mv-evinfo-owner" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="主催者・講師等" oninput="mvOnEvInfoChange()"/>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0">参加者</span>
+          <input id="mv-evinfo-members" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text)" placeholder="お名前・人数等" oninput="mvOnEvInfoChange()"/>
+        </div>
+        <div style="display:flex;align-items:flex-start;gap:6px">
+          <span style="font-size:10px;color:var(--text2);width:48px;flex-shrink:0;padding-top:5px">メモ</span>
+          <textarea id="mv-evinfo-memo" style="flex:1;font-size:12px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);min-height:50px;resize:vertical" oninput="mvOnEvInfoChange()"></textarea>
+        </div>
+      </div>
     </div>
     <!-- 進行バー＋時刻 -->
     <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
@@ -1214,36 +1237,63 @@ function gEvInfoPreview(){
 }
 
 function updateEvInfoPreview(){
-  // PC と スマホ両方のpreviewを更新
-  ['evinfo-preview','evinfo-preview-mv'].forEach(id=>{
-    const p=document.getElementById(id);
-    if(!p) return;
-    const item=gEvInfoPreview();
-    p.innerHTML='';
+  const item=gEvInfoPreview();
+
+  // PC側プレビュー更新
+  const pcP=document.getElementById('evinfo-preview');
+  if(pcP){
+    pcP.innerHTML='';
     if(!item){
-      p.textContent='イベント概要を入力';
-      p.style.color='var(--text3)';
-      return;
+      pcP.textContent='イベントの概要を入力';
+      pcP.style.color='var(--text3)';
+    } else {
+      pcP.style.color='var(--text)';
+      const lbl=document.createElement('span');
+      lbl.textContent=item.label+': ';
+      lbl.style.cssText='font-size:10px;color:var(--text3);flex-shrink:0;margin-right:2px';
+      pcP.appendChild(lbl);
+      if(/^https?:\/\//i.test(item.text)){
+        const a=document.createElement('a');
+        a.href=item.text;a.target='_blank';a.rel='noopener noreferrer';
+        a.textContent=item.text;
+        a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
+        a.addEventListener('click',e=>e.stopPropagation());
+        pcP.appendChild(a);
+      } else {
+        const val=document.createElement('span');
+        val.textContent=item.text;
+        val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px';
+        pcP.appendChild(val);
+      }
     }
-    p.style.color='var(--text)';
+  }
+
+  // スマホ側プレビュー更新
+  const mvP=document.getElementById('evinfo-preview-mv');
+  const pencil=document.getElementById('mv-evinfo-pencil');
+  const chevron=document.getElementById('mv-evinfo-chevron');
+  if(!mvP) return;
+
+  mvP.innerHTML='';
+  if(!item){
+    // 未入力：鉛筆・chevron非表示、テキストなし
+    if(pencil) pencil.style.display='none';
+    if(chevron) chevron.style.display='none';
+    mvP.textContent='';
+  } else {
+    // 入力あり：「✏で入力」ではなく内容を1行表示、鉛筆・chevron表示
+    if(pencil) pencil.style.display='block';
+    if(chevron) chevron.style.display='block';
+    mvP.style.color='var(--text2)';
     const lbl=document.createElement('span');
     lbl.textContent=item.label+': ';
-    lbl.style.cssText='font-size:10px;color:var(--text3);flex-shrink:0;margin-right:2px';
-    p.appendChild(lbl);
-    if(/^https?:\/\//i.test(item.text)){
-      const a=document.createElement('a');
-      a.href=item.text; a.target='_blank'; a.rel='noopener noreferrer';
-      a.textContent=item.text;
-      a.style.cssText='color:var(--acc,#5DCAA5);text-decoration:underline;font-size:11px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis';
-      a.addEventListener('click',e=>e.stopPropagation());
-      p.appendChild(a);
-    } else {
-      const val=document.createElement('span');
-      val.textContent=item.text;
-      val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:11px';
-      p.appendChild(val);
-    }
-  });
+    lbl.style.cssText='font-size:12px;color:var(--text3);flex-shrink:0;margin-right:2px';
+    mvP.appendChild(lbl);
+    const val=document.createElement('span');
+    val.textContent=item.text;
+    val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px';
+    mvP.appendChild(val);
+  }
 }
 
 function toggleEvInfo(){
@@ -1267,6 +1317,28 @@ function toggleEvInfo(){
   }
 }
 
+
+function mvToggleEvInfoBar(){
+  const item=gEvInfoPreview();
+  if(!item) return; // 未入力時は開閉不可
+  const panel=document.getElementById('mv-evinfo-expanded');
+  const chevron=document.getElementById('mv-evinfo-chevron');
+  if(!panel) return;
+  const open=panel.style.display==='none'||panel.style.display==='';
+  panel.style.display=open?'flex':'none';
+  if(chevron) chevron.style.transform=open?'rotate(180deg)':'rotate(0deg)';
+  // 開いたら入力値を反映
+  if(open){
+    const loc=document.getElementById('mv-evinfo-location');
+    const own=document.getElementById('mv-evinfo-owner');
+    const mem=document.getElementById('mv-evinfo-members');
+    const mmo=document.getElementById('mv-evinfo-memo');
+    if(loc) loc.value=evInfo.location||'';
+    if(own) own.value=evInfo.owner||'';
+    if(mem) mem.value=evInfo.members||'';
+    if(mmo) mmo.value=evInfo.memo||'';
+  }
+}
 function mvToggleEvInfo(){
   const panel=document.getElementById('mv-evinfo-panel');
   const icon=document.getElementById('evinfo-toggle-icon-mv');
@@ -4544,19 +4616,21 @@ function mvToggleEdit(){
 }
 
 function mvOpenEventEdit(){
-  // PC側の値をシートに反映
   document.getElementById('mv-evt').value=document.getElementById('evt').value||'';
   document.getElementById('mv-evd').value=document.getElementById('evd').value||'';
   document.getElementById('mv-evs').value=document.getElementById('evs').value||'13:00';
   document.getElementById('mv-eve').value=document.getElementById('eve').value||'16:00';
-  // DOW
   const evd=document.getElementById('mv-evd').value;
   if(evd){const[y,m,d]=evd.split('-').map(Number);const days=['日','月','火','水','木','金','土'];document.getElementById('mv-dow').textContent=days[new Date(y,m-1,d).getDay()]+'曜';}
-  // イベント概要
-  document.getElementById('mv-evinfo-location').value=evInfo.location||'';
-  document.getElementById('mv-evinfo-owner').value=evInfo.owner||'';
-  document.getElementById('mv-evinfo-members').value=evInfo.members||'';
-  document.getElementById('mv-evinfo-memo').value=evInfo.memo||'';
+  // イベント概要（イベント編集シート内）
+  const loc2=document.getElementById('mv-evinfo-location');
+  const own2=document.getElementById('mv-evinfo-owner');
+  const mem2=document.getElementById('mv-evinfo-members');
+  const mmo2=document.getElementById('mv-evinfo-memo');
+  if(loc2) loc2.value=evInfo.location||'';
+  if(own2) own2.value=evInfo.owner||'';
+  if(mem2) mem2.value=evInfo.members||'';
+  if(mmo2) mmo2.value=evInfo.memo||'';
   document.getElementById('mv-event-edit').style.display='flex';
 }
 function mvCloseEventEdit(){
