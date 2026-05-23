@@ -220,6 +220,11 @@ tbody tr:hover td{background:var(--bg2)}
 .mv-drop-line{height:0;display:none;margin:0}
 .mv-time-row{display:flex;gap:8px;align-items:center}
 .mv-time-input{flex:1;font-size:16px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);text-align:center;font-family:inherit;outline:none}
+@media(max-width:600px){
+  .body,.top-bar{display:none!important}
+  .mv{display:flex}
+  .mv-clock{display:block}
+}
 /* Table row with color bar */
 .tbl-row{border:none;border-bottom:1px solid var(--border)}
 .tbl-row td{border:none;padding:6px 8px;vertical-align:middle}
