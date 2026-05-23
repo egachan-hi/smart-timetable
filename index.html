@@ -4232,19 +4232,13 @@ function mvRenderSerial(nowMin,sm){
         ${s.comment?`<div class="mv-card-comment" style="display:none;padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">${esc(s.comment)}</div>`:''}
       </div>`;
 
-    // 鉛筆ボタン → メモ展開（モーダルは開かない）
+    // 鉛筆ボタン → 編集モーダルを開く
     const editBtn=card.querySelector('.mv-edit-icon-btn');
     editBtn.addEventListener('touchend',e=>{
       e.stopPropagation();e.preventDefault();
-      const commentEl=card.querySelector('.mv-card-comment');
-      const chevron=card.querySelector('.mv-card-chevron');
-      if(commentEl){
-        const open=commentEl.style.display==='none'||commentEl.style.display==='';
-        commentEl.style.display=open?'block':'none';
-        if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
-      }
+      mvOpenSM(s.id);
     },{passive:false});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();});
+    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
 
     // タップ → メモアコーディオン展開
     let tapMoved=false,tapStartY=0,tapStartTime=0;
@@ -4288,7 +4282,8 @@ function mvRenderSerial(nowMin,sm){
 
 
 function mvRenderFree(nowMin,sm){
-  document.getElementById('mv-now').style.display='none';
+  const _mvNow=document.getElementById('mv-now');
+  if(_mvNow) _mvNow.style.display='none';
   const sf=[...freeEvs].sort((a,b)=>a.fromMin-b.fromMin);
   const body=document.getElementById('mv-body');body.innerHTML='';
   if(sf.length===0){body.innerHTML='<div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">フリーエリアはありません</div>';return;}
@@ -4326,19 +4321,13 @@ function mvRenderFree(nowMin,sm){
         ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(ev.comment)}</div>`:''}
       </div>`;
 
-    // 鉛筆ボタン → メモ展開のみ
+    // 鉛筆ボタン → 編集モーダルを開く
     const editBtn=card.querySelector('.mv-edit-icon-btn');
     editBtn.addEventListener('touchend',e=>{
       e.stopPropagation();e.preventDefault();
-      const commentEl=card.querySelector('.mv-card-comment');
-      const chevron=card.querySelector('.mv-card-chevron');
-      if(commentEl){
-        const open=commentEl.style.display==='none'||commentEl.style.display==='';
-        commentEl.style.display=open?'block':'none';
-        if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
-      }
+      mvOpenFM(ev.id);
     },{passive:false});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();});
+    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenFM(ev.id);});
 
     // タップ → メモ展開のみ
     let fTapMoved=false,fTapStart=0,fTapStartY=0;
