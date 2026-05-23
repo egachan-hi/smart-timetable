@@ -155,7 +155,7 @@ tbody tr:hover td{background:var(--bg2)}
 .isw{width:20px;height:20px;border-radius:4px;cursor:pointer;border:2px solid transparent;display:flex;align-items:center;justify-content:center}.isw.on{border-color:var(--text)}
 /* ========== MOBILE VIEW ========== */
 .mv{display:none;flex-direction:column;height:100svh;overflow:hidden;background:var(--bg)}
-.mv-header{padding:max(env(safe-area-inset-top),12px) 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
+.mv-header{padding:max(env(safe-area-inset-top),52px) 14px 8px;border-bottom:1px solid var(--border);flex-shrink:0;background:var(--bg)}
 .mv-title{font-size:17px;font-weight:700;color:var(--text);line-height:1.2}
 .mv-meta{font-size:11px;color:var(--text2);margin-top:1px}
 .mv-progress{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden;margin-top:6px}
@@ -185,7 +185,7 @@ tbody tr:hover td{background:var(--bg2)}
 .mv-clock{display:none;font-size:13px;font-weight:700;color:var(--text2);padding:6px 14px 2px;flex-shrink:0}
 /* 遅延バナー */
 /* 下部ツールバー */
-.mv-toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px max(env(safe-area-inset-bottom),10px);border-top:1px solid var(--border);background:var(--bg);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.mv-toolbar{display:flex;align-items:center;gap:6px;padding:4px 12px max(env(safe-area-inset-bottom),6px);border-top:1px solid var(--border);background:var(--bg);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .mv-toolbar::-webkit-scrollbar{display:none}
 .mv-tbtn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:6px 0;border:none;border-radius:0;background:none;color:var(--text2);font-size:9px;cursor:pointer;white-space:nowrap;flex-shrink:0;min-height:44px;-webkit-tap-highlight-color:transparent}
 .mv-tbtn svg{flex-shrink:0}
@@ -915,7 +915,7 @@ tbody tr:hover td{background:var(--bg2)}
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><line x1="18" y1="6" x2="8" y2="16" stroke-width="2.2"/><line x1="8" y1="3" x2="8" y2="6"/><line x1="5" y1="6" x2="8" y2="6"/><line x1="5.5" y1="3.5" x2="4" y2="2"/><line x1="18" y1="10" x2="18" y2="8.5"/><line x1="21" y1="6" x2="19.5" y2="6"/><line x1="19.5" y1="7.5" x2="20.5" y2="8.5"/></svg>
     </button>
     <!-- 時間調整 -->
-    <button id="mv-btn-time-adj" class="mv-tbtn" onclick="openTimeAdj()" style="flex:1;display:none">
+    <button id="mv-btn-time-adj" class="mv-tbtn" onclick="openTimeAdj()" style="flex:1">
       <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </button>
     <!-- 共有 -->
@@ -2755,12 +2755,32 @@ function updateBtnTimeAdj(){
 }
 
 function openTimeAdj(){
+  // 当日かつ開始時刻以降のみ有効
+  const now=new Date();
+  const nowMin=now.getHours()*60+now.getMinutes();
+  const sm=gSM(), em=gEM();
+  const evd=document.getElementById('evd').value;
+  const isNoDate=typeof noDate!=='undefined'&&noDate;
+  let isTargetDay=false;
+  if(isNoDate||!evd){
+    isTargetDay=true;
+  } else {
+    const[y,m,d]=evd.split('-').map(Number);
+    if(now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d) isTargetDay=true;
+  }
+  if(!isTargetDay){
+    alert('時間調整は当日または日付未設定のイベントのみ使用できます。');
+    return;
+  }
+  if(nowMin<sm){
+    alert('時間調整はイベント開始時刻以降に使用できます。');
+    return;
+  }
+
   const list=document.getElementById('time-adj-session-list');
   list.innerHTML='';
 
-  const now=new Date();
-  const nowMin=now.getHours()*60+now.getMinutes();
-  const sm=gSM(), st=gSt();
+  const st=gSt();
 
   // 現在時刻が属するセッションを自動判定
   let autoCurrentIdx=-1;
@@ -4115,12 +4135,7 @@ function mvRender(){
 
 
 
-  // 時間調整ボタン
-  const adjBtn=document.getElementById('mv-btn-time-adj');
-  if(adjBtn){
-    const btnActive=isToday&&nowMin>=sm;
-    adjBtn.style.display=btnActive?'flex':'none';
-  }
+
 
   // Undo/Redo
   mvUpdateUR();
@@ -4472,10 +4487,10 @@ function mvOpenSM(id){
     div.style.background='none';
     // PCと同じSVG丸
     const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
-    sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','24');sv.setAttribute('height','24');
+    sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','18');sv.setAttribute('height','18');
     sv.style.pointerEvents='none';
     const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
-    ci.setAttribute('cx','12');ci.setAttribute('cy','12');ci.setAttribute('r','12');
+    ci.setAttribute('cx','12');ci.setAttribute('cy','12');ci.setAttribute('r','10');
     ci.setAttribute('fill',CDot[col]||'#999');
     sv.appendChild(ci);div.appendChild(sv);
     div.ontouchstart=function(){this.style.transform='scale(1.15)';};
