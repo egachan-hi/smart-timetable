@@ -184,7 +184,6 @@ tbody tr:hover td{background:var(--bg2)}
 /* 時刻表示 */
 .mv-clock{display:none;font-size:13px;font-weight:700;color:var(--text2);padding:6px 14px 2px;flex-shrink:0}
 /* 遅延バナー */
-.mv-delay-bar{display:none;margin:4px 12px 0;padding:6px 10px;border-radius:8px;background:rgba(229,62,62,0.1);border:1px solid rgba(229,62,62,0.3);font-size:11px;color:#E53E3E;font-weight:600;align-items:center;gap:6px;flex-shrink:0}
 /* 下部ツールバー */
 .mv-toolbar{display:flex;align-items:center;gap:6px;padding:8px 12px max(env(safe-area-inset-bottom),10px);border-top:1px solid var(--border);background:var(--bg);flex-shrink:0;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .mv-toolbar::-webkit-scrollbar{display:none}
@@ -261,7 +260,7 @@ tbody tr:hover td{background:var(--bg2)}
   <span id="top-date-label" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;padding:0 2px"></span>
   <button class="tb" id="btn-next-day" onclick="shiftDay(1)" title="翌日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
   <div class="spacer"></div>
-  <button class="tb ai" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成</button>
+  <button class="tb ai" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="8" y2="16" stroke-width="2.2"/><line x1="8" y1="3" x2="8" y2="6"/><line x1="5" y1="6" x2="8" y2="6"/><line x1="5.5" y1="3.5" x2="4" y2="2"/><line x1="18" y1="10" x2="18" y2="8.5"/><line x1="21" y1="6" x2="19.5" y2="6"/><line x1="19.5" y1="7.5" x2="20.5" y2="8.5"/></svg>AI生成</button>
   <button class="tb" id="btn-time-adj" onclick="openTimeAdj()" title="時間調整"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>時間調整</button>
   <div class="sep"></div>
   <button class="tb" onclick="newEV()" title="新規"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>新規</button>
@@ -778,7 +777,7 @@ tbody tr:hover td{background:var(--bg2)}
       </div>
 
       <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成</div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><line x1="18" y1="6" x2="8" y2="16" stroke-width="2.2"/><line x1="8" y1="3" x2="8" y2="6"/><line x1="5" y1="6" x2="8" y2="6"/><line x1="5.5" y1="3.5" x2="4" y2="2"/><line x1="18" y1="10" x2="18" y2="8.5"/><line x1="21" y1="6" x2="19.5" y2="6"/><line x1="19.5" y1="7.5" x2="20.5" y2="8.5"/></svg>AI生成</div>
         <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
           <li>イベントの概要・目的をテキストで入力、またはPDF・画像・Word・PPT・音声ファイルをアップロード</li>
           <li>3つの生成モードから選択：<b>設定時間にぴったり合わせる</b>／<b>ファイルに最適化する</b>／<b>音声を時間どおりに再現する</b></li>
@@ -853,22 +852,15 @@ tbody tr:hover td{background:var(--bg2)}
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
     </div>
     <!-- イベント概要1行（参照モード） -->
-    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:6px;margin-top:4px;min-height:20px;overflow:hidden">
-      <span style="font-size:14px;font-weight:400;color:var(--text2);flex-shrink:0;white-space:nowrap">概要：</span>
-      <span id="evinfo-preview-mv" style="flex:1;font-size:14px;font-weight:400;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text2)">—</span>
+    <div id="mv-evinfo-bar" style="display:flex;align-items:center;gap:5px;margin-top:4px;min-height:20px;overflow:hidden">
+      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2);pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+      <span id="evinfo-preview-mv" style="flex:1;font-size:14px;font-weight:400;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text2)">イベント概要を入力</span>
     </div>
     <!-- 進行バー＋時刻 -->
     <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
       <div class="mv-progress" style="flex:1;margin-top:0"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
       <span id="mv-clock" style="display:none;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
     </div>
-  </div>
-
-  <!-- 遅延バナー -->
-  <div class="mv-delay-bar" id="mv-delay-bar">
-    <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;pointer-events:none"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-    <span id="mv-delay-text" style="flex:1"></span>
-    <button onclick="openTimeAdj()" style="font-size:10px;font-weight:700;padding:3px 8px;border:1px solid #E53E3E;border-radius:6px;background:transparent;color:#E53E3E;cursor:pointer;white-space:nowrap;pointer-events:auto">時間調整</button>
   </div>
 
   <!-- タブ -->
@@ -882,44 +874,33 @@ tbody tr:hover td{background:var(--bg2)}
   <div class="mv-body" id="mv-body"></div>
 
   <!-- 下部ツールバー -->
-  <div class="mv-toolbar" style="display:flex;align-items:center;padding:6px 8px max(env(safe-area-inset-bottom),8px);border-top:1px solid var(--border);background:var(--bg);gap:0">
-    <!-- AI生成 -->
-    <button class="mv-tbtn" onclick="openAI()" style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>
+  <div class="mv-toolbar" style="display:flex;align-items:stretch;padding:0 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid var(--border);background:var(--bg)">
+    <!-- 編集 -->
+    <button class="mv-tbtn" onclick="mvOpenEventEdit()" style="flex:1">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
     </button>
     <!-- 新規 -->
-    <button class="mv-tbtn" onclick="newEV()" style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+    <button class="mv-tbtn" onclick="newEV()" style="flex:1">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
     </button>
     <!-- 保存 -->
-    <button class="mv-tbtn" onclick="quickSaveEV()" style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-    </button>
-    <!-- 鉛筆（イベント編集） -->
-    <button class="mv-tbtn" onclick="mvOpenEventEdit()" style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+    <button class="mv-tbtn" onclick="quickSaveEV()" style="flex:1">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
     </button>
     <!-- 時間調整 -->
-    <button id="mv-btn-time-adj" class="mv-tbtn" onclick="openTimeAdj()" style="flex:1;border:none;background:none;gap:1px;display:none;color:var(--accent)">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><line x1="1" y1="1" x2="23" y2="23" style="display:none"/></svg>
-    </button>
-    <!-- Undo -->
-    <button id="mv-bundo" class="mv-tbtn" onclick="mvUndo()" disabled style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
-    </button>
-    <!-- Redo -->
-    <button id="mv-bredo" class="mv-tbtn" onclick="mvRedo()" disabled style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>
+    <button id="mv-btn-time-adj" class="mv-tbtn" onclick="openTimeAdj()" style="flex:1;display:none">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
     </button>
     <!-- 共有 -->
-    <button class="mv-tbtn" onclick="if(typeof fbShowRoom==='function')fbShowRoom()" style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
+    <button class="mv-tbtn" onclick="if(typeof fbShowRoom==='function')fbShowRoom()" style="flex:1">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
     </button>
     <!-- その他 -->
-    <button class="mv-tbtn" onclick="mvOpenMore()" style="flex:1;border:none;background:none;gap:1px">
-      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" style="pointer-events:none"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+    <button class="mv-tbtn" onclick="mvOpenMore()" style="flex:1">
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
     </button>
   </div>
+</div>
 </div>
 
 <!-- イベント編集シート -->
@@ -982,14 +963,13 @@ tbody tr:hover td{background:var(--bg2)}
 <div id="mv-more-menu" style="display:none;position:fixed;inset:0;z-index:190;background:rgba(0,0,0,.4)" onclick="if(event.target===this)mvCloseMore()">
   <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg);border-radius:18px 18px 0 0;padding:16px 16px max(env(safe-area-inset-bottom),20px);display:flex;flex-direction:column;gap:8px">
     <div style="width:36px;height:4px;background:var(--border);border-radius:2px;margin:0 auto 4px"></div>
-    <button onclick="openAI();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:none;border-radius:12px;background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;font-size:14px;font-weight:600;cursor:pointer">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>AI生成
+    <!-- Undo -->
+    <button id="mv-bundo" onclick="mvUndo()" disabled style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;opacity:0.4">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>元に戻す
     </button>
-    <button onclick="newEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>新規
-    </button>
-    <button onclick="quickSaveEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>保存
+    <!-- Redo -->
+    <button id="mv-bredo" onclick="mvRedo()" disabled style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;opacity:0.4">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>やり直す
     </button>
     <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
@@ -1237,7 +1217,7 @@ function updateEvInfoPreview(){
     const item=gEvInfoPreview();
     p.innerHTML='';
     if(!item){
-      p.textContent='イベントの概要を入力';
+      p.textContent='イベント概要を入力';
       p.style.color='var(--text3)';
       return;
     }
@@ -4057,27 +4037,7 @@ function mvRender(){
   if(mvTab==='s') mvRenderSerial(isToday?nowMin:-1,sm);
   else mvRenderFree(isToday?nowMin:-1,sm);
 
-  // 遅延バナー
-  const delayBar=document.getElementById('mv-delay-bar');
-  if(delayBar){
-    const st=gSt();
-    let autoCurrentIdx=-1;
-    sessions.forEach((s,i)=>{
-      const start=sm+st[i],end=start+s.dur;
-      if(nowMin>=start&&nowMin<end)autoCurrentIdx=i;
-    });
-    let delayMin=0;
-    if(isToday&&autoCurrentIdx>=0){
-      const expectedStart=sm+st[autoCurrentIdx];
-      if(nowMin>expectedStart+1) delayMin=nowMin-expectedStart;
-    }
-    if(isToday&&nowMin>=sm&&delayMin>2){
-      delayBar.style.display='flex';
-      document.getElementById('mv-delay-text').textContent=`${delayMin}分遅れています`;
-    } else {
-      delayBar.style.display='none';
-    }
-  }
+
 
   // 時間調整ボタン
   const adjBtn=document.getElementById('mv-btn-time-adj');
@@ -4106,8 +4066,8 @@ function mvScrollToCurrent(){
 function mvUpdateUR(){
   const bu=document.getElementById('mv-bundo');
   const br=document.getElementById('mv-bredo');
-  if(bu) bu.disabled=hi<=0;
-  if(br) br.disabled=hi>=hist.length-1;
+  if(bu){bu.disabled=hi<=0;bu.style.opacity=hi<=0?'0.4':'1';}
+  if(br){br.disabled=hi>=hist.length-1;br.style.opacity=hi>=hist.length-1?'0.4':'1';}
 }
 
 function mvUndo(){undo();mvUpdateUR();if(typeof mvRender==='function')mvRender();}
@@ -4178,10 +4138,19 @@ function mvRenderSerial(nowMin,sm){
         ${s.comment?`<div class="mv-card-comment" style="display:none;padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">${esc(s.comment)}</div>`:''}
       </div>`;
 
-    // 鉛筆ボタン → 編集モーダル
+    // 鉛筆ボタン → メモ展開（モーダルは開かない）
     const editBtn=card.querySelector('.mv-edit-icon-btn');
-    editBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenSM(s.id);},{passive:false});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
+    editBtn.addEventListener('touchend',e=>{
+      e.stopPropagation();e.preventDefault();
+      const commentEl=card.querySelector('.mv-card-comment');
+      const chevron=card.querySelector('.mv-card-chevron');
+      if(commentEl){
+        const open=commentEl.style.display==='none'||commentEl.style.display==='';
+        commentEl.style.display=open?'block':'none';
+        if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
+      }
+    },{passive:false});
+    editBtn.addEventListener('click',e=>{e.stopPropagation();});
 
     // タップ → メモアコーディオン展開
     let tapMoved=false,tapStartY=0,tapStartTime=0;
@@ -4259,10 +4228,19 @@ function mvRenderFree(nowMin,sm){
         ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(ev.comment)}</div>`:''}
       </div>`;
 
-    // 鉛筆ボタン → 編集モーダル
+    // 鉛筆ボタン → メモ展開のみ
     const editBtn=card.querySelector('.mv-edit-icon-btn');
-    editBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenFM(ev.id);},{passive:false});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenFM(ev.id);});
+    editBtn.addEventListener('touchend',e=>{
+      e.stopPropagation();e.preventDefault();
+      const commentEl=card.querySelector('.mv-card-comment');
+      const chevron=card.querySelector('.mv-card-chevron');
+      if(commentEl){
+        const open=commentEl.style.display==='none'||commentEl.style.display==='';
+        commentEl.style.display=open?'block':'none';
+        if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
+      }
+    },{passive:false});
+    editBtn.addEventListener('click',e=>{e.stopPropagation();});
 
     // タップ → メモ展開のみ
     let fTapMoved=false,fTapStart=0,fTapStartY=0;
@@ -4392,36 +4370,76 @@ function mvOpenSM(id){
   document.getElementById('mv-sm-name').value=s.name;
   document.getElementById('mv-sm-dur').textContent=s.dur;
   document.getElementById('mv-sm-comment').value=s.comment||'';
-  // 色・アイコン選択（PCと同様）
+  // 色・アイコン選択（PCのcp()と同仕様：1行目●色、2行目アイコン）
   const colorsEl=document.getElementById('mv-sm-colors');
   colorsEl.innerHTML='';
-  const allColors=[...COLORS,...ICON_COLORS];
-  const dk=isDark();
-  allColors.forEach(col=>{
+  // PCのcp()と同仕様: 1行目●小丸(背景なし)、2行目アイコン(背景なし)
+  const row1=document.createElement('div');
+  row1.style.cssText='display:flex;gap:4px;margin-bottom:4px;flex-wrap:wrap';
+  COLORS.forEach(col=>{
     const div=document.createElement('div');
-    const isSel=s.color===col;
     div.id='mv-color-'+col;
-    div.style.cssText=`width:34px;height:34px;border-radius:50%;background:${CDot[col]};border:3px solid ${isSel?'var(--text)':'transparent'};box-shadow:${isSel?'0 0 0 2px var(--bg) inset':'none'};cursor:pointer;transition:transform .1s;flex-shrink:0;display:flex;align-items:center;justify-content:center`;
+    div.className='csw'+(s.color===col?' sel':'');
+    div.dataset.color=col;
+    div.style.background='none';
+    // PCと同じSVG丸
+    const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','24');sv.setAttribute('height','24');
+    sv.style.pointerEvents='none';
+    const ci=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    ci.setAttribute('cx','12');ci.setAttribute('cy','12');ci.setAttribute('r','12');
+    ci.setAttribute('fill',CDot[col]||'#999');
+    sv.appendChild(ci);div.appendChild(sv);
+    div.ontouchstart=function(){this.style.transform='scale(1.15)';};
+    div.ontouchend=function(){this.style.transform='';};
+    div.onclick=function(){mvSelectColor(col);};
+    row1.appendChild(div);
+  });
+  colorsEl.appendChild(row1);
+  // 2行目: アイコン（背景なし、PCのcsw角丸枠スタイル）
+  const row2=document.createElement('div');
+  row2.style.cssText='display:flex;gap:4px;flex-wrap:wrap';
+  ICON_COLORS.forEach(col=>{
+    const div=document.createElement('div');
+    div.id='mv-color-'+col;
+    div.className='csw'+(s.color===col?' sel':'');
+    div.dataset.color=col;
+    div.style.background='none';
+    div.style.borderRadius='4px';
+    div.style.display='flex';
+    div.style.alignItems='center';
+    div.style.justifyContent='center';
+    div.style.borderWidth='2px';
+    div.style.borderStyle='solid';
+    div.style.borderColor=s.color===col?(CDot[col]||'#666'):'transparent';
     if(ICON_SVG[col]){
-      const fill=dk?(CT_DARK[col]||'#E8E8E8'):(CT[col]||'#fff');
-      div.innerHTML=`<svg viewBox="0 0 24 24" width="16" height="16" fill="${fill}" style="pointer-events:none"><path d="${ICON_SVG[col]}"/></svg>`;
+      const sv=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      sv.setAttribute('viewBox','0 0 24 24');sv.setAttribute('width','20');sv.setAttribute('height','20');
+      sv.setAttribute('fill',CDot[col]||'#666');sv.style.pointerEvents='none';
+      const pth=document.createElementNS('http://www.w3.org/2000/svg','path');
+      pth.setAttribute('d',ICON_SVG[col]);sv.appendChild(pth);div.appendChild(sv);
     }
     div.ontouchstart=function(){this.style.transform='scale(1.15)';};
     div.ontouchend=function(){this.style.transform='';};
     div.onclick=function(){mvSelectColor(col);};
-    colorsEl.appendChild(div);
+    row2.appendChild(div);
   });
+  colorsEl.appendChild(row2);
   mvSelectedColor=s.color||'teal';
   document.getElementById('mv-sm').style.display='flex';
 }
 let mvSelectedColor='teal';
 function mvSelectColor(c){
   mvSelectedColor=c;
-  COLORS.forEach(col=>{
+  [...COLORS,...ICON_COLORS].forEach(col=>{
     const el=document.getElementById('mv-color-'+col);
     if(!el)return;
-    el.style.border=col===c?'3px solid #333':'3px solid transparent';
-    el.style.boxShadow=col===c?'0 0 0 2px #fff inset':'none';
+    const isIcon=ICON_COLORS.includes(col);
+    // PCのssSC()と同じ：cswクラスのsel付け外し
+    el.className='csw'+(col===c?' sel':'');
+    if(isIcon){
+      el.style.borderColor=col===c?(CDot[col]||'#666'):'transparent';
+    }
   });
 }
 function mvCloseSM(){document.getElementById('mv-sm').style.display='none';mvEditId=null;}
