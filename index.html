@@ -58,7 +58,7 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .ok{background:#EAF3DE;color:#27500A}.ov{background:#FCEBEB;color:#A32D2D}.un{background:#FAEEDA;color:#633806}
 .tls{flex:1;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none;padding-top:14px}
 .tls::-webkit-scrollbar{display:none}
-.frs{flex:1;overflow-y:auto;position:relative;padding-top:14px}
+.frs{flex:1;overflow-y:hidden;position:relative;padding-top:14px}
 .tlb{display:grid;grid-template-columns:38px 1fr;position:relative}
 .tc{border-right:none;position:relative}
 .tt{position:absolute;right:0;width:100%;display:flex;align-items:center;justify-content:flex-end;padding-right:3px;font-size:9px;font-weight:600;color:var(--text3);pointer-events:none;transform:translateY(-50%)}
@@ -366,7 +366,7 @@ tbody tr:hover td{background:var(--bg2)}
           <span>フリーエリア</span>
           <button class="ib" onclick="openFE(null)" style="font-size:15px;width:18px;height:18px">+</button>
         </div>
-        <div class="frs" id="frs" onscroll="syncScroll('frs')" style="position:relative">
+        <div class="frs" id="frs" style="position:relative">
           <div class="fdl2" id="fdl" style="position:absolute;left:0;right:0;height:2px;background:#BA7517;z-index:20;pointer-events:none;display:none"></div>
           <div class="fc" id="fcan">
             <div class="fov" id="fov"></div>
@@ -3841,14 +3841,14 @@ function escLink(s){
 // ================================================================
 let _scrolling=false;
 function syncScroll(src){
-  if(_scrolling)return;
-  _scrolling=true;
   const tls=document.getElementById('tls');
   const frs=document.getElementById('frs');
-  if(src==='tls'){frs.scrollTop=tls.scrollTop;}
-  else{tls.scrollTop=frs.scrollTop;}
-  _scrolling=false;
+  if(!frs||!tls)return;
+  // frsの表示高さをtlsに合わせる（overflow:hiddenでscrollTopが効くように）
+  frs.style.height=tls.clientHeight+'px';
+  frs.scrollTop=tls.scrollTop;
 }
+
 // ================================================================
 // EXPORT / IMPORT
 // ================================================================
@@ -5204,6 +5204,7 @@ window.fbPush = function(){
       end: document.getElementById('eve').value || '16:00',
       sessions: JSON.parse(JSON.stringify(sessions)),
       freeEvs: JSON.parse(JSON.stringify(freeEvs)),
+      evInfo: JSON.parse(JSON.stringify(evInfo || {})),
       ts: _fbLastPush
     };
     _fbDB.ref('rooms/' + fbGetRoomId() + '/data').set(data)
