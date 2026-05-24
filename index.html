@@ -4617,13 +4617,13 @@ function mvRenderSerial(nowMin,sm){
             <div class="mv-card-name" style="${isPast?'opacity:0.5':''}">${esc(s.name)}</div>
             <div class="mv-card-time">${hm(start)}〜${hm(end)} (${s.dur}分)</div>
           </div>
-          ${s.comment?`<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3)"><polyline points="9 18 15 12 9 6"/></svg>`:''}
+          ${s.comment?`<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3);transform:${isActive?'rotate(90deg)':''}"><polyline points="9 18 15 12 9 6"/></svg>`:''}
           <button class="mv-edit-icon-btn" style="background:none;border:none;padding:7px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px" >
             <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
           </button>
         </div>
         ${isActive?`<div class="mv-card-remain">▶ 進行中 — あと${end-nowMin}分</div>`:''}
-        ${s.comment?`<div class="mv-card-comment" style="display:none;padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">${esc(s.comment)}</div>`:''}
+        ${s.comment?`<div class="mv-card-comment" style="display:${isActive?'block':'none'};padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">${esc(s.comment)}</div>`:''}
       </div>`;
 
     // 鉛筆ボタン → 編集モーダルを開く
