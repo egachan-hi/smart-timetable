@@ -3411,7 +3411,7 @@ function extractJsonSessions(rawText, label){
   });
 }
 
-async // 粒度ラベル
+// 粒度ラベル
 const AI_GRAN_LABELS = [
   '1時間あたり10セッション以上',
   '1時間あたり7〜9セッション',
@@ -3844,10 +3844,43 @@ function syncScroll(src){
   const tls=document.getElementById('tls');
   const frs=document.getElementById('frs');
   if(!frs||!tls)return;
-  // frsの表示高さをtlsに合わせる（overflow:hiddenでscrollTopが効くように）
   frs.style.height=tls.clientHeight+'px';
   frs.scrollTop=tls.scrollTop;
 }
+
+// フリーエリアのタッチ/ホイールをシリアル側に転送（初回のみ）
+(function setupFrsEvents(){
+  let _frsReady=false;
+  function _init(){
+    if(_frsReady)return;
+    const frs=document.getElementById('frs');
+    const tls=document.getElementById('tls');
+    if(!frs||!tls)return;
+    _frsReady=true;
+    // ホイール転送
+    frs.addEventListener('wheel',function(e){
+      e.preventDefault();
+      tls.scrollTop+=e.deltaY;
+    },{passive:false});
+    // タッチ転送
+    let _ty=0;
+    frs.addEventListener('touchstart',function(e){
+      _ty=e.touches[0].clientY;
+    },{passive:true});
+    frs.addEventListener('touchmove',function(e){
+      e.preventDefault();
+      const dy=_ty-e.touches[0].clientY;
+      _ty=e.touches[0].clientY;
+      tls.scrollTop+=dy;
+    },{passive:false});
+  }
+  // DOM準備後に初期化
+  if(document.readyState==='loading'){
+    document.addEventListener('DOMContentLoaded',_init);
+  } else {
+    setTimeout(_init,200);
+  }
+})();
 
 // ================================================================
 // EXPORT / IMPORT
