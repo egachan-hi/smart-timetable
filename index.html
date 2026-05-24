@@ -509,45 +509,7 @@ tbody tr:hover td{background:var(--bg2)}
         <textarea class="mta" id="aiprompt" style="height:60px" placeholder="例: MBTI体験ワークショップ、30分の筋トレメニュー、本格キーマカレーのレシピ　など" autocomplete="off" autocorrect="off" autocapitalize="off"></textarea>
       </div>
 
-      <div style="height:1px;background:var(--border)"></div>
 
-      <!-- セッションの粒度 -->
-      <div>
-        <div class="ml" style="margin-bottom:8px">🔢 セッションの粒度<span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:4px">(1時間あたりのセッション数の目安)</span></div>
-        <style>
-          #ai-granularity{width:100%;cursor:pointer;-webkit-appearance:none;appearance:none;height:4px;background:var(--border);border-radius:2px;outline:none;display:block}
-          #ai-granularity::-webkit-slider-thumb{-webkit-appearance:none;appearance:none;width:10px;height:26px;border-radius:3px;background:var(--text2);cursor:pointer}
-          #ai-granularity::-moz-range-thumb{width:10px;height:26px;border-radius:3px;background:var(--text2);cursor:pointer;border:none}
-        </style>
-        <!-- バー＋目盛り＋ラベル -->
-        <div style="padding:0 8px">
-          <!-- 5列グリッドで目盛り線とラベルをセットで配置 -->
-          <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:2px">
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:20%">
-              <span style="width:2px;height:14px;background:var(--text3);border-radius:1px;display:block"></span>
-              <span style="font-size:10px;color:var(--text3)">10&lt;</span>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:20%">
-              <span style="width:2px;height:9px;background:var(--text3);border-radius:1px;display:block"></span>
-              <span style="font-size:10px;color:var(--text3)">7〜9</span>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:20%">
-              <span style="width:2px;height:9px;background:var(--text3);border-radius:1px;display:block"></span>
-              <span style="font-size:10px;color:var(--text3)">4〜6</span>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:20%">
-              <span style="width:2px;height:9px;background:var(--text3);border-radius:1px;display:block"></span>
-              <span style="font-size:10px;color:var(--text3)">2〜3</span>
-            </div>
-            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;width:20%">
-              <span style="width:2px;height:14px;background:var(--text3);border-radius:1px;display:block"></span>
-              <span style="font-size:10px;color:var(--text3)">&lt;1</span>
-            </div>
-          </div>
-          <input type="range" id="ai-granularity" min="1" max="5" value="3"
-            oninput="aiGranularityChange()"/>
-        </div>
-      </div>
 
       <div style="height:1px;background:var(--border)"></div>
 
@@ -582,6 +544,43 @@ tbody tr:hover td{background:var(--bg2)}
           <label style="display:flex;align-items:center;gap:6px;font-size:11px;cursor:pointer;padding:4px 6px;border-radius:4px;border:1px solid var(--border);grid-column:1/-1" class="ai-radio-row"><input type="radio" name="ai-pop" value="unknown" onchange="aiPopChange()"/>未定または不明</label>
         </div>
       </div>
+
+      <!-- セッションの粒度（参加人数の後） -->
+      <div style="height:1px;background:var(--border)"></div>
+      <div>
+        <div class="ml" style="margin-bottom:8px">🔢 セッションの粒度<span style="font-size:10px;font-weight:400;color:var(--text2);margin-left:4px">(1時間あたりのセッション数の目安)</span></div>
+        <!-- カスタムスライダー（divベース・5ボタン） -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:4px">
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;flex-shrink:0">細かい</span>
+          <div style="flex:1;position:relative">
+            <!-- ライン -->
+            <div id="ai-gt-l" style="position:absolute;top:50%;left:0;height:2px;background:var(--border);transform:translateY(-50%);width:50%;pointer-events:none"></div>
+            <div id="ai-gt-r" style="position:absolute;top:50%;left:50%;height:2px;background:var(--accent);transform:translateY(-50%);width:50%;pointer-events:none"></div>
+            <!-- 5点ボタン -->
+            <div style="display:flex;justify-content:space-between;position:relative">
+              <button id="ai-gb0" onclick="aiGranSet(1)" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;padding:0;flex-shrink:0">
+                <span style="font-size:9px;color:var(--text2);line-height:1;pointer-events:none">10&lt;</span>
+              </button>
+              <button id="ai-gb1" onclick="aiGranSet(2)" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;padding:0;flex-shrink:0">
+                <span style="font-size:9px;color:var(--text2);line-height:1;pointer-events:none">7〜9</span>
+              </button>
+              <button id="ai-gb2" onclick="aiGranSet(3)" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;padding:0;flex-shrink:0">
+                <span style="font-size:9px;color:var(--text2);line-height:1;pointer-events:none">4〜6</span>
+              </button>
+              <button id="ai-gb3" onclick="aiGranSet(4)" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;padding:0;flex-shrink:0">
+                <span style="font-size:9px;color:var(--text2);line-height:1;pointer-events:none">2〜3</span>
+              </button>
+              <button id="ai-gb4" onclick="aiGranSet(5)" style="width:32px;height:32px;border-radius:50%;border:1.5px solid var(--border);background:var(--bg2);cursor:pointer;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:1px;padding:0;flex-shrink:0">
+                <span style="font-size:9px;color:var(--text2);line-height:1;pointer-events:none">&lt;1</span>
+              </button>
+            </div>
+          </div>
+          <span style="font-size:10px;color:var(--text2);white-space:nowrap;flex-shrink:0">粗い</span>
+        </div>
+        <input type="hidden" id="ai-granularity" value="3"/>
+      </div>
+
+
 
       <div style="height:1px;background:var(--border)"></div>
 
@@ -3428,12 +3427,39 @@ const AI_GRAN_PROMPTS = [
   '1時間あたり1セッション以下の大まかな粒度で設計してください。各セッションは30〜60分程度の大きなブロックで構成してください。'
 ];
 
+function aiGranSet(val){
+  document.getElementById('ai-granularity').value=val;
+  aiGranularityChange();
+}
+
 function aiGranularityChange(){
-  const el = document.getElementById('ai-granularity');
-  if(!el) return;
-  const val = parseInt(el.value) - 1;
-  const lbl = document.getElementById('ai-granularity-label');
-  if(lbl) lbl.textContent = AI_GRAN_LABELS[val] || '';
+  const el=document.getElementById('ai-granularity');
+  if(!el)return;
+  const val=parseInt(el.value)||3;
+  const ACC='var(--accent)', GRAY='var(--border)', ACCBG='rgba(93,202,165,0.1)';
+
+  // ボタン5つの見た目を更新
+  for(let i=0;i<5;i++){
+    const btn=document.getElementById('ai-gb'+i);
+    if(!btn)continue;
+    const span=btn.querySelector('span');
+    const isSelected=(i+1)===val;
+    const isRight=(i+1)>val;
+    btn.style.borderColor=isSelected?ACC:(isRight?ACC:GRAY);
+    btn.style.background=isSelected?ACC:'var(--bg2)';
+    btn.style.transform=isSelected?'scale(1.15)':'scale(1)';
+    if(span){
+      span.style.color=isSelected?'var(--bg)':(isRight?ACC:'var(--text2)');
+      span.style.fontWeight=isSelected?'700':'normal';
+    }
+  }
+
+  // ライン更新（左:グレー、右:アクセント）
+  const pct=[(val-1)/4*100]+'%';
+  const tl=document.getElementById('ai-gt-l');
+  const tr=document.getElementById('ai-gt-r');
+  if(tl) tl.style.width=pct;
+  if(tr){tr.style.left=pct;tr.style.width=(100-(val-1)/4*100)+'%';}
 }
 
 async function runAI(){
