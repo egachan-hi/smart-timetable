@@ -4720,23 +4720,26 @@ function mvRenderSerial(nowMin,sm){
       iconHtml=`<span style="width:9px;height:9px;border-radius:50%;background:${CD[s.color]||'#B4B2A9'};display:inline-block;flex-shrink:0"></span>`;
     }
 
-    card.innerHTML=`
-      <div class="mv-card-bar" style="background:${CD[s.color]||'#B4B2A9'}"></div>
-      <div class="mv-card-body" style="min-width:0;padding:9px 8px 9px 10px">
-        <div style="display:flex;align-items:center;gap:6px">
-          ${iconHtml}
-          <div style="flex:1;min-width:0">
-            <div class="mv-card-name" style="${isPast?'opacity:0.5':''}">${esc(s.name)}</div>
-            <div class="mv-card-time">${hm(start)}〜${hm(end)} (${s.dur}分)</div>
-          </div>
-          ${s.comment?`<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3);transform:${isActive?'rotate(90deg)':''}"><polyline points="9 18 15 12 9 6"/></svg>`:''}
-          <button class="mv-edit-icon-btn" style="background:none;border:none;padding:7px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px" >
-            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
-        </div>
-        ${isActive?`<div class="mv-card-remain">▶ 進行中 — あと${end-nowMin}分</div>`:''}
-        ${s.comment?`<div class="mv-card-comment" style="display:${isActive?'block':'none'};padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">${esc(s.comment)}</div>`:''}
-      </div>`;
+    const chevronHtml=s.comment?('<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3);transform:'+(isActive?'rotate(90deg)':'')+'"><polyline points="9 18 15 12 9 6"/></svg>'):'';
+    const remainHtml=isActive?('<div class="mv-card-remain">▶ 進行中 — あと'+(end-nowMin)+'分</div>'):'';
+    const commentHtml=s.comment?('<div class="mv-card-comment" style="display:'+(isActive?'block':'none')+';padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">'+esc(s.comment)+'</div>'):'';
+    card.innerHTML=
+      '<div class="mv-card-bar" style="background:'+(CD[s.color]||'#B4B2A9')+'"></div>'+
+      '<div class="mv-card-body" style="min-width:0;padding:9px 8px 9px 10px">'+
+        '<div style="display:flex;align-items:center;gap:6px">'+
+          iconHtml+
+          '<div style="flex:1;min-width:0">'+
+            '<div class="mv-card-name" style="'+(isPast?'opacity:0.5':'')+'">'+esc(s.name)+'</div>'+
+            '<div class="mv-card-time">'+hm(start)+'〜'+hm(end)+' ('+s.dur+'分)</div>'+
+          '</div>'+
+          chevronHtml+
+          '<button class="mv-edit-icon-btn" style="background:none;border:none;padding:7px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px">'+
+            '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
+          '</button>'+
+        '</div>'+
+        remainHtml+
+        commentHtml+
+      '</div>';
 
     // 鉛筆ボタン → 編集モーダルを開く
     const editBtn=card.querySelector('.mv-edit-icon-btn');
