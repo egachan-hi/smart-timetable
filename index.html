@@ -219,7 +219,7 @@ tbody tr:hover td{background:var(--bg2)}
 .mv-drop-line{height:0;display:none;margin:0}
 .mv-time-row{display:flex;gap:8px;align-items:center}
 .mv-time-input{flex:1;font-size:16px;padding:10px 12px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);text-align:center;font-family:inherit;outline:none}
-@media(max-width:600px){
+@media(max-width:768px){
   .body,.top-bar{display:none!important}
   .mv{display:flex}
   .mv-clock{display:block}
@@ -1731,7 +1731,7 @@ function validateTimeRange(changed){
   }
 }
 
-function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function'&&window.innerWidth<=600)mvRender();}
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function'){const _mv=document.getElementById('mv');if(_mv&&getComputedStyle(_mv).display!=='none')mvRender();}}
 
 // ================================================================
 // RENDER BLOCK LIST
@@ -4573,8 +4573,8 @@ let mvTab='s', mvEditId=null, mvDurVal=10;
 let mvDragId=null, mvDragStartY=0, mvDragEl=null, mvDragGhost=null, mvLongPressTimer=null;
 
 function mvRender(){
-  const isMobile=window.innerWidth<=600;
-  if(!isMobile)return;
+  const _mvEl=document.getElementById('mv');
+  if(!_mvEl||getComputedStyle(_mvEl).display==='none')return;
 
   const title=document.getElementById('evt').value||'タイムテーブル';
   const date=document.getElementById('evd').value;
