@@ -2911,11 +2911,14 @@ function openTimeAdj(){
 
   const st=gSt();
 
-  // 現在時刻が属するセッションを自動判定
-  let autoCurrentIdx=-1;
-  sessions.forEach((s,i)=>{
-    const start=sm+st[i], end=start+s.dur;
-    if(nowMin>=start&&nowMin<end) autoCurrentIdx=i;
+  // 「時間調整」を除いた通常セッションから現在位置を判定してリスト表示
+  const normalSessions=sessions.filter(s=>s.name!=='時間調整');
+  let normalCurrentIdx=-1;
+  let elapsed2=0;
+  normalSessions.forEach((s,i)=>{
+    const start=sm+elapsed2, end=start+s.dur;
+    if(nowMin>=start&&nowMin<end) normalCurrentIdx=i;
+    elapsed2+=s.dur;
   });
 
   // 「開始前」選択肢を先頭に追加
@@ -2931,9 +2934,9 @@ function openTimeAdj(){
   rowBefore.appendChild(rbBefore);rowBefore.appendChild(nmBefore);
   list.appendChild(rowBefore);
 
-  // セッションリスト（現在時刻以降は非表示）
-  sessions.forEach((s,i)=>{
-    if(autoCurrentIdx>=0&&i>=autoCurrentIdx) return;
+  // 通常セッションのみ・現在進行中以降は非表示
+  normalSessions.forEach((s,i)=>{
+    if(normalCurrentIdx>=0&&i>=normalCurrentIdx) return;
     const row=document.createElement('label');
     row.style.cssText='display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:6px;cursor:pointer';
     const rb=document.createElement('input');
@@ -3004,8 +3007,8 @@ function calcTimeAdj(){
   const now=new Date();
   const nowMin=now.getHours()*60+now.getMinutes();
   const sm=gSM(), st=gSt();
-  const evd=document.getElementById('evd').value;
-  const noDateMode=!evd||(typeof noDate!=='undefined'&&noDate);
+  // liveMode統一: ライブモード時のみ現在時刻を参照
+  const noDateMode=!liveMode;
 
   // 「開始前」選択時
   if(selected.value==='__before'){
@@ -3021,7 +3024,7 @@ function calcTimeAdj(){
     const waitMin=parseInt(remEl.value)||0;
     // 遅延 = (現在時刻 - 最初のセッション開始時刻) + 開始まであと◯分
     const firstStart=sm+(st[0]||0);
-    const elapsed=noDateMode?0:Math.max(0,nowMin-firstStart);
+    const elapsed=liveMode?Math.max(0,nowMin-firstStart):0;
     const total=elapsed+waitMin;
     let html=`<div style="color:#E53E3E;font-weight:600">${total}分遅れています。<br>時間調整のセッションを追加しますか？</div>`;
     let detail=`経過時間: ${elapsed}分`;
@@ -3071,7 +3074,7 @@ function calcTimeAdj(){
   // 後続セッション合計（currentIdx+1 〜 autoCurrentIdx-1）
   let followDur=0;
   let elapsedInCurrent=0;
-  if(!noDateMode){
+  if(liveMode){
     if(autoCurrentIdx>currentIdx+1){
       for(let i=currentIdx+1;i<autoCurrentIdx;i++) followDur+=sessions[i].dur;
     }
@@ -3101,7 +3104,7 @@ function calcTimeAdj(){
   }
   let detail=`残り時間: ${remain}分`;
   if(followDur>0) detail+=`<br>後続セッション合計: ${followDur}分`;
-  if(elapsedInCurrent>0&&!noDateMode) detail+=`<br>現セッション経過: ${elapsedInCurrent}分`;
+  if(elapsedInCurrent>0&&liveMode) detail+=`<br>現セッション経過: ${elapsedInCurrent}分`;
   html+=`<div style="font-size:11px;color:var(--text3);margin-top:6px">${detail}</div>`;
 
   result.innerHTML=html;
