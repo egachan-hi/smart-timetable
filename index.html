@@ -306,6 +306,10 @@ tbody tr:hover td{background:var(--bg2)}
           <label style="display:flex;align-items:center;gap:2px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap">
             <input type="checkbox" id="no-date-chk" onchange="toggleNoDate()" style="margin:0;width:12px;height:12px"/>日付設定しない
           </label>
+          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:10px">
+            <input type="checkbox" id="live-mode-chk" onchange="toggleLiveMode()" style="margin:0;width:12px;height:12px"/>ライブモード
+          </label>
+          <span id="live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E;margin-left:4px">● LIVE</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
@@ -884,7 +888,7 @@ tbody tr:hover td{background:var(--bg2)}
   <div class="mv-header">
     <div style="display:flex;align-items:flex-start;gap:6px">
       <div style="flex:1;min-width:0">
-        <div class="mv-title" id="mv-title" style="font-size:14px;font-weight:700;color:var(--text)">タイムテーブル</div>
+        <div style="display:flex;align-items:center;gap:6px"><div class="mv-title" id="mv-title" style="font-size:14px;font-weight:700;color:var(--text)">タイムテーブル</div><span id="mv-live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">● LIVE</span></div>
         <div class="mv-meta" id="mv-meta" style="font-size:14px;font-weight:400;color:var(--text2);margin-top:1px"></div>
       </div>
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
@@ -930,20 +934,25 @@ tbody tr:hover td{background:var(--bg2)}
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">保存</span>
     </button>
-    <!-- AI生成（ブルー背景） -->
-    <button class="mv-tbtn" onclick="openAI()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0;background:linear-gradient(135deg,#4A6FD4,#2D8CF0);border-radius:8px;margin:4px 2px">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="#fff" style="pointer-events:none"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>
-      <span style="font-size:9px;color:#fff;pointer-events:none;line-height:1">AI生成</span>
+    <!-- AI生成 -->
+    <button class="mv-tbtn" onclick="openAI()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="pointer-events:none"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>
+      <span style="font-size:9px;color:var(--text2);pointer-events:none;line-height:1">AI生成</span>
     </button>
     <!-- 時間調整 -->
     <button id="mv-btn-time-adj" class="mv-tbtn" onclick="openTimeAdj()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-      <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">調整</span>
+      <span style="font-size:9px;color:var(--text2);pointer-events:none;line-height:1">時間調整</span>
     </button>
     <!-- 共有 -->
     <button class="mv-tbtn" onclick="if(typeof fbShowRoom==='function')fbShowRoom()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">共有</span>
+    </button>
+    <!-- ライブ -->
+    <button id="mv-live-btn" class="mv-tbtn" onclick="toggleLiveMode(!liveMode)" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="mv-live-btn-icon" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
+      <span id="mv-live-btn-label" style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">ライブ</span>
     </button>
     <!-- その他 -->
     <button class="mv-tbtn" onclick="mvOpenMore()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
@@ -1041,6 +1050,7 @@ tbody tr:hover td{background:var(--bg2)}
     <button id="mv-bredo" onclick="mvRedo()" disabled style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer;opacity:0.4">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>やり直す
     </button>
+
     <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
     </button>
@@ -1255,6 +1265,7 @@ function restoreSavedEvs(){
 
 let cv='tl';
 let noDate=false;   // 日付を特定しない
+let liveMode=false; // ライブモード（日付に関わらず現在時刻で進行管理）
 let dayCount=1;     // 日程数（1〜7）
 let currentDay=1;   // 表示中の日（複数日時）
 // 複数日のセッションデータ: dayData[dayIndex] = {sessions, freeEvs}
@@ -1926,10 +1937,63 @@ function rTL(){
   uDiff();
 }
 
+
+function isActuallyToday(){
+  const evd=document.getElementById('evd').value;
+  if(!evd) return false;
+  const today=new Date();
+  const[y,m,d]=evd.split('-').map(Number);
+  return today.getFullYear()===y&&today.getMonth()+1===m&&today.getDate()===d;
+}
+
+function initLiveMode(){
+  // 今日の日付のときはデフォルトでライブモードON
+  if(isActuallyToday()){
+    toggleLiveMode(true);
+  }
+}
+
+function toggleLiveMode(forceVal){
+  const chk=document.getElementById('live-mode-chk');
+  const newVal = forceVal!==undefined ? forceVal : (chk?chk.checked:false);
+
+  // 今日以外でONにしようとした場合は確認
+  if(newVal && !isActuallyToday()){
+    if(!confirm('今日はイベント当日ではありませんがライブモードに切り替えますか？')){
+      if(chk) chk.checked=false;
+      const mvChk=document.getElementById('mv-live-mode-chk');
+      if(mvChk) mvChk.checked=false;
+      return;
+    }
+  }
+  liveMode=newVal;
+  if(chk) chk.checked=liveMode;
+  // バッジ表示
+  const badge=document.getElementById('live-badge');
+  if(badge) badge.style.display=liveMode?'inline':'none';
+  // スマホライブボタンの色
+  const mvLiveIcon=document.getElementById('mv-live-btn-icon');
+  const mvLiveLabel=document.getElementById('mv-live-btn-label');
+  if(mvLiveIcon) mvLiveIcon.style.stroke=liveMode?'#E53E3E':'currentColor';
+  if(mvLiveLabel){ mvLiveLabel.textContent=liveMode?'LIVE':'ライブ'; mvLiveLabel.style.color=liveMode?'#E53E3E':'var(--text2)'; }
+  // スマホバッジ（ヘッダーとメニュー）
+  const mvBadge=document.getElementById('mv-live-badge');
+  if(mvBadge) mvBadge.style.display=liveMode?'inline':'none';
+  const mvBadgeMenu=document.getElementById('mv-live-badge-menu');
+  if(mvBadgeMenu) mvBadgeMenu.style.display=liveMode?'inline':'none';
+  // チェックボックス同期
+  const mvChk=document.getElementById('mv-live-mode-chk');
+  if(mvChk) mvChk.checked=liveMode;
+  // 再描画
+  render();
+  if(typeof updateNowLine==='function') updateNowLine();
+  autoSave();
+}
+
 function updateNowLine(){
   document.querySelectorAll('.now-line,.now-label').forEach(el=>el.remove());
   const evDate=document.getElementById('evd').value;
-  if(noDate||!evDate)return;
+  if(!liveMode)return;
 
   const today=new Date();
   const todayStr=`${today.getFullYear()}-${String(today.getMonth()+1).padStart(2,'0')}-${String(today.getDate()).padStart(2,'0')}`;
@@ -1942,8 +2006,7 @@ function updateNowLine(){
     targetDate=`${dt.getFullYear()}-${String(dt.getMonth()+1).padStart(2,'0')}-${String(dt.getDate()).padStart(2,'0')}`;
   }
 
-  // 今日の日付と一致しない場合は表示しない
-  if(todayStr!==targetDate)return;
+  // liveMode時は日付チェック不要（上でreturn済み）
 
   const nowMin=today.getHours()*60+today.getMinutes();
   const sm=gSM();
@@ -2797,54 +2860,30 @@ function openAI(){
 function updateBtnTimeAdj(){
   const btn=document.getElementById('btn-time-adj');
   if(!btn)return;
-  let active=false;
-  const now=new Date();
-  const nowMin=now.getHours()*60+now.getMinutes();
-  const isNoDate=typeof noDate!=='undefined'&&noDate;
-  const evd=document.getElementById('evd').value;
-
-  // 当日 or 日付なしのみ対象
-  let isTargetDay=false;
-  if(isNoDate||!evd){
-    isTargetDay=true;
-  } else {
-    const [y,m,d]=evd.split('-').map(Number);
-    if(now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d) isTargetDay=true;
-  }
-
-  if(isTargetDay){
-    // 現在時刻が開始時刻以降であれば有効
-    const sm=gSM();
-    if(nowMin>=sm) active=true;
-  }
-
-  btn.disabled=!active;
-  btn.style.opacity=active?'1':'0.4';
-  btn.style.cursor=active?'pointer':'not-allowed';
+  // 随時押せるように常に有効
+  btn.disabled=false;
+  btn.style.opacity='1';
+  btn.style.cursor='pointer';
 }
 
 function openTimeAdj(){
-  // 当日かつ開始時刻以降のみ有効
   const now=new Date();
   const nowMin=now.getHours()*60+now.getMinutes();
   const sm=gSM(), em=gEM();
   const evd=document.getElementById('evd').value;
   const isNoDate=typeof noDate!=='undefined'&&noDate;
-  let isTargetDay=false;
-  if(isNoDate||!evd){
-    isTargetDay=true;
-  } else {
-    const[y,m,d]=evd.split('-').map(Number);
-    if(now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d) isTargetDay=true;
-  }
-  if(!isTargetDay){
-    alert('時間調整は当日または日付未設定のイベントのみ使用できます。');
-    return;
-  }
-  if(nowMin<sm){
-    alert('時間調整はイベント開始時刻以降に使用できます。');
-    return;
-  }
+  // liveMode統一
+  const isLive=liveMode;
+
+  // タイトル切替
+  const titleEl=document.getElementById('time-adj-title');
+  if(titleEl) titleEl.textContent=isLive?'遅れているタイムラインの時間調整':'設定時間内に時間調整';
+
+  // セッション選択エリアと残り時間エリアの表示切替
+  const sessionArea=document.getElementById('time-adj-session-area');
+  const remainArea=document.getElementById('time-adj-remain-area');
+  if(sessionArea) sessionArea.style.display=isLive?'block':'none';
+  if(remainArea) remainArea.style.display=isLive?'flex':'none';
 
   const list=document.getElementById('time-adj-session-list');
   list.innerHTML='';
@@ -2900,7 +2939,28 @@ function openTimeAdj(){
   const autoPanel=document.getElementById('time-adj-auto-panel');
   if(autoPanel){ autoPanel.style.display='none'; }
   _adjFollowModes={};
-  calcTimeAdj();
+
+  if(!isLive){
+    // 非ライブ: チェックボックスエリア非表示・自動調整パネルを即表示
+    const result=document.getElementById('time-adj-result');
+    if(result) result.innerHTML='';
+    const okBtn=document.getElementById('time-adj-ok');
+    if(okBtn){ okBtn._insertBefore=0; okBtn._adjMin=0; okBtn.disabled=false; okBtn.style.opacity='1'; }
+    // チェックボックスエリアを非表示
+    const autoLabel=document.getElementById('time-adj-auto-label');
+    if(autoLabel) autoLabel.style.display='none';
+    // 自動調整パネルを即表示
+    const autoPanel=document.getElementById('time-adj-auto-panel');
+    if(autoPanel){ autoPanel.style.display='flex'; }
+    const _autoChk=document.getElementById('time-adj-auto-chk');
+    if(_autoChk){ _autoChk.checked=true; _autoChk.disabled=false; }
+    buildAutoAdjRows();
+  } else {
+    // ライブ時はチェックボックスエリアを表示に戻す
+    const autoLabel=document.getElementById('time-adj-auto-label');
+    if(autoLabel) autoLabel.style.display='';
+    calcTimeAdj();
+  }
   document.getElementById('time-adj-overlay').style.display='flex';
 }
 
@@ -3047,6 +3107,9 @@ function applyTimeAdj(){
   okBtn.disabled=true;
   okBtn.style.opacity='0.4';
 
+  // 非ライブ時はセッション挿入なし（自動調整のみ）
+  const _isNonLive=(adjMin===0||adjMin==null);
+
   // 自動調整が有効な場合
   const chk=document.getElementById('time-adj-auto-chk');
   if(chk&&chk.checked){
@@ -3067,18 +3130,14 @@ function applyTimeAdj(){
     sessions=sessions.filter(s=>s.dur>0);
   }
 
-  // 時間調整セッションを挿入
-  // ※後続セッション削除後にinsertBeforeのインデックスが変わらないよう、先に計算
-  const actualInsert=sessions.findIndex((s,i)=>{
-    // insertBefore番目のセッションの直前に挿入
-    // 元のinsertBeforeを基準にする
-    return i===insertBefore;
-  });
-  const insertIdx=actualInsert>=0?actualInsert:insertBefore;
-
-  const newId=nid++;
-  const adjSession={id:newId,name:'時間調整',dur:adjMin,color:'white',comment:''};
-  sessions.splice(insertIdx,0,adjSession);
+  // 時間調整セッションを挿入（ライブ時のみ）
+  if(!_isNonLive){
+    const actualInsert=sessions.findIndex((s,i)=>i===insertBefore);
+    const insertIdx=actualInsert>=0?actualInsert:insertBefore;
+    const newId=nid++;
+    const adjSession={id:newId,name:'時間調整',dur:adjMin,color:'white',comment:''};
+    sessions.splice(insertIdx,0,adjSession);
+  }
   snap();
   render();
   if(typeof mvRender==='function') mvRender();
@@ -3120,7 +3179,9 @@ function buildAutoAdjRows(){
   const sm=gSM(), st=gSt();
   const selected=document.querySelector('#time-adj-session-list input[type=radio]:checked');
   const isBefore = selected && selected.value === '__before';
-  const startIdx = isBefore ? 0 : insertBefore + 1;
+  const sessionArea=document.getElementById('time-adj-session-area');
+  const isNonLiveMode = sessionArea && sessionArea.style.display==='none';
+  const startIdx = (isNonLiveMode||isBefore) ? 0 : insertBefore + 1;
   const followSessions = sessions.slice(startIdx);
 
   followSessions.forEach(s=>{
@@ -4482,7 +4543,7 @@ dayData=[{sessions:[],freeEvs:[]}];
 autoLoad();
 restoreSavedEvs();
 updateEvInfoPreview();
-uUR();sv('tl');render();setTimeout(fitz,0);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
+uUR();sv('tl');render();setTimeout(fitz,0);setTimeout(initLiveMode,100);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
 
 // ================================================================
 // MOBILE VIEW
@@ -4505,12 +4566,7 @@ function mvRender(){
   const nowMin=now.getHours()*60+now.getMinutes();
   const sm=gSM(),em=gEM();
   const evDate=document.getElementById('evd').value;
-  const isToday=(()=>{
-    if(typeof noDate!=='undefined'&&noDate)return true;
-    if(!evDate)return false;
-    const[y,m,d]=evDate.split('-').map(Number);
-    return now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===d;
-  })();
+  const isToday=liveMode;
 
   // meta
   const metaEl=document.getElementById('mv-meta');
@@ -5417,16 +5473,16 @@ if(document.readyState === 'loading'){
 <!-- ============================================================ -->
 <div id="time-adj-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);z-index:9000;align-items:flex-start;justify-content:center;overflow-y:auto;padding:20px 0">
   <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:20px 24px;min-width:340px;max-width:520px;width:92%;box-shadow:0 8px 32px rgba(0,0,0,0.25);display:flex;flex-direction:column;gap:12px;margin:auto">
-    <div style="font-size:14px;font-weight:700;color:var(--text)">遅れているタイムラインの時間調整</div>
+    <div id="time-adj-title" style="font-size:14px;font-weight:700;color:var(--text)">遅れているタイムラインの時間調整</div>
 
     <!-- 現在進行中のセッション選択 -->
-    <div>
+    <div id="time-adj-session-area">
       <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:5px">現在進行中のセッション</div>
       <div id="time-adj-session-list" style="display:flex;flex-direction:column;gap:3px;max-height:140px;overflow-y:auto"></div>
     </div>
 
     <!-- 残り時間入力 -->
-    <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div id="time-adj-remain-area" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       <span id="time-adj-remain-label" style="font-size:12px;color:var(--text2)">現在進行中のセッションがあと</span>
       <input id="time-adj-remain" type="number" min="0" max="999" value="0" disabled
         style="width:56px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text);font-size:13px;text-align:center;opacity:0.4"
