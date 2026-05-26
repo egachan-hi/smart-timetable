@@ -1731,7 +1731,7 @@ function validateTimeRange(changed){
   }
 }
 
-function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();}
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function'&&window.innerWidth<=600){const _modOpen=['mv-sm','mv-fm','mv-event-edit'].some(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';});if(!_modOpen)mvRender();}}
 
 // ================================================================
 // RENDER BLOCK LIST
@@ -2004,6 +2004,7 @@ function toggleLiveMode(forceVal){
   // 再描画
   render();
   if(typeof updateNowLine==='function') updateNowLine();
+  if(typeof mvRender==='function') mvRender();
   autoSave();
 }
 
@@ -5209,8 +5210,16 @@ function mvInlineBlur(inp, field){
       const ae=document.activeElement;
       if(ae!==document.getElementById('mv-evs')&&ae!==document.getElementById('mv-eve')){
         if(inputs) inputs.setAttribute('style','display:none;gap:8px');
+        // blurで値を保存（render呼び出しなし）
+        const _evt=document.getElementById('mv-evt');
+        const _evd=document.getElementById('mv-evd');
+        if(_evt) document.getElementById('evt').value=_evt.value||'';
+        if(_evd) document.getElementById('evd').value=_evd.value||'';
+        document.getElementById('evs').value=evs||'';
+        document.getElementById('eve').value=eve||'';
+        updateDow();autoSave();if(typeof fbPush==='function')fbPush();
       }
-    },200);
+    },500);
     return;
   }
   const viewMap={title:'mv-evt-view',date:'mv-evd-view',location:'mv-evinfo-location-view',owner:'mv-evinfo-owner-view',members:'mv-evinfo-members-view',memo:'mv-evinfo-memo-view'};
@@ -5231,7 +5240,7 @@ function mvInlineBlur(inp, field){
 }
 
 function mvSaveEventInfoLive(){
-  // リアルタイムでPC側に反映
+  // リアルタイムでPC側に反映（renderは保存ボタン押下時のみ）
   const evt=document.getElementById('mv-evt');
   const evd=document.getElementById('mv-evd');
   const evs=document.getElementById('mv-evs');
@@ -5240,10 +5249,8 @@ function mvSaveEventInfoLive(){
   if(evd) document.getElementById('evd').value=evd.value||'';
   if(evs) document.getElementById('evs').value=evs.value||'';
   if(eve) document.getElementById('eve').value=eve.value||'';
-  updateDow();render();
-  autoSave();
+  updateDow();autoSave();
   if(typeof fbPush==='function') fbPush();
-  mvRender();
 }
 
 function mvSaveEventInfo(){
