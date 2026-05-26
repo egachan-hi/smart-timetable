@@ -4714,9 +4714,9 @@ function mvRenderSerial(nowMin,sm){
     let iconHtml='';
     if(ICON_SVG[s.color]){
       const fill=dk?(CT_DARK[s.color]||'#E8E8E8'):(CT[s.color]||'#333');
-      iconHtml=`<svg viewBox="0 0 24 24" width="15" height="15" fill="${fill}" style="flex-shrink:0;pointer-events:none"><path d="${ICON_SVG[s.color]}"/></svg>`;
+      iconHtml='<svg viewBox="0 0 24 24" width="15" height="15" fill="'+fill+'" style="flex-shrink:0;pointer-events:none"><path d="'+ICON_SVG[s.color]+'"/></svg>';
     } else {
-      iconHtml=`<span style="width:9px;height:9px;border-radius:50%;background:${CD[s.color]||'#B4B2A9'};display:inline-block;flex-shrink:0"></span>`;
+      iconHtml='<span style="width:9px;height:9px;border-radius:50%;background:'+(CD[s.color]||'#B4B2A9')+';display:inline-block;flex-shrink:0"></span>';
     }
 
     const chevronHtml=s.comment?('<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3);transform:'+(isActive?'rotate(90deg)':'')+'"><polyline points="9 18 15 12 9 6"/></svg>'):'';
@@ -4810,9 +4810,9 @@ function mvRenderFree(nowMin,sm){
     let iconHtml='';
     if(ICON_SVG[ev.color]){
       const fill=dk?(CT_DARK[ev.color]||'#E8E8E8'):(CT[ev.color]||'#085041');
-      iconHtml=`<svg viewBox="0 0 24 24" width="15" height="15" fill="${fill}" style="flex-shrink:0"><path d="${ICON_SVG[ev.color]}"/></svg>`;
+      iconHtml='<svg viewBox="0 0 24 24" width="15" height="15" fill="'+fill+'" style="flex-shrink:0"><path d="'+ICON_SVG[ev.color]+'"/></svg>';
     } else {
-      iconHtml=`<span style="width:10px;height:10px;border-radius:50%;background:${CD[ev.color]||'#5DCAA5'};display:inline-block;flex-shrink:0"></span>`;
+      iconHtml='<span style="width:10px;height:10px;border-radius:50%;background:'+(CD[ev.color]||'#5DCAA5')+';display:inline-block;flex-shrink:0"></span>';
     }
 
     card.innerHTML=`
