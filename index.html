@@ -1731,7 +1731,7 @@ function validateTimeRange(changed){
   }
 }
 
-function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function'&&window.innerWidth<=600){const _modOpen=['mv-sm','mv-fm','mv-event-edit'].some(id=>{const el=document.getElementById(id);return el&&el.style.display!=='none';});if(!_modOpen)mvRender();}}
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function'&&window.innerWidth<=600)mvRender();}
 
 // ================================================================
 // RENDER BLOCK LIST
