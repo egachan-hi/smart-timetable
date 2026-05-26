@@ -289,7 +289,7 @@ tbody tr:hover td{background:var(--bg2)}
       <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
         <div style="display:flex;align-items:center;gap:4px">
-          <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();"/>
+          <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();if(typeof fbPush==='function')fbPush();"/>
           <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
           <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:auto">から</span>
           <select id="day-count-sel" style="font-size:11px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0" onchange="onDayCountChange()">
@@ -314,9 +314,9 @@ tbody tr:hover td{background:var(--bg2)}
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
         <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
-        <input type="time" id="evs" value="13:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="render();autoSave();setTimeout(fitz,50);updateTotalTime();"/>
+        <input type="time" id="evs" value="13:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('evs');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();"/>
         <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
-        <input type="time" id="eve" value="16:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="render();autoSave();setTimeout(fitz,50);updateTotalTime();"/>
+        <input type="time" id="eve" value="16:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('eve');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();"/>
         <span id="total-time-lbl" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;margin-left:6px"></span>
       </div>
       <!-- イベント概要ウィジェット -->
@@ -1708,6 +1708,27 @@ function sv(v){
   document.getElementById('tab-tl').classList.toggle('on',v==='tl');
   document.getElementById('tab-tb').classList.toggle('on',v==='tb');
   if(v==='tb')renderTbl();
+}
+
+function validateTimeRange(changed){
+  const evs=document.getElementById('evs');
+  const eve=document.getElementById('eve');
+  if(!evs||!eve)return;
+  const [sh,sm]=evs.value.split(':').map(Number);
+  const [eh,em]=eve.value.split(':').map(Number);
+  const startMin=sh*60+sm;
+  const endMin=eh*60+em;
+  if(endMin<=startMin){
+    if(changed==='evs'){
+      // 開始を変えたら終了を開始+最低30分に
+      const newEnd=startMin+30;
+      eve.value=`${String(Math.floor(newEnd/60)).padStart(2,'0')}:${String(newEnd%60).padStart(2,'0')}`;
+    } else {
+      // 終了を変えたら開始を終了-最低30分に
+      const newStart=Math.max(0,endMin-30);
+      evs.value=`${String(Math.floor(newStart/60)).padStart(2,'0')}:${String(newStart%60).padStart(2,'0')}`;
+    }
+  }
 }
 
 function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();}
