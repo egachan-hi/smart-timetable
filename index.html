@@ -1731,7 +1731,7 @@ function validateTimeRange(changed){
   }
 }
 
-function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function'){const _mv=document.getElementById('mv');if(_mv&&getComputedStyle(_mv).display!=='none')mvRender();}}
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function')mvRender();}
 
 // ================================================================
 // RENDER BLOCK LIST
@@ -4573,8 +4573,7 @@ let mvTab='s', mvEditId=null, mvDurVal=10;
 let mvDragId=null, mvDragStartY=0, mvDragEl=null, mvDragGhost=null, mvLongPressTimer=null;
 
 function mvRender(){
-  const _mvEl=document.getElementById('mv');
-  if(!_mvEl||getComputedStyle(_mvEl).display==='none')return;
+  // スマホ判定はCSSに任せ、常にmvRenderを実行（PC側要素はCSSで非表示）
 
   const title=document.getElementById('evt').value||'タイムテーブル';
   const date=document.getElementById('evd').value;
