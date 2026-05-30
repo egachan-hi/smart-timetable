@@ -4705,6 +4705,9 @@ let mvDragId=null, mvDragStartY=0, mvDragEl=null, mvDragGhost=null, mvLongPressT
 
 function mvRender(){
   // スマホ判定はCSSに任せ、常にmvRenderを実行（PC側要素はCSSで非表示）
+  // イベント編集シートが開いている間はmvRenderをスキップ（入力中の値が上書きされるため）
+  const _editOpen=document.getElementById('mv-event-edit');
+  if(_editOpen&&_editOpen.style.display!=='none') return;
   try{
   const title=document.getElementById('evt').value||'タイムテーブル';
   const date=document.getElementById('evd').value;
