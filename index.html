@@ -5599,6 +5599,7 @@ function fbListen(){
       document.getElementById('eve').value = data.end || '16:00';
       if(data.sessions && data.sessions.length > 0){ sessions = data.sessions; nid = Math.max(nid, Math.max.apply(null, sessions.map(function(s){return s.id+1;})), 30); }
       if(data.freeEvs && data.freeEvs.length > 0){ freeEvs = data.freeEvs; nfid = Math.max(nfid, Math.max.apply(null, freeEvs.map(function(e){return e.id+1;})), 100); }
+      if(data.evInfo){ evInfo = Object.assign({location:'',owner:'',members:'',memo:''}, data.evInfo); loadEvInfoToWidget(); }
       render(); updateDow();
       if(typeof mvRender==='function'){
         try{ mvRender(); }catch(mvErr){ console.error('mvRender error:',mvErr); }
