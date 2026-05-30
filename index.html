@@ -286,7 +286,7 @@ tbody tr:hover td{background:var(--bg2)}
       <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">セッションメニュー</span>
     </div>
     <div class="ei">
-      <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル"/>
+      <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
         <div style="display:flex;align-items:center;gap:4px">
           <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();if(typeof fbPush==='function')fbPush();"/>
@@ -314,9 +314,9 @@ tbody tr:hover td{background:var(--bg2)}
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
         <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
-        <input type="time" id="evs" value="13:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('evs');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();"/>
+        <input type="time" id="evs" value="13:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('evs');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
         <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
-        <input type="time" id="eve" value="16:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('eve');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();"/>
+        <input type="time" id="eve" value="16:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('eve');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
         <span id="total-time-lbl" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;margin-left:6px"></span>
       </div>
       <!-- イベント概要ウィジェット -->
@@ -329,20 +329,20 @@ tbody tr:hover td{background:var(--bg2)}
         <div id="evinfo-panel" style="display:none;padding:6px 8px 8px;border-top:1px solid var(--border);flex-direction:column;gap:5px">
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">場所/ID</span>
-            <input id="evinfo-location" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="開催場所・URL等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+            <input id="evinfo-location" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="開催場所・URL等" oninput="onEvInfoChange();if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">オーナー</span>
-            <input id="evinfo-owner" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="主催者・講師・組織名等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+            <input id="evinfo-owner" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="主催者・講師・組織名等" oninput="onEvInfoChange();if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">参加者</span>
-            <input id="evinfo-members" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="お名前・人数等" oninput="onEvInfoChange()" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
+            <input id="evinfo-members" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="お名前・人数等" oninput="onEvInfoChange();if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
           </div>
           <div style="display:flex;align-items:flex-start;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0;padding-top:4px">メモ</span>
             <div id="evinfo-memo-wrap" style="flex:1;position:relative">
-              <textarea id="evinfo-memo" class="mta evinfo-field" style="width:100%;box-sizing:border-box;font-size:11px;padding:2px 5px;min-height:20px;resize:vertical;border-color:transparent;background:transparent;overflow:hidden" placeholder="" oninput="onEvInfoChange()" onfocus="evInfoMemoFocus()" onblur="evInfoMemoBlur()"></textarea>
+              <textarea id="evinfo-memo" class="mta evinfo-field" style="width:100%;box-sizing:border-box;font-size:11px;padding:2px 5px;min-height:20px;resize:vertical;border-color:transparent;background:transparent;overflow:hidden" placeholder="" oninput="onEvInfoChange();if(typeof fbPush==='function')fbPush();" onfocus="evInfoMemoFocus()" onblur="evInfoMemoBlur()"></textarea>
               <div id="evinfo-memo-link" style="display:none;font-size:11px;padding:2px 5px;cursor:text;word-break:break-all" onclick="evInfoMemoFocus()"></div>
             </div>
           </div>
@@ -5359,11 +5359,14 @@ window.fbShowRoom = function(){
   }
 };
 
+var _fbPushTimer = null;
 window.fbPush = function(){
-  if(!_fbDB || _fbSyncing) return;
-  var now = Date.now();
-  if(now - _fbLastPush < 200) return;
-  _fbLastPush = now;
+  if(!_fbDB) return;
+  // debounce: 500ms後に送信（連続入力の最後だけ送る）
+  clearTimeout(_fbPushTimer);
+  _fbPushTimer = setTimeout(function(){
+    if(_fbSyncing) return;
+    _fbLastPush = Date.now();
   try{
     var data = {
       title: document.getElementById('evt').value || '',
@@ -5378,6 +5381,7 @@ window.fbPush = function(){
     _fbDB.ref('rooms/' + fbGetRoomId() + '/data').set(data)
       .catch(function(e){ console.warn('Firebase push error:', e); });
   }catch(e){ console.warn('fbPush error:', e); }
+  }, 500);
 };
 
 function fbUpdateStatus(){
