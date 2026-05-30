@@ -1534,12 +1534,15 @@ function onEvInfoChange(){
 }
 
 function loadEvInfoToWidget(){
-  if(evInfoOpen){
-    document.getElementById('evinfo-location').value=evInfo.location;
-    document.getElementById('evinfo-owner').value=evInfo.owner;
-    document.getElementById('evinfo-members').value=evInfo.members;
-    document.getElementById('evinfo-memo').value=evInfo.memo;
-  }
+  // パネルの開閉に関わらず常に入力欄に反映
+  const loc=document.getElementById('evinfo-location');
+  const own=document.getElementById('evinfo-owner');
+  const mem=document.getElementById('evinfo-members');
+  const mmo=document.getElementById('evinfo-memo');
+  if(loc) loc.value=evInfo.location||'';
+  if(own) own.value=evInfo.owner||'';
+  if(mem) mem.value=evInfo.members||'';
+  if(mmo) mmo.value=evInfo.memo||'';
   updateEvInfoPreview();
 }
 
