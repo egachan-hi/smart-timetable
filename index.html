@@ -892,6 +892,9 @@ tbody tr:hover td{background:var(--bg2)}
         <div class="mv-meta" id="mv-meta" style="font-size:14px;font-weight:400;color:var(--text2);margin-top:1px"></div>
       </div>
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
+      <button id="mv-day-cfg-btn" onclick="mvOpenDayTimeSetting()" style="display:none;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 6px;cursor:pointer;color:var(--text2);font-size:11px;flex-shrink:0" title="日付・時間設定">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
       <!-- 鉛筆アイコン（右上） -->
       <button onclick="mvOpenEventEdit()" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:6px">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -4740,17 +4743,30 @@ function mvRender(){
   if(daySel){
     if(dayCount>1){
       daySel.style.display='block';
-      if(daySel.options.length!==dayCount){
-        daySel.innerHTML='';
-        for(let i=1;i<=dayCount;i++){
-          const opt=document.createElement('option');
-          opt.value=i;opt.textContent=`DAY${i}`;
-          daySel.appendChild(opt);
+      const cfgBtn=document.getElementById('mv-day-cfg-btn');
+      if(cfgBtn) cfgBtn.style.display='flex';
+      // 常に再構築（日付表示を最新に）
+      daySel.innerHTML='';
+      const _days=['日','月','火','水','木','金','土'];
+      for(let i=1;i<=dayCount;i++){
+        const opt=document.createElement('option');
+        opt.value=i;
+        const dd=dayData[i-1];
+        const ddate=dd&&dd.date?dd.date:'';
+        if(ddate){
+          const[y,mo,d]=ddate.split('-').map(Number);
+          const dt=new Date(y,mo-1,d);
+          opt.textContent=`DAY${i} ${mo}/${d}(${_days[dt.getDay()]})`;
+        } else {
+          opt.textContent=`DAY${i}`;
         }
+        daySel.appendChild(opt);
       }
       daySel.value=String(currentDay);
     } else {
       daySel.style.display='none';
+      const cfgBtn=document.getElementById('mv-day-cfg-btn');
+      if(cfgBtn) cfgBtn.style.display='none';
     }
   }
 
@@ -4800,6 +4816,12 @@ function mvUpdateUR(){
 
 function mvUndo(){undo();mvUpdateUR();if(typeof mvRender==='function')mvRender();}
 function mvRedo(){redo();mvUpdateUR();if(typeof mvRender==='function')mvRender();}
+
+
+function mvOpenDayTimeSetting(){
+  if(dayCount<=1)return;
+  openDayTimeSetting();
+}
 
 function mvSwitchDayUI(){
   const sel=document.getElementById('mv-day-sel');
