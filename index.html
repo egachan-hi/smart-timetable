@@ -5371,7 +5371,6 @@ function mvInlineBlur(inp, field){
 }
 
 function mvSaveEventInfoLive(){
-  // リアルタイムでPC側に反映（renderは保存ボタン押下時のみ）
   const evt=document.getElementById('mv-evt');
   const evd=document.getElementById('mv-evd');
   const evs=document.getElementById('mv-evs');
@@ -5380,7 +5379,14 @@ function mvSaveEventInfoLive(){
   if(evd) document.getElementById('evd').value=evd.value||'';
   if(evs) document.getElementById('evs').value=evs.value||'';
   if(eve) document.getElementById('eve').value=eve.value||'';
-  updateDow();autoSave();
+  updateDow();
+  updateTotalTime();
+  updateTopDateLabel();
+  // ライブモード: 今日の日付に変わった場合自動ON
+  if(typeof isActuallyToday==='function'&&isActuallyToday()&&!liveMode){
+    toggleLiveMode(true);
+  }
+  autoSave();
   if(typeof fbPush==='function') fbPush();
 }
 
