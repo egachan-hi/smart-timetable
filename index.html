@@ -257,7 +257,7 @@ tbody tr:hover td{background:var(--bg2)}
   </div>
   <div class="sep"></div>
   <button class="tb" id="btn-prev-day" onclick="shiftDay(-1)" title="前日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
-  <span id="top-date-label" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;padding:0 2px"></span>
+  <span id="top-date-label" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;padding:0 2px;cursor:pointer" onclick="openDayTimeSetting()" title="クリックして日時設定"></span>
   <button class="tb" id="btn-next-day" onclick="shiftDay(1)" title="翌日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
   <div class="spacer"></div>
   <button class="tb ai" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>AI生成</button>
@@ -292,7 +292,7 @@ tbody tr:hover td{background:var(--bg2)}
           <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();if(typeof fbPush==='function')fbPush();"/>
           <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
           <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:auto">から</span>
-          <select id="day-count-sel" style="font-size:11px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0" onchange="onDayCountChange()">
+          <select id="day-count-sel" style="font-size:11px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0" onchange="onDayCountChange();initDayTimes();">
             <option value="1">1DAY</option>
             <option value="2">2DAYS</option>
             <option value="3">3DAYS</option>
@@ -1551,7 +1551,13 @@ function s0(){return JSON.stringify({sessions:JSON.parse(JSON.stringify(sessions
 function autoSave(){
   try{
     // 複数日の場合は現在日のデータを保存
-    if(dayCount>1) dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
+    if(dayCount>1) dayData[currentDay-1]={
+    sessions:JSON.parse(JSON.stringify(sessions)),
+    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+    start:document.getElementById('evs').value||'13:00',
+    end:document.getElementById('eve').value||'17:00',
+    date:document.getElementById('evd').value||''
+  };
     localStorage.setItem('stt-autosave', JSON.stringify({
       title: document.getElementById('evt').value||'',
       date: document.getElementById('evd').value||'',
@@ -4267,7 +4273,13 @@ function execGCal(){
 function exportJSON(){
   logEvent('export_stt');
   // 現在のDAYを保存
-  if(dayCount>1) dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
+  if(dayCount>1) dayData[currentDay-1]={
+    sessions:JSON.parse(JSON.stringify(sessions)),
+    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+    start:document.getElementById('evs').value||'13:00',
+    end:document.getElementById('eve').value||'17:00',
+    date:document.getElementById('evd').value||''
+  };
   const data={
     version:1,
     title:document.getElementById('evt').value,
@@ -4314,7 +4326,13 @@ function loadSTTFile(e){
 function exportPDF(){
   logEvent('export_pdf');
   // 現在のDAYを保存
-  if(dayCount>1) dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
+  if(dayCount>1) dayData[currentDay-1]={
+    sessions:JSON.parse(JSON.stringify(sessions)),
+    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+    start:document.getElementById('evs').value||'13:00',
+    end:document.getElementById('eve').value||'17:00',
+    date:document.getElementById('evd').value||''
+  };
 
   const sm=gSM(),em=gEM();
   const title=document.getElementById('evt').value||'タイムテーブル';
@@ -4427,7 +4445,32 @@ function exportPDF(){
     @media print{body{padding:12px 16px}tr{page-break-inside:avoid}}
   </style></head><body>${bodyHtml}
   <script>window.onload=function(){window.print();}<\/script>
-  </body></html>`;
+  
+<!-- DAY個別時間設定ポップオーバー -->
+<div id="day-time-pop" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:8000;align-items:center;justify-content:center" onclick="if(event.target===this)closeDayTimeSetting()">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:18px 20px;min-width:280px;display:flex;flex-direction:column;gap:12px;box-shadow:0 8px 32px rgba(0,0,0,.25)">
+    <div style="font-size:13px;font-weight:700;color:var(--text)" id="dtp-title">DAY1 の時間設定</div>
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text2);width:32px">日付</span>
+        <input type="date" id="dtp-date" style="flex:1;font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text2);width:32px">開始</span>
+        <input type="time" id="dtp-start" style="flex:1;font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)"/>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <span style="font-size:11px;color:var(--text2);width:32px">終了</span>
+        <input type="time" id="dtp-end" style="flex:1;font-size:12px;padding:4px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg2);color:var(--text)"/>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeDayTimeSetting()" style="padding:6px 14px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">キャンセル</button>
+      <button onclick="saveDayTimeSetting()" style="padding:6px 14px;font-size:12px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer">保存</button>
+    </div>
+  </div>
+</div>
+</body></html>`;
 
   const w=window.open('','_blank','width=700,height=900');
   w.document.write(html);
@@ -4461,7 +4504,13 @@ function onDayCountChange(){
   const fromLbl=document.getElementById('from-label');
   if(fromLbl) fromLbl.style.display=(!noDate&&newCount>1)?'':' none';
   // 現在のDAYデータを保存してからdayDataを操作
-  dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
+  dayData[currentDay-1]={
+    sessions:JSON.parse(JSON.stringify(sessions)),
+    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+    start:document.getElementById('evs').value||'13:00',
+    end:document.getElementById('eve').value||'17:00',
+    date:document.getElementById('evd').value||''
+  };
   // dayDataを拡張（縮小時はデータを保持したまま配列は縮小しない）
   while(dayData.length<newCount){
     dayData.push({sessions:[],freeEvs:[]});
@@ -4481,7 +4530,13 @@ function onDayCountChange(){
 function switchDay(d){
   if(dayCount<=1)return;
   // 現在の状態を保存
-  dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
+  dayData[currentDay-1]={
+    sessions:JSON.parse(JSON.stringify(sessions)),
+    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+    start:document.getElementById('evs').value||'13:00',
+    end:document.getElementById('eve').value||'17:00',
+    date:document.getElementById('evd').value||''
+  };
   currentDay=Math.max(1,Math.min(dayCount,currentDay+d));
   // 切り替え先を読み込み
   const target=dayData[currentDay-1];
@@ -4489,7 +4544,72 @@ function switchDay(d){
   freeEvs=JSON.parse(JSON.stringify(target.freeEvs||[]));
   nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
   nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-  updateTopDateLabel();snap();render();if(typeof mvRender==='function')mvRender();
+  if(target.start) document.getElementById('evs').value=target.start;
+  if(target.end)   document.getElementById('eve').value=target.end;
+  if(target.date!==undefined) document.getElementById('evd').value=target.date;
+  updateDow();updateTotalTime();updateTopDateLabel();snap();render();if(typeof mvRender==='function')mvRender();
+}
+
+
+// DAYごとの時間帯設定を初期化（dayData生成時に呼ぶ）
+function initDayTimes(){
+  for(let i=0;i<dayCount;i++){
+    if(!dayData[i]) dayData[i]={sessions:[],freeEvs:[]};
+    if(!dayData[i].start){
+      // 初回: 現在のevs/eveをコピー
+      dayData[i].start=document.getElementById('evs').value||'13:00';
+      dayData[i].end=document.getElementById('eve').value||'17:00';
+    }
+    if(dayData[i].date===undefined){
+      // 日付: 基準日からi日後
+      const base=document.getElementById('evd').value;
+      if(base){
+        const[y,m,d]=base.split('-').map(Number);
+        const dt=new Date(y,m-1,d+i);
+        dayData[i].date=[dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');
+      } else {
+        dayData[i].date='';
+      }
+    }
+  }
+}
+
+function openDayTimeSetting(){
+  if(dayCount<=1)return;
+  // 現在のdayDataを保存してからポップオーバーを表示
+  const d=dayData[currentDay-1]||{};
+  const date=d.date||'';
+  const start=d.start||document.getElementById('evs').value||'13:00';
+  const end=d.end||document.getElementById('eve').value||'17:00';
+  const pop=document.getElementById('day-time-pop');
+  if(!pop)return;
+  const dtpTitle=document.getElementById('dtp-title');
+  if(dtpTitle) dtpTitle.textContent=`DAY${currentDay} の時間設定`;
+  document.getElementById('dtp-date').value=date;
+  document.getElementById('dtp-start').value=start;
+  document.getElementById('dtp-end').value=end;
+  pop.style.display='flex';
+}
+function closeDayTimeSetting(){
+  const pop=document.getElementById('day-time-pop');
+  if(pop) pop.style.display='none';
+}
+function saveDayTimeSetting(){
+  const date=document.getElementById('dtp-date').value;
+  const start=document.getElementById('dtp-start').value;
+  const end=document.getElementById('dtp-end').value;
+  if(!dayData[currentDay-1]) dayData[currentDay-1]={sessions:[],freeEvs:[]};
+  dayData[currentDay-1].date=date;
+  dayData[currentDay-1].start=start;
+  dayData[currentDay-1].end=end;
+  // 現在表示中のDAYなら即反映
+  document.getElementById('evd').value=date;
+  document.getElementById('evs').value=start;
+  document.getElementById('eve').value=end;
+  validateTimeRange('evs');
+  updateDow();updateTotalTime();updateTopDateLabel();render();
+  if(typeof fbPush==='function') fbPush();
+  closeDayTimeSetting();
 }
 
 function updateTopDateLabel(){
@@ -4502,27 +4622,32 @@ function updateTopDateLabel(){
   if(prevBtn){prevBtn.disabled=!isMultiDay||currentDay<=1;prevBtn.style.opacity=(isMultiDay&&currentDay>1)?'1':'0.3';}
   if(nextBtn){nextBtn.disabled=!isMultiDay||currentDay>=dayCount;nextBtn.style.opacity=(isMultiDay&&currentDay<dayCount)?'1':'0.3';}
 
-  if(noDate||!document.getElementById('evd').value){
-    // 日付未設定
-    if(isMultiDay){
-      el.textContent=`DAY${currentDay}`;
+  const days=['日','月','火','水','木','金','土'];
+  if(isMultiDay){
+    // 複数日：dayDataに個別の日付があればそれを使う、なければ基準日+offset
+    const dayDate=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined
+      ? dayData[currentDay-1].date : '';
+    if(dayDate){
+      const[y,m,d]=dayDate.split('-').map(Number);
+      const dt=new Date(y,m-1,d);
+      el.textContent=`DAY${currentDay} ${m}/${d}(${days[dt.getDay()]})`;
     } else {
-      el.textContent='日付未設定';
+      const base=document.getElementById('evd').value;
+      if(base){
+        const[y,m,d]=base.split('-').map(Number);
+        const dt=new Date(y,m-1,d+currentDay-1);
+        el.textContent=`DAY${currentDay} ${dt.getMonth()+1}/${dt.getDate()}(${days[dt.getDay()]})`;
+      } else {
+        el.textContent=`DAY${currentDay}`;
+      }
     }
     return;
   }
-
   const v=document.getElementById('evd').value;
-  const days=['日','月','火','水','木','金','土'];
+  if(noDate||!v){el.textContent='日付未設定';return;}
   const[y,m,d]=v.split('-').map(Number);
-  if(isMultiDay){
-    // 複数日：基準日からcurrentDay-1日後を表示
-    const dt=new Date(y,m-1,d+currentDay-1);
-    el.textContent=`DAY${currentDay} ${dt.getMonth()+1}/${dt.getDate()}(${days[dt.getDay()]})`;
-  } else {
-    const dt=new Date(y,m-1,d);
-    el.textContent=`${m}/${d}(${days[dt.getDay()]})`;
-  }
+  const dt=new Date(y,m-1,d);
+  el.textContent=`${m}/${d}(${days[dt.getDay()]})`;
 }
 
 function shiftDay(d){
