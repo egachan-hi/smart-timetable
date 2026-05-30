@@ -1731,7 +1731,7 @@ function validateTimeRange(changed){
   }
 }
 
-function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();if(typeof mvRender==='function')mvRender();}
+function render(){rBL();rTL();rFR();if(cv==='tb')renderTbl();if(typeof updateNowLine==='function')setTimeout(updateNowLine,0);updateBtnTimeAdj();}
 
 // ================================================================
 // RENDER BLOCK LIST
@@ -4574,7 +4574,7 @@ let mvDragId=null, mvDragStartY=0, mvDragEl=null, mvDragGhost=null, mvLongPressT
 
 function mvRender(){
   // スマホ判定はCSSに任せ、常にmvRenderを実行（PC側要素はCSSで非表示）
-
+  try{
   const title=document.getElementById('evt').value||'タイムテーブル';
   const date=document.getElementById('evd').value;
   const days=['日','月','火','水','木','金','土'];
@@ -4647,6 +4647,7 @@ function mvRender(){
   if(mvLiveLabel){ mvLiveLabel.textContent=liveMode?'LIVE':'ライブ'; mvLiveLabel.style.color=liveMode?'#E53E3E':'var(--text2)'; }
   const mvBadge=document.getElementById('mv-live-badge');
   if(mvBadge) mvBadge.style.display=liveMode?'inline':'none';
+  }catch(e){console.error('mvRender内エラー:',e);}
 }
 
 
@@ -5422,7 +5423,9 @@ function fbListen(){
       if(data.sessions && data.sessions.length > 0){ sessions = data.sessions; nid = Math.max(nid, Math.max.apply(null, sessions.map(function(s){return s.id+1;})), 30); }
       if(data.freeEvs && data.freeEvs.length > 0){ freeEvs = data.freeEvs; nfid = Math.max(nfid, Math.max.apply(null, freeEvs.map(function(e){return e.id+1;})), 100); }
       render(); updateDow();
-      if(typeof mvRender==='function') mvRender();
+      if(typeof mvRender==='function'){
+        try{ mvRender(); }catch(mvErr){ console.error('mvRender error:',mvErr); }
+      }
     }catch(e){ console.warn(e); }
     finally{ setTimeout(function(){ _fbSyncing = false; }, 200); }
   });
