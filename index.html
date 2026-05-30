@@ -5390,6 +5390,20 @@ function mvInlineBlur(inp, field){
     viewEl.style.display='block';
   }
   inp.style.display='none';
+
+  // evInfo フィールドの場合: evInfo変数とPC入力欄を更新してfbPush
+  if(['location','owner','members','memo'].includes(field)){
+    mvOnEvInfoChange();
+  }
+  // title/date フィールドの場合: PC側に反映してfbPush
+  if(field==='title'){
+    const pc=document.getElementById('evt');
+    if(pc) pc.value=inp.value||'';
+    autoSave();if(typeof fbPush==='function')fbPush();
+  }
+  if(field==='date'){
+    mvSaveEventInfoLive();
+  }
 }
 
 function mvSaveEventInfoLive(){
