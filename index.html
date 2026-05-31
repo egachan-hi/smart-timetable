@@ -339,6 +339,14 @@ tbody tr:hover td{background:var(--bg2)}
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">参加者</span>
             <input id="evinfo-members" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="お名前・人数等" oninput="onEvInfoChange();if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"/>
           </div>
+          <div class="ei-row">
+            <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">スライドURL</span>
+            <div style="flex:1;display:flex;flex-direction:column;gap:2px">
+              <input type="url" id="evinfo-slide-url" class="mi evinfo-field" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent" placeholder="https://..." oninput="onEvInfoChange();validateSlideUrl();if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this);evInfoInlineBlur('slide')"/>
+              <div id="evinfo-slide-url-view" style="font-size:11px;color:var(--accent);display:none"></div>
+              <div id="evinfo-slide-url-msg" style="font-size:10px;display:none"></div>
+            </div>
+          </div>
           <div style="display:flex;align-items:flex-start;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0;padding-top:4px">メモ</span>
             <div id="evinfo-memo-wrap" style="flex:1;position:relative">
@@ -895,6 +903,10 @@ tbody tr:hover td{background:var(--bg2)}
       <button id="mv-day-cfg-btn" onclick="mvOpenDayTimeSetting()" style="display:none;background:none;border:1px solid var(--border);border-radius:6px;padding:4px 6px;cursor:pointer;color:var(--text2);font-size:11px;flex-shrink:0" title="日付・時間設定">
         <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
       </button>
+      <!-- スライドリンクボタン（右上） -->
+      <button id="mv-slide-btn" onclick="openSlideUrl()" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text2);flex-shrink:0;display:none;align-items:center;justify-content:center;border-radius:6px" title="スライドを開く">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
+      </button>
       <!-- 鉛筆アイコン（右上） -->
       <button onclick="mvOpenEventEdit()" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:6px">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
@@ -1026,6 +1038,13 @@ tbody tr:hover td{background:var(--bg2)}
             style="display:none;width:100%;font-size:14px;padding:5px 0;border:none;border-bottom:2px solid var(--accent);background:transparent;color:var(--text);outline:none;box-sizing:border-box"
             onblur="mvInlineBlur(this,'members')" oninput="mvOnEvInfoChange()"/>
         </div>
+        <div onclick="mvInlineEdit(this,'slideUrl')" style="padding:4px 0;cursor:pointer;border-top:1px solid var(--border)">
+          <div style="font-size:11px;color:var(--text3);margin-bottom:2px">スライドURL</div>
+          <div id="mv-evinfo-slide-url-view" style="font-size:14px;color:var(--text);min-height:22px;padding:2px 0"></div>
+          <input id="mv-evinfo-slide-url" type="url" placeholder="https://..."
+            style="display:none;width:100%;font-size:14px;padding:5px 0;border:none;border-bottom:2px solid var(--accent);background:transparent;color:var(--text);outline:none;box-sizing:border-box"
+            onblur="mvInlineBlur(this,'slideUrl')" oninput="mvOnEvInfoChange()"/>
+        </div>
         <div onclick="mvInlineEdit(this,'memo')" style="padding:4px 0;cursor:pointer;border-top:1px solid var(--border)">
           <div style="font-size:11px;color:var(--text3)">メモ</div>
           <div id="mv-evinfo-memo-view" style="font-size:14px;color:var(--text);min-height:40px;padding:2px 0;white-space:pre-wrap;word-break:break-all"></div>
@@ -1054,6 +1073,15 @@ tbody tr:hover td{background:var(--bg2)}
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg>やり直す
     </button>
 
+    <!-- 複数日切替（dayCount>1のときのみ表示） -->
+    <div id="mv-more-day-section" style="display:none;flex-direction:column;gap:6px">
+      <div style="font-size:11px;color:var(--text2);padding:0 4px">日程切替</div>
+      <div id="mv-more-day-btns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <button onclick="mvOpenDayTimeSetting();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+        この日の日付・時間設定
+      </button>
+    </div>
     <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
     </button>
@@ -1278,15 +1306,16 @@ let gSrc=null,gN='',gD=0,gC='teal';
 // ================================================================
 // イベント概要
 // ================================================================
-let evInfo={location:'',owner:'',members:'',memo:''};
+let evInfo={location:'',owner:'',members:'',memo:'',slideUrl:''};
 let evInfoOpen=false;
 
 function gEvInfoPreview(){
   const v=evInfo;
-  if(v.location.trim()) return {label:'場所/ID', text:v.location.trim()};
-  if(v.owner.trim())    return {label:'オーナー', text:v.owner.trim()};
-  if(v.members.trim())  return {label:'参加者', text:v.members.trim()};
-  if(v.memo.trim()){
+  if(v.location&&v.location.trim()) return {label:'場所/ID', text:v.location.trim()};
+  if(v.owner&&v.owner.trim())       return {label:'オーナー', text:v.owner.trim()};
+  if(v.members&&v.members.trim())   return {label:'参加者', text:v.members.trim()};
+  if(v.slideUrl&&v.slideUrl.trim()) return {label:'スライドURL', text:v.slideUrl.trim()};
+  if(v.memo&&v.memo.trim()){
     const line=v.memo.split('\n')[0];
     return {label:'メモ', text:line.length>30?line.slice(0,30)+'…':line};
   }
@@ -1527,10 +1556,64 @@ function evInfoMemoInit(){
   }
 }
 
+
+
+function evInfoInlineEdit(field){
+  // inputは常時表示なのでfocusのみ
+  const inp=document.getElementById('evinfo-slide-url');
+  if(inp) inp.focus();
+}
+function evInfoInlineBlur(field){
+  // inputは常時表示。blurでリンクプレビューのみ更新
+  const view=document.getElementById('evinfo-slide-url-view');
+  const inp=document.getElementById('evinfo-slide-url');
+  const msg=document.getElementById('evinfo-slide-url-msg');
+  if(!view||!inp)return;
+  const val=inp.value.trim();
+  if(val.startsWith('http://')||val.startsWith('https://')){
+    view.style.display='block';
+    view.innerHTML='<a href="'+val+'" target="_blank" rel="noopener" style="color:var(--accent);text-decoration:underline;font-size:10px;word-break:break-all" onclick="event.stopPropagation()">🔗 開く</a>';
+    if(msg) msg.style.display='none';
+  } else if(val===''){
+    view.style.display='none';
+    if(msg) msg.style.display='none';
+  } else {
+    view.style.display='none';
+    if(msg){msg.style.display='block';msg.style.color='#E53E3E';msg.textContent='⚠ https:// で始まるURLを入力してください';}
+  }
+}
+
+function validateSlideUrl(){
+  const inp=document.getElementById('evinfo-slide-url');
+  const prev=document.getElementById('evinfo-slide-url-preview');
+  if(!inp||!prev)return;
+  const val=inp.value.trim();
+  if(!val){prev.style.display='none';inp.style.borderColor='';return;}
+  if(val.startsWith('http://')||val.startsWith('https://')){
+    inp.style.borderColor='var(--accent)';
+    prev.style.display='block';
+    prev.innerHTML='<a href="'+val+'" target="_blank" rel="noopener" style="color:var(--accent);font-size:11px;word-break:break-all">🔗 '+val+'</a>';
+  } else {
+    inp.style.borderColor='#E53E3E';
+    prev.style.display='block';
+    prev.innerHTML='<span style="color:#E53E3E;font-size:11px">⚠ http:// または https:// で始まるURLを入力してください</span>';
+  }
+}
+function updateSlideUrlPreview(){
+  validateSlideUrl();
+}
+function openSlideUrl(){
+  const url=(evInfo.slideUrl||'').trim();
+  if(!url){alert('スライドURLが設定されていません');return;}
+  if(!url.startsWith('http://')&&!url.startsWith('https://')){alert('有効なURLではありません');return;}
+  window.open(url,'_blank','noopener');
+}
+
 function onEvInfoChange(){
   evInfo.location =document.getElementById('evinfo-location').value;
   evInfo.owner    =document.getElementById('evinfo-owner').value;
   evInfo.members  =document.getElementById('evinfo-members').value;
+  evInfo.slideUrl =document.getElementById('evinfo-slide-url').value;
   evInfo.memo     =document.getElementById('evinfo-memo').value;
   updateEvInfoPreview();
   autoSave();
@@ -1545,7 +1628,11 @@ function loadEvInfoToWidget(){
   if(loc) loc.value=evInfo.location||'';
   if(own) own.value=evInfo.owner||'';
   if(mem) mem.value=evInfo.members||'';
+  const sld=document.getElementById('evinfo-slide-url');
+  if(sld) sld.value=evInfo.slideUrl||'';
+  evInfoInlineBlur('slide');
   if(mmo) mmo.value=evInfo.memo||'';
+  updateSlideUrlPreview();
   updateEvInfoPreview();
 }
 
@@ -2367,7 +2454,14 @@ function uDiff(){
 function addAnyEvent(){sessions.push({id:nid++,name:ANY.name,dur:ANY.dur,color:ANY.color,comment:''});snap();rTL();if(cv==='tb')renderTbl();}
 function addST(){const t=TYPES[0]||ANY;sessions.push({id:nid++,name:t.name,dur:t.dur,color:t.color,comment:''});snap();rTL();if(cv==='tb')renderTbl();}
 function delFid(id){freeEvs=freeEvs.filter(x=>x.id!==id);snap();rFR();if(cv==='tb')renderTbl();}
-function resetAll(){if(!confirm('すべてのセッションを削除しますか？'))return;sessions=[];freeEvs=[];snap();render();if(typeof mvRender==='function')mvRender();}
+function resetAll(){
+  if(!confirm('すべてのセッションを削除しますか？'))return;
+  sessions=[];freeEvs=[];
+  dayCount=1;currentDay=1;dayData=[{sessions:[],freeEvs:[],start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'16:00',date:document.getElementById('evd').value||''}];
+  const dcSel=document.getElementById('day-count-sel');
+  if(dcSel) dcSel.value='1';
+  snap();render();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
+}
 
 const TT=document.getElementById('tt');
 function sTT(x,y,t){TT.textContent=t;TT.style.display='block';TT.style.left=x+'px';TT.style.top=(y-26)+'px';}
@@ -3948,7 +4042,23 @@ function duplicateEV(){
   alert(`「${title}」として複製しました`);
 }
 
-function newEV(){if(!confirm('現在のデータをリセットして新規イベントを作成しますか？'))return;sessions=[];freeEvs=[];document.getElementById('evt').value='';document.getElementById('evd').value='';document.getElementById('evs').value='13:00';document.getElementById('eve').value='16:00';closeEV();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();}
+function newEV(){
+  if(!confirm('現在のデータをリセットして新規イベントを作成しますか？'))return;
+  sessions=[];freeEvs=[];
+  // 複数日程をリセットして1日に戻す
+  dayCount=1;currentDay=1;dayData=[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}];
+  const dcSel=document.getElementById('day-count-sel');
+  if(dcSel) dcSel.value='1';
+  document.getElementById('evt').value='';
+  document.getElementById('evd').value='';
+  document.getElementById('evs').value='13:00';
+  document.getElementById('eve').value='16:00';
+  // evInfoもリセット
+  evInfo={location:'',owner:'',members:'',memo:'',slideUrl:''};
+  loadEvInfoToWidget();
+  closeEV();snap();render();updateDow();updateTopDateLabel();
+  if(typeof mvRender==='function')mvRender();
+}
 
 // ================================================================
 // CSV
@@ -4787,6 +4897,12 @@ function mvRender(){
   // イベント概要プレビュー
   updateEvInfoPreview();
 
+  // スライドURLボタン表示制御
+  const mvSlideBtn=document.getElementById('mv-slide-btn');
+  if(mvSlideBtn){
+    const hasSlide=(evInfo.slideUrl||'').trim().startsWith('http');
+    mvSlideBtn.style.display=hasSlide?'flex':'none';
+  }
   // ライブボタン状態同期
   const mvLiveIcon=document.getElementById('mv-live-btn-icon');
   const mvLiveLabel=document.getElementById('mv-live-btn-label');
@@ -4837,7 +4953,36 @@ function mvSwitchDayUI(){
 function mvOpenShare(){
   if(typeof fbShowRoom==='function') fbShowRoom();
 }
-function mvOpenMore(){document.getElementById('mv-more-menu').style.display='flex';}
+function mvOpenMore(){
+  // 複数日切替ボタンを動的生成
+  const sec=document.getElementById('mv-more-day-section');
+  const btns=document.getElementById('mv-more-day-btns');
+  if(sec&&btns){
+    if(dayCount>1){
+      sec.style.display='flex';
+      btns.innerHTML='';
+      const days=['日','月','火','水','木','金','土'];
+      for(let i=1;i<=dayCount;i++){
+        const btn=document.createElement('button');
+        const dd=dayData[i-1];
+        const ddate=dd&&dd.date?dd.date:'';
+        let label=`DAY${i}`;
+        if(ddate){
+          const[y,mo,d]=ddate.split('-').map(Number);
+          const dt=new Date(y,mo-1,d);
+          label=`DAY${i} ${mo}/${d}(${days[dt.getDay()]})`;
+        }
+        btn.textContent=label;
+        btn.style.cssText=`padding:8px 12px;border-radius:10px;font-size:13px;font-weight:${i===currentDay?'700':'400'};border:${i===currentDay?'2px solid var(--accent)':'1px solid var(--border)'};background:${i===currentDay?'var(--accent-bg, rgba(93,202,165,0.1))':'var(--bg2)'};color:${i===currentDay?'var(--accent)':'var(--text)'};cursor:pointer;`;
+        btn.onclick=(()=>{const day=i;return()=>{switchDay(day-currentDay);mvCloseMore();}; })();
+        btns.appendChild(btn);
+      }
+    } else {
+      sec.style.display='none';
+    }
+  }
+  document.getElementById('mv-more-menu').style.display='flex';
+}
 function mvCloseMore(){document.getElementById('mv-more-menu').style.display='none';}
 
 function mvRenderSerial(nowMin,sm){
@@ -5319,6 +5464,18 @@ function mvOpenEventEdit(){
   set('mv-evinfo-location',evInfo.location||'','—');
   set('mv-evinfo-owner',evInfo.owner||'','—');
   set('mv-evinfo-members',evInfo.members||'','—');
+  // slideUrl: リンクとして表示
+  const slideUrlView=document.getElementById('mv-evinfo-slide-url-view');
+  const slideUrlInp=document.getElementById('mv-evinfo-slide-url');
+  const slideUrlVal=evInfo.slideUrl||'';
+  if(slideUrlInp) slideUrlInp.value=slideUrlVal;
+  if(slideUrlView){
+    if(slideUrlVal.startsWith('http')){
+      slideUrlView.innerHTML='<a href="'+slideUrlVal+'" target="_blank" rel="noopener" style="color:var(--accent);word-break:break-all;font-size:14px" onclick="event.stopPropagation()">🔗 '+slideUrlVal+'</a>';
+    } else {
+      slideUrlView.innerHTML='<span style="color:var(--text2)">—</span>';
+    }
+  }
   const memoView=document.getElementById('mv-evinfo-memo-view');
   if(memoView) memoView.textContent=evInfo.memo||'—';
   const memoInp=document.getElementById('mv-evinfo-memo');
@@ -5344,8 +5501,8 @@ function mvInlineEdit(row, field){
     if(first) setTimeout(()=>first.focus(),50);
     return;
   }
-  const idMap={title:'mv-evt',date:'mv-evd',location:'mv-evinfo-location',owner:'mv-evinfo-owner',members:'mv-evinfo-members',memo:'mv-evinfo-memo'};
-  const viewMap={title:'mv-evt-view',date:'mv-evd-view',location:'mv-evinfo-location-view',owner:'mv-evinfo-owner-view',members:'mv-evinfo-members-view',memo:'mv-evinfo-memo-view'};
+  const idMap={title:'mv-evt',date:'mv-evd',location:'mv-evinfo-location',owner:'mv-evinfo-owner',members:'mv-evinfo-members',slideUrl:'mv-evinfo-slide-url',memo:'mv-evinfo-memo'};
+  const viewMap={title:'mv-evt-view',date:'mv-evd-view',location:'mv-evinfo-location-view',owner:'mv-evinfo-owner-view',members:'mv-evinfo-members-view',slideUrl:'mv-evinfo-slide-url-view',memo:'mv-evinfo-memo-view'};
   const viewEl=document.getElementById(viewMap[field]);
   const inpEl=document.getElementById(idMap[field]);
   if(viewEl) viewEl.style.display='none';
@@ -5395,7 +5552,7 @@ function mvInlineBlur(inp, field){
   inp.style.display='none';
 
   // evInfo フィールドの場合: evInfo変数とPC入力欄を更新してfbPush
-  if(['location','owner','members','memo'].includes(field)){
+  if(['location','owner','members','slideUrl','memo'].includes(field)){
     mvOnEvInfoChange();
   }
   // title/date フィールドの場合: PC側に反映してfbPush
