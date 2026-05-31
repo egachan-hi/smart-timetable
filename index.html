@@ -5706,6 +5706,8 @@ window.fbPush = function(){
       sessions: JSON.parse(JSON.stringify(sessions)),
       freeEvs: JSON.parse(JSON.stringify(freeEvs)),
       evInfo: JSON.parse(JSON.stringify(evInfo || {})),
+      dayCount: dayCount||1,
+      dayData: JSON.parse(JSON.stringify(dayData||[])),
       ts: _fbLastPush
     };
     _fbDB.ref('rooms/' + fbGetRoomId() + '/data').set(data)
@@ -5756,8 +5758,14 @@ function fbListen(){
       document.getElementById('eve').value = data.end || '16:00';
       if(data.sessions && data.sessions.length > 0){ sessions = data.sessions; nid = Math.max(nid, Math.max.apply(null, sessions.map(function(s){return s.id+1;})), 30); }
       if(data.freeEvs && data.freeEvs.length > 0){ freeEvs = data.freeEvs; nfid = Math.max(nfid, Math.max.apply(null, freeEvs.map(function(e){return e.id+1;})), 100); }
-      if(data.evInfo){ evInfo = Object.assign({location:'',owner:'',members:'',memo:''}, data.evInfo); loadEvInfoToWidget(); }
-      render(); updateDow();
+      if(data.evInfo){ evInfo = Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''}, data.evInfo); loadEvInfoToWidget(); }
+      if(data.dayCount&&data.dayCount!==dayCount){
+        dayCount=data.dayCount;
+        const dcSel=document.getElementById('day-count-sel');
+        if(dcSel) dcSel.value=String(dayCount);
+      }
+      if(data.dayData&&data.dayData.length>0){ dayData=data.dayData; }
+      render(); updateDow(); updateTopDateLabel();
       if(typeof mvRender==='function'){
         try{ mvRender(); }catch(mvErr){ console.error('mvRender error:',mvErr); }
       }
