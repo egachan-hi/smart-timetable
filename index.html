@@ -195,6 +195,8 @@ tbody tr:hover td{background:var(--bg2)}
 /* DAY切替 */
 .mv-day-sel{font-size:12px;font-weight:700;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer}
 /* モーダル */
+.mv-more-menu button,.mv-more-menu label{-webkit-tap-highlight-color:transparent;outline:none;}
+.mv-more-menu button:focus,.mv-more-menu label:focus{outline:none;box-shadow:none;}
 .mv-modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:200;display:flex;align-items:flex-end;justify-content:center}
 .mv-modal{background:var(--bg);border-radius:18px 18px 0 0;width:100%;max-width:600px;padding:0 0 env(safe-area-inset-bottom,16px);max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
 .mv-modal-handle{width:36px;height:4px;background:var(--border2,var(--border));border-radius:2px;margin:10px auto 6px}
@@ -4646,12 +4648,15 @@ function onDayCountChange(){
   const fromLbl=document.getElementById('from-label');
   if(fromLbl) fromLbl.style.display=(!noDate&&newCount>1)?'':' none';
   // 現在のDAYデータを保存してからdayDataを操作
+  const _exDate=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined
+    ? dayData[currentDay-1].date
+    : document.getElementById('evd').value||'';
   dayData[currentDay-1]={
     sessions:JSON.parse(JSON.stringify(sessions)),
     freeEvs:JSON.parse(JSON.stringify(freeEvs)),
     start:document.getElementById('evs').value||'13:00',
     end:document.getElementById('eve').value||'17:00',
-    date:document.getElementById('evd').value||''
+    date:_exDate
   };
   // dayDataを拡張（新しいDAYには基準日からi日後の日付を設定）
   const _base=document.getElementById('evd').value;
@@ -4679,13 +4684,16 @@ function onDayCountChange(){
 
 function switchDay(d){
   if(dayCount<=1)return;
-  // 現在の状態を保存
+  // 現在の状態を保存（dateは既存値を優先・evdは上書きしない）
+  const _existingDate=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined
+    ? dayData[currentDay-1].date
+    : document.getElementById('evd').value||'';
   dayData[currentDay-1]={
     sessions:JSON.parse(JSON.stringify(sessions)),
     freeEvs:JSON.parse(JSON.stringify(freeEvs)),
     start:document.getElementById('evs').value||'13:00',
     end:document.getElementById('eve').value||'17:00',
-    date:document.getElementById('evd').value||''
+    date:_existingDate
   };
   currentDay=Math.max(1,Math.min(dayCount,currentDay+d));
   // 切り替え先を読み込み
@@ -5075,8 +5083,10 @@ function mvOpenMore(){
     }
   }
   document.getElementById('mv-more-menu').style.display='flex';
-  // フォーカスを外してボタンのハイライトを防ぐ
-  setTimeout(()=>{ const el=document.getElementById('mv-more-menu'); if(el) el.focus(); },50);
+  // iOS Safariのフォーカスハイライトを防ぐ
+  setTimeout(()=>{
+    if(document.activeElement && document.activeElement.blur) document.activeElement.blur();
+  },50);
 }
 function mvCloseMore(){document.getElementById('mv-more-menu').style.display='none';}
 
