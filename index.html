@@ -4647,9 +4647,17 @@ function onDayCountChange(){
     end:document.getElementById('eve').value||'17:00',
     date:document.getElementById('evd').value||''
   };
-  // dayDataを拡張（縮小時はデータを保持したまま配列は縮小しない）
+  // dayDataを拡張（新しいDAYには基準日からi日後の日付を設定）
+  const _base=document.getElementById('evd').value;
   while(dayData.length<newCount){
-    dayData.push({sessions:[],freeEvs:[]});
+    const i=dayData.length;
+    let _date='';
+    if(_base){
+      const[_y,_m,_d]=_base.split('-').map(Number);
+      const _dt=new Date(_y,_m-1,_d+i);
+      _date=[_dt.getFullYear(),String(_dt.getMonth()+1).padStart(2,'0'),String(_dt.getDate()).padStart(2,'0')].join('-');
+    }
+    dayData.push({sessions:[],freeEvs:[],start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'17:00',date:_date});
   }
   // 縮小時はdayData自体は保持（配列の長さを変えない）→復活可能
   dayCount=newCount;
@@ -4693,25 +4701,15 @@ function initDayTimes(){
   const evs=document.getElementById('evs').value||'13:00';
   const eve=document.getElementById('eve').value||'17:00';
   for(let i=0;i<dayCount;i++){
-    // 新規DAYのみ初期化（既存のDAYは上書きしない）
-    if(!dayData[i]||Object.keys(dayData[i]).length===0){
-      // 日付: 基準日からi日後
-      let date='';
-      if(base){
-        const[y,m,d]=base.split('-').map(Number);
-        const dt=new Date(y,m-1,d+i);
-        date=[dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');
-      }
-      dayData[i]={sessions:[],freeEvs:[],start:evs,end:eve,date:date};
-    } else {
-      // 既存DAYでdateが空or未設定の場合のみ補完
-      if(!dayData[i].date&&base){
-        const[y,m,d]=base.split('-').map(Number);
-        const dt=new Date(y,m-1,d+i);
-        dayData[i].date=[dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');
-      }
-      if(!dayData[i].start) dayData[i].start=evs;
-      if(!dayData[i].end)   dayData[i].end=eve;
+    if(!dayData[i]) dayData[i]={sessions:[],freeEvs:[]};
+    // start/endが未設定の場合のみ設定
+    if(!dayData[i].start) dayData[i].start=evs;
+    if(!dayData[i].end)   dayData[i].end=eve;
+    // dateが未設定or空の場合のみ基準日+i日で設定
+    if(!dayData[i].date&&base){
+      const[y,m,d]=base.split('-').map(Number);
+      const dt=new Date(y,m-1,d+i);
+      dayData[i].date=[dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');
     }
   }
 }
