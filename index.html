@@ -5853,6 +5853,8 @@ window.fbPush = function(){
   if(!_fbDB) return;
   // debounce: 500ms後に送信（連続入力の最後だけ送る）
   clearTimeout(_fbPushTimer);
+  // tsを先に設定して受信ループを防ぐ
+  _fbLastPush = Date.now();
   _fbPushTimer = setTimeout(function(){
     if(_fbSyncing) return;
     _fbLastPush = Date.now();
