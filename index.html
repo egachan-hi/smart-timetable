@@ -4856,22 +4856,20 @@ function updateTopDateLabel(){
 
   const days=['日','月','火','水','木','金','土'];
   if(isMultiDay){
+    // noDate時は日付なし表示
+    if(noDate){
+      el.textContent=`DAY${currentDay} 日付未設定`;
+      return;
+    }
     // 複数日：dayDataに個別の日付があればそれを使う、なければ基準日+offset
-    const dayDate=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined
+    const dayDate=dayData[currentDay-1]&&dayData[currentDay-1].date
       ? dayData[currentDay-1].date : '';
     if(dayDate){
       const[y,m,d]=dayDate.split('-').map(Number);
       const dt=new Date(y,m-1,d);
       el.textContent=`DAY${currentDay} ${m}/${d}(${days[dt.getDay()]})`;
     } else {
-      const base=document.getElementById('evd').value;
-      if(base){
-        const[y,m,d]=base.split('-').map(Number);
-        const dt=new Date(y,m-1,d+currentDay-1);
-        el.textContent=`DAY${currentDay} ${dt.getMonth()+1}/${dt.getDate()}(${days[dt.getDay()]})`;
-      } else {
-        el.textContent=`DAY${currentDay}`;
-      }
+      el.textContent=`DAY${currentDay} 日付未設定`;
     }
     return;
   }
