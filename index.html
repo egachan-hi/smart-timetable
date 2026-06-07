@@ -4711,6 +4711,9 @@ function onDayCountChange(){
       dayData[i].date=_date; // 日付のみ上書き（セッションは保持）
       if(!dayData[i].start) dayData[i].start=_evs;
       if(!dayData[i].end)   dayData[i].end=_eve;
+      // sessions/freeEvsが未定義の場合は空配列で初期化
+      if(!dayData[i].sessions) dayData[i].sessions=[];
+      if(!dayData[i].freeEvs) dayData[i].freeEvs=[];
     } else {
       dayData.push({sessions:[],freeEvs:[],start:_evs,end:_eve,date:_date});
     }
