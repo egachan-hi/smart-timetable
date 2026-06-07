@@ -306,6 +306,7 @@ tbody tr:hover td{background:var(--bg2)}
           <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:6px">
             <input type="checkbox" id="multi-day-chk" onchange="toggleMultiDay()" style="margin:0;width:12px;height:12px"/>複数日程
           </label>
+          <span id="multi-day-badge" onclick="openMultiDayModal()" style="display:none;font-size:11px;padding:2px 7px;border-radius:10px;background:var(--bg-info,#E1F5EE);color:var(--teal,#0F6E56);cursor:pointer;font-weight:500;user-select:none"></span>
         </div>
         <div style="display:flex;align-items:center;gap:4px">
           <label style="display:flex;align-items:center;gap:2px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap">
@@ -2126,6 +2127,7 @@ function toggleMultiDay(){
       const sel=document.getElementById('day-count-sel');
       if(sel) sel.value='2';
     }
+    updateMultiDayChk();
     openMultiDayModal();
   } else {
     // 複数日程OFFにする → 1DAYに戻す
@@ -2166,6 +2168,16 @@ function closeMultiDayModal(){
 function updateMultiDayChk(){
   const chk=document.getElementById('multi-day-chk');
   if(chk) chk.checked=dayCount>1;
+  // PCバッジ
+  const badge=document.getElementById('multi-day-badge');
+  if(badge){
+    if(dayCount>1){
+      badge.style.display='inline';
+      badge.textContent=dayCount+'DAYS ✎';
+    } else {
+      badge.style.display='none';
+    }
+  }
   const mvChk=document.getElementById('mv-multi-day-chk');
   if(mvChk) mvChk.checked=dayCount>1;
   const editBtn=document.getElementById('mv-multi-day-edit-btn');
