@@ -312,7 +312,7 @@ tbody tr:hover td{background:var(--bg2)}
             <option value="6">6DAYS</option>
             <option value="7">7DAYS</option>
           </select>
-          <span id="multi-day-badge" onclick="openMultiDayModal()" style="display:none;font-size:11px;padding:2px 7px;border-radius:10px;background:var(--bg-info,#E1F5EE);color:var(--teal,#0F6E56);cursor:pointer;font-weight:500;user-select:none"></span>
+          <span id="multi-day-badge" onclick="openMultiDayModal()" style="display:none;font-size:11px;color:var(--accent);cursor:pointer;font-weight:600;user-select:none;text-decoration:underline;text-underline-offset:2px"></span>
           <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto">
             <input type="checkbox" id="no-date-chk" onchange="toggleNoDate()" style="margin:0;width:12px;height:12px"/>日付設定しない
           </label>
@@ -2173,7 +2173,7 @@ function updateMultiDayChk(){
   if(badge){
     if(dayCount>1){
       badge.style.display='inline';
-      badge.textContent=dayCount+'DAYS ✎';
+      badge.textContent=dayCount+'DAYS';
     } else {
       badge.style.display='none';
     }
