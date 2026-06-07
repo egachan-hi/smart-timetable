@@ -293,7 +293,16 @@ tbody tr:hover td{background:var(--bg2)}
         <div style="display:flex;align-items:center;gap:4px">
           <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="shiftDayDataFromBase();updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();if(typeof fbPush==='function')fbPush();"/>
           <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
-          <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:auto">から</span>
+          <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:4px">から</span>
+          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto">
+            <input type="checkbox" id="live-mode-chk" onchange="toggleLiveMode()" style="margin:0;width:12px;height:12px"/>ライブモード
+          </label>
+          <span id="live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E;margin-left:4px">● LIVE</span>
+        </div>
+        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
+          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
+            <input type="checkbox" id="multi-day-chk" onchange="toggleMultiDay()" style="margin:0;width:12px;height:12px"/>複数日程にする
+          </label>
           <select id="day-count-sel" style="display:none">
             <option value="1">1DAY</option>
             <option value="2">2DAYS</option>
@@ -303,19 +312,10 @@ tbody tr:hover td{background:var(--bg2)}
             <option value="6">6DAYS</option>
             <option value="7">7DAYS</option>
           </select>
-          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:6px">
-            <input type="checkbox" id="multi-day-chk" onchange="toggleMultiDay()" style="margin:0;width:12px;height:12px"/>複数日程
-          </label>
           <span id="multi-day-badge" onclick="openMultiDayModal()" style="display:none;font-size:11px;padding:2px 7px;border-radius:10px;background:var(--bg-info,#E1F5EE);color:var(--teal,#0F6E56);cursor:pointer;font-weight:500;user-select:none"></span>
-        </div>
-        <div style="display:flex;align-items:center;gap:4px">
-          <label style="display:flex;align-items:center;gap:2px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap">
+          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto">
             <input type="checkbox" id="no-date-chk" onchange="toggleNoDate()" style="margin:0;width:12px;height:12px"/>日付設定しない
           </label>
-          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:10px">
-            <input type="checkbox" id="live-mode-chk" onchange="toggleLiveMode()" style="margin:0;width:12px;height:12px"/>ライブモード
-          </label>
-          <span id="live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E;margin-left:4px">● LIVE</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
@@ -2193,7 +2193,7 @@ function renderMultiDayList(){
     row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)';
     row.innerHTML=
       '<span style="font-size:12px;font-weight:700;color:var(--accent);width:36px;flex-shrink:0">DAY'+(i+1)+'</span>'+
-      '<input type="date" value="'+(d.date||'')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);flex:1" data-day="'+i+'" class="mday-date"/>'+
+      (!noDate?'<input type="date" value="'+(d.date||'')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);flex:1" data-day="'+i+'" class="mday-date"/>'  :'<span style="font-size:12px;color:var(--text3);flex:1;padding:3px 6px">日付未設定</span>')+
       '<input type="time" value="'+(d.start||'13:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-start"/>'+
       '<span style="font-size:11px;color:var(--text3)">〜</span>'+
       '<input type="time" value="'+(d.end||'17:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-end"/>'+
@@ -5025,6 +5025,9 @@ function updateTopDateLabel(){
   const[y,m,d]=v.split('-').map(Number);
   const dt=new Date(y,m-1,d);
   el.textContent=`${m}/${d}(${days[dt.getDay()]})`;
+  // from-label: 複数日程かつ日付設定ありの時のみ表示
+  const _fl=document.getElementById('from-label');
+  if(_fl) _fl.style.display=(dayCount>1&&!noDate)?'inline':'none';
 }
 
 function shiftDay(d){
@@ -5046,7 +5049,8 @@ function shiftDay(d){
 function updateDow(){
   const v=document.getElementById('evd').value;
   const el=document.getElementById('dow-label');
-  if(!v){if(el)el.textContent='';updateTopDateLabel();return;}
+  // noDateまたは複数日程の時は曜日非表示
+  if(!v||noDate){if(el)el.textContent='';updateTopDateLabel();return;}
   const days=['日','月','火','水','木','金','土'];
   const[y,m,d]=v.split('-').map(Number);
   const date=new Date(y,m-1,d);
