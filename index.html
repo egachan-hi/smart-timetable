@@ -3399,7 +3399,9 @@ function calcAutoAdjResult(){
   // 後続セッション以外（調整対象外）の合計
   const selected2=document.querySelector('#time-adj-session-list input[type=radio]:checked');
   const isBefore2 = selected2 && selected2.value === '__before';
-  const startIdx2 = isBefore2 ? 0 : insertBefore + 1;
+  // ライブモードOFF: 選択セッション自身も調整対象に含める
+  // ライブモードON:  選択セッション（進行中）は除外し次から
+  const startIdx2 = isBefore2 ? 0 : (liveMode ? insertBefore + 1 : insertBefore);
   const followSessions = sessions.slice(startIdx2);
   const nonFollowDur = sessions.slice(0, startIdx2).reduce((a,s)=>a+s.dur,0) + adjMin;
   // 後続セッションに使える残り時間
