@@ -290,19 +290,11 @@ tbody tr:hover td{background:var(--bg2)}
     <div class="ei">
       <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
+        <!-- 1行目: 日付 + 曜日 + から + バッジ -->
         <div style="display:flex;align-items:center;gap:4px">
           <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="shiftDayDataFromBase();updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();if(typeof fbPush==='function')fbPush();"/>
           <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
           <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:4px">から</span>
-          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto">
-            <input type="checkbox" id="live-mode-chk" onchange="toggleLiveMode()" style="margin:0;width:12px;height:12px"/>ライブモード
-          </label>
-          <span id="live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E;margin-left:4px">● LIVE</span>
-        </div>
-        <div style="display:flex;align-items:center;gap:6px;margin-top:2px">
-          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
-            <input type="checkbox" id="multi-day-chk" onchange="toggleMultiDay()" style="margin:0;width:12px;height:12px"/>複数日程にする
-          </label>
           <select id="day-count-sel" style="display:none">
             <option value="1">1DAY</option>
             <option value="2">2DAYS</option>
@@ -313,9 +305,19 @@ tbody tr:hover td{background:var(--bg2)}
             <option value="7">7DAYS</option>
           </select>
           <span id="multi-day-badge" onclick="openMultiDayModal()" style="display:none;font-size:11px;color:var(--accent);cursor:pointer;font-weight:600;user-select:none;text-decoration:underline;text-underline-offset:2px"></span>
+        </div>
+        <!-- 2行目: 複数日程 + 日付設定しない + ライブ -->
+        <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
+          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
+            <input type="checkbox" id="multi-day-chk" onchange="toggleMultiDay()" style="margin:0;width:12px;height:12px"/>複数日程にする
+          </label>
           <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto">
             <input type="checkbox" id="no-date-chk" onchange="toggleNoDate()" style="margin:0;width:12px;height:12px"/>日付設定しない
           </label>
+          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
+            <input type="checkbox" id="live-mode-chk" onchange="toggleLiveMode()" style="margin:0;width:12px;height:12px"/>LIVE
+          </label>
+          <span id="live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">●</span>
         </div>
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
@@ -2283,6 +2285,12 @@ function toggleLiveMode(forceVal){
   // バッジ表示
   const badge=document.getElementById('live-badge');
   if(badge) badge.style.display=liveMode?'inline':'none';
+  // PC: ライブモードON時はLIVEラベルを赤く
+  const liveLbl=document.getElementById('live-mode-chk');
+  if(liveLbl&&liveLbl.parentElement){
+    const span=liveLbl.parentElement.querySelector('span')||liveLbl.nextSibling;
+    liveLbl.parentElement.style.color=liveMode?'#E53E3E':'';
+  }
   // スマホライブボタンの色
   const mvLiveIcon=document.getElementById('mv-live-btn-icon');
   const mvLiveLabel=document.getElementById('mv-live-btn-label');
