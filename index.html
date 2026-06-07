@@ -4695,17 +4695,25 @@ function onDayCountChange(){
     end:document.getElementById('eve').value||'17:00',
     date:_exDate
   };
-  // dayDataを拡張（新しいDAYには基準日からi日後の日付を設定）
+  // 基準日から連続した日付を全DAYに再設定
   const _base=document.getElementById('evd').value;
-  while(dayData.length<newCount){
-    const i=dayData.length;
+  const _evs=document.getElementById('evs').value||'13:00';
+  const _eve=document.getElementById('eve').value||'17:00';
+  // 既存DAYの日付を基準日+i日で上書き、足りないDAYは新規追加
+  for(let i=0;i<newCount;i++){
     let _date='';
     if(_base){
       const[_y,_m,_d]=_base.split('-').map(Number);
       const _dt=new Date(_y,_m-1,_d+i);
       _date=[_dt.getFullYear(),String(_dt.getMonth()+1).padStart(2,'0'),String(_dt.getDate()).padStart(2,'0')].join('-');
     }
-    dayData.push({sessions:[],freeEvs:[],start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'17:00',date:_date});
+    if(dayData[i]){
+      dayData[i].date=_date; // 日付のみ上書き（セッションは保持）
+      if(!dayData[i].start) dayData[i].start=_evs;
+      if(!dayData[i].end)   dayData[i].end=_eve;
+    } else {
+      dayData.push({sessions:[],freeEvs:[],start:_evs,end:_eve,date:_date});
+    }
   }
   // 縮小時はdayData自体は保持（配列の長さを変えない）→復活可能
   dayCount=newCount;
