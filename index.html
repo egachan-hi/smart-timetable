@@ -4676,7 +4676,7 @@ function toggleNoDate(){
     const _dc2=parseInt((document.getElementById('day-count-sel')||{}).value)||1;
     _fl2.style.display=(!noDate&&_dc2>1)?'':' none';
   }
-  updateDow();updateTopDateLabel();autoSave();if(typeof fbPush==='function')fbPush();
+  updateDow();render();updateTopDateLabel();autoSave();if(typeof fbPush==='function')fbPush();
 }
 
 function onDayCountChange(){
