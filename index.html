@@ -373,7 +373,7 @@ tbody tr:hover td{background:var(--bg2)}
   <div class="cr">
     <div class="tlv" id="vtl">
       <div class="tlp">
-        <div class="ch"><span>シリアルセッション</span><span style="flex:1"></span><span style="font-size:10px;font-weight:600;white-space:nowrap;color:var(--text);margin-right:4px" id="trl">13:00〜17:00</span><span class="db ok" id="dbd">ぴったり！</span><button class="ib" onclick="addAnyEvent()" style="font-size:15px;width:18px;height:18px;margin-left:4px" title="任意のセッションを追加">+</button></div>
+        <div class="ch"><span>シリアルセッション</span><span id="live-countdown" style="display:none;font-size:10px;font-weight:700;color:#E53E3E;margin-left:8px;white-space:nowrap"></span><span style="flex:1"></span><span style="font-size:10px;font-weight:600;white-space:nowrap;color:var(--text);margin-right:4px" id="trl">13:00〜17:00</span><span class="db ok" id="dbd">ぴったり！</span><button class="ib" onclick="addAnyEvent()" style="font-size:15px;width:18px;height:18px;margin-left:4px" title="任意のセッションを追加">+</button></div>
         <div class="tls" id="tls" onscroll="syncScroll('tls')">
           <div class="tlb" id="tlb">
             <div class="tc" id="tc"></div>
@@ -906,6 +906,7 @@ tbody tr:hover td{background:var(--bg2)}
       <div style="flex:1;min-width:0">
         <div style="display:flex;align-items:center;gap:6px"><div class="mv-title" id="mv-title" style="font-size:14px;font-weight:700;color:var(--text)">タイムテーブル</div><span id="mv-live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">● LIVE</span></div>
         <div class="mv-meta" id="mv-meta" style="font-size:14px;font-weight:400;color:var(--text2);margin-top:1px"></div>
+        <div id="mv-live-countdown" style="display:none;font-size:12px;font-weight:700;color:#E53E3E;margin-top:2px"></div>
       </div>
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
       <!-- スライドリンクボタン（右上） -->
@@ -2305,6 +2306,13 @@ function toggleLiveMode(forceVal){
   // 再描画
   render();
   if(typeof updateNowLine==='function') updateNowLine();
+  // liveMode OFF時にカウントダウンを非表示
+  if(!liveMode){
+    const cdPC=document.getElementById('live-countdown');
+    const cdMV=document.getElementById('mv-live-countdown');
+    if(cdPC){cdPC.textContent='';cdPC.style.display='none';}
+    if(cdMV){cdMV.textContent='';cdMV.style.display='none';}
+  }
   if(typeof mvRender==='function') mvRender();
   autoSave();
   if(typeof fbPush==='function') fbPush();
@@ -2357,6 +2365,20 @@ function updateNowLine(){
     fcan.appendChild(frsLine);
   }
   updateBtnTimeAdj();
+  // 開始前カウントダウン表示
+  const sm2=gSM();
+  const nowMin2=today.getHours()*60+today.getMinutes();
+  const minsToStart=sm2-nowMin2;
+  const cdPC=document.getElementById('live-countdown');
+  const cdMV=document.getElementById('mv-live-countdown');
+  if(minsToStart>0){
+    const txt=`開始まで${minsToStart}分`;
+    if(cdPC){cdPC.textContent=txt;cdPC.style.display='inline';}
+    if(cdMV){cdMV.textContent=txt;cdMV.style.display='block';}
+  } else {
+    if(cdPC){cdPC.textContent='';cdPC.style.display='none';}
+    if(cdMV){cdMV.textContent='';cdMV.style.display='none';}
+  }
 }
 
 // ================================================================
@@ -5128,33 +5150,19 @@ function mvRender(){
   document.getElementById('mv-bar').style.width=prog+'%';
 
   // DAY切替
+  // mv-day-selは非表示固定（DAY切替はその他メニューから）
   const daySel=document.getElementById('mv-day-sel');
   if(daySel){
-    if(dayCount>1){
-      daySel.style.display='block';
-
-      // 常に再構築（日付表示を最新に）
-      daySel.innerHTML='';
-      const _days=['日','月','火','水','木','金','土'];
-      for(let i=1;i<=dayCount;i++){
-        const opt=document.createElement('option');
-        opt.value=i;
-        const dd=dayData[i-1];
-        const ddate=dd&&dd.date?dd.date:'';
-        if(ddate){
-          const[y,mo,d]=ddate.split('-').map(Number);
-          const dt=new Date(y,mo-1,d);
-          opt.textContent=`DAY${i} ${mo}/${d}(${_days[dt.getDay()]})`;
-        } else {
-          opt.textContent=`DAY${i}`;
-        }
-        daySel.appendChild(opt);
-      }
-      daySel.value=String(currentDay);
-    } else {
-      daySel.style.display='none';
-
+    daySel.style.display='none';
+    // 内部的に値だけ更新しておく
+    daySel.innerHTML='';
+    for(let i=1;i<=dayCount;i++){
+      const opt=document.createElement('option');
+      opt.value=i;
+      opt.textContent=`DAY${i}`;
+      daySel.appendChild(opt);
     }
+    daySel.value=String(currentDay);
   }
 
   // セッション描画
