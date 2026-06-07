@@ -294,7 +294,7 @@ tbody tr:hover td{background:var(--bg2)}
           <input type="date" id="evd" value="2026-05-22" style="flex:1;min-width:0;max-width:130px;font-size:11px;font-weight:600" onchange="shiftDayDataFromBase();updateDow();if(typeof updateNowLine==='function')updateNowLine();if(typeof updateTotalTime==='function')updateTotalTime();updateBtnTimeAdj();if(typeof mvRender==='function'&&mvRender._scrolled)mvRender._scrolled=false;autoSave();if(typeof fbPush==='function')fbPush();"/>
           <span id="dow-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
           <span id="from-label" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;display:none;margin-left:auto">から</span>
-          <select id="day-count-sel" style="font-size:11px;padding:1px 2px;border:1px solid var(--border);border-radius:3px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0" onchange="onDayCountChange();initDayTimes();">
+          <select id="day-count-sel" style="display:none">
             <option value="1">1DAY</option>
             <option value="2">2DAYS</option>
             <option value="3">3DAYS</option>
@@ -303,6 +303,9 @@ tbody tr:hover td{background:var(--bg2)}
             <option value="6">6DAYS</option>
             <option value="7">7DAYS</option>
           </select>
+          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:6px">
+            <input type="checkbox" id="multi-day-chk" onchange="toggleMultiDay()" style="margin:0;width:12px;height:12px"/>複数日程
+          </label>
         </div>
         <div style="display:flex;align-items:center;gap:4px">
           <label style="display:flex;align-items:center;gap:2px;font-size:11px;color:var(--text2);cursor:pointer;white-space:nowrap">
@@ -1000,16 +1003,12 @@ tbody tr:hover td{background:var(--bg2)}
         </label>
         <!-- 日程数 -->
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
-          <span style="font-size:13px;color:var(--text);flex:1">日程数</span>
-          <select id="mv-day-count-sel" onchange="mvChangeDayCount(this.value)" style="font-size:13px;padding:4px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">
-            <option value="1">1DAY</option>
-            <option value="2">2DAY</option>
-            <option value="3">3DAY</option>
-            <option value="4">4DAY</option>
-            <option value="5">5DAY</option>
-            <option value="6">6DAY</option>
-            <option value="7">7DAY</option>
-          </select>
+          <select id="mv-day-count-sel" style="display:none"></select>
+          <label style="display:flex;align-items:center;gap:8px;cursor:pointer;flex:1">
+            <input type="checkbox" id="mv-multi-day-chk" onchange="mvToggleMultiDay(this.checked)" style="width:16px;height:16px;cursor:pointer"/>
+            <span style="font-size:13px;color:var(--text)">複数日程</span>
+          </label>
+          <button id="mv-multi-day-edit-btn" onclick="openMultiDayModal()" style="display:none;font-size:12px;padding:4px 10px;border:1px solid var(--accent);border-radius:8px;background:transparent;color:var(--accent);cursor:pointer">編集</button>
         </div>
         <!-- 日付入力 -->
         <div onclick="mvInlineEdit(this,'date')" style="cursor:pointer">
@@ -1100,6 +1099,10 @@ tbody tr:hover td{background:var(--bg2)}
     <div id="mv-more-day-section" style="display:none;flex-direction:column;gap:6px">
       <div style="font-size:11px;color:var(--text2);padding:0 4px">日程切替</div>
       <div id="mv-more-day-btns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+      <button onclick="openMultiDayModal();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer;margin-top:4px">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        日程設定を編集
+      </button>
 
     </div>
     <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
@@ -2099,6 +2102,157 @@ function initLiveMode(){
   if(isActuallyToday()){
     toggleLiveMode(true);
   }
+}
+
+
+// ============================================================
+// 複数日程モーダル
+// ============================================================
+function toggleMultiDay(){
+  const chk=document.getElementById('multi-day-chk');
+  if(chk.checked){
+    // 複数日程ONにする
+    // 現在のDAY1のセッションをdayDataに保存
+    dayData[0]={
+      sessions:JSON.parse(JSON.stringify(sessions)),
+      freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+      start:document.getElementById('evs').value||'13:00',
+      end:document.getElementById('eve').value||'17:00',
+      date:document.getElementById('evd').value||''
+    };
+    if(dayCount<=1){
+      dayCount=2;
+      if(!dayData[1]) dayData[1]={sessions:[],freeEvs:[],start:'13:00',end:'17:00',date:''};
+      const sel=document.getElementById('day-count-sel');
+      if(sel) sel.value='2';
+    }
+    openMultiDayModal();
+  } else {
+    // 複数日程OFFにする → 1DAYに戻す
+    if(!confirm('複数日程をオフにするとDAY2以降のデータが非表示になります。よろしいですか？')) {
+      chk.checked=true; return;
+    }
+    dayCount=1; currentDay=1;
+    const sel=document.getElementById('day-count-sel');
+    if(sel) sel.value='1';
+    if(dayData[0]){
+      sessions=JSON.parse(JSON.stringify(dayData[0].sessions||[]));
+      freeEvs=JSON.parse(JSON.stringify(dayData[0].freeEvs||[]));
+      const d=dayData[0];
+      if(d.start) document.getElementById('evs').value=d.start;
+      if(d.end)   document.getElementById('eve').value=d.end;
+      if(d.date)  document.getElementById('evd').value=d.date;
+    }
+    updateMultiDayChk();
+    updateTopDateLabel();snap();render();
+    if(typeof mvRender==='function') mvRender();
+    if(typeof fbPush==='function') fbPush();
+  }
+}
+
+function openMultiDayModal(){
+  const modal=document.getElementById('multi-day-modal');
+  if(!modal){ console.error('multi-day-modal not found'); return; }
+  renderMultiDayList();
+  modal.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8100;align-items:center;justify-content:center';
+}
+
+function closeMultiDayModal(){
+  document.getElementById('multi-day-modal').style.display='none';
+  // チェックボックスの状態を実際のdayCountに合わせる
+  updateMultiDayChk();
+}
+
+function updateMultiDayChk(){
+  const chk=document.getElementById('multi-day-chk');
+  if(chk) chk.checked=dayCount>1;
+  const mvChk=document.getElementById('mv-multi-day-chk');
+  if(mvChk) mvChk.checked=dayCount>1;
+  const editBtn=document.getElementById('mv-multi-day-edit-btn');
+  if(editBtn) editBtn.style.display=dayCount>1?'block':'none';
+}
+
+function renderMultiDayList(){
+  const list=document.getElementById('multi-day-list');
+  list.innerHTML='';
+  for(let i=0;i<dayCount;i++){
+    const d=dayData[i]||{};
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)';
+    row.innerHTML=
+      '<span style="font-size:12px;font-weight:700;color:var(--accent);width:36px;flex-shrink:0">DAY'+(i+1)+'</span>'+
+      '<input type="date" value="'+(d.date||'')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);flex:1" data-day="'+i+'" class="mday-date"/>'+
+      '<input type="time" value="'+(d.start||'13:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-start"/>'+
+      '<span style="font-size:11px;color:var(--text3)">〜</span>'+
+      '<input type="time" value="'+(d.end||'17:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-end"/>'+
+      (i>0?'<button onclick="removeMultiDayEntry('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 4px;font-size:16px;flex-shrink:0">×</button>':'<span style="width:24px"></span>');
+    list.appendChild(row);
+  }
+}
+
+function addMultiDayEntry(){
+  // モーダル内の現在の入力値を一時保存
+  _syncModalToDayData();
+  dayCount++;
+  if(!dayData[dayCount-1]) dayData[dayCount-1]={sessions:[],freeEvs:[],start:'13:00',end:'17:00',date:''};
+  const sel=document.getElementById('day-count-sel');
+  if(sel) sel.value=String(dayCount);
+  renderMultiDayList();
+}
+
+function removeMultiDayEntry(i){
+  if(dayCount<=1) return;
+  if(!confirm('DAY'+(i+1)+'を削除しますか？このDAYのセッションデータも削除されます。')) return;
+  _syncModalToDayData();
+  dayData.splice(i,1);
+  dayCount--;
+  if(currentDay>dayCount) currentDay=dayCount;
+  const sel=document.getElementById('day-count-sel');
+  if(sel) sel.value=String(dayCount);
+  renderMultiDayList();
+}
+
+function _syncModalToDayData(){
+  // モーダルの入力値をdayDataに反映
+  document.querySelectorAll('.mday-date').forEach(el=>{
+    const i=parseInt(el.dataset.day);
+    if(dayData[i]) dayData[i].date=el.value;
+  });
+  document.querySelectorAll('.mday-start').forEach(el=>{
+    const i=parseInt(el.dataset.day);
+    if(dayData[i]) dayData[i].start=el.value;
+  });
+  document.querySelectorAll('.mday-end').forEach(el=>{
+    const i=parseInt(el.dataset.day);
+    if(dayData[i]) dayData[i].end=el.value;
+  });
+}
+
+function saveMultiDayModal(){
+  _syncModalToDayData();
+  // 現在のDAYのデータも先に保存
+  const _exd=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined?dayData[currentDay-1].date:document.getElementById('evd').value||'';
+  dayData[currentDay-1]={
+    sessions:JSON.parse(JSON.stringify(sessions)),
+    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+    start:document.getElementById('evs').value||'13:00',
+    end:document.getElementById('eve').value||'17:00',
+    date:_exd
+  };
+  // DAY1の日付・時間をPC表示に反映
+  if(dayData[currentDay-1]){
+    const d=dayData[currentDay-1];
+    if(d.date)  document.getElementById('evd').value=d.date;
+    if(d.start) document.getElementById('evs').value=d.start;
+    if(d.end)   document.getElementById('eve').value=d.end;
+  }
+  updateMultiDayChk();
+  updateTopDateLabel();
+  updateDow();updateTotalTime();
+  snap();render();
+  if(typeof mvRender==='function') mvRender();
+  if(typeof fbPush==='function') fbPush();
+  closeMultiDayModal();
 }
 
 function toggleLiveMode(forceVal){
@@ -4653,6 +4807,22 @@ function exportPDF(){
     </div>
   </div>
 </div>
+
+<!-- 複数日程設定モーダル -->
+<div id="multi-day-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8100;align-items:center;justify-content:center" onclick="if(event.target===this)closeMultiDayModal()">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;min-width:360px;max-width:500px;width:90%;max-height:80vh;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="font-size:14px;font-weight:700;color:var(--text)">複数日程の設定</div>
+    <div id="multi-day-list" style="display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:50vh"></div>
+    <button onclick="addMultiDayEntry()" style="display:flex;align-items:center;justify-content:center;gap:6px;padding:8px;border:1px dashed var(--border);border-radius:8px;background:transparent;color:var(--accent);font-size:13px;cursor:pointer">
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+      DAYを追加
+    </button>
+    <div style="display:flex;gap:8px;justify-content:flex-end">
+      <button onclick="closeMultiDayModal()" style="padding:7px 16px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">キャンセル</button>
+      <button onclick="saveMultiDayModal()" style="padding:7px 16px;font-size:12px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-weight:600">保存</button>
+    </div>
+  </div>
+</div>
 </body></html>`;
 
   const w=window.open('','_blank','width=700,height=900');
@@ -4697,27 +4867,18 @@ function onDayCountChange(){
     end:document.getElementById('eve').value||'17:00',
     date:_exDate
   };
-  // 基準日から連続した日付を全DAYに再設定
-  const _base=document.getElementById('evd').value;
+  // 基準日概念廃止: 既存DAYの日付は保持、新規DAYのみ空で追加
   const _evs=document.getElementById('evs').value||'13:00';
   const _eve=document.getElementById('eve').value||'17:00';
-  // 既存DAYの日付を基準日+i日で上書き、足りないDAYは新規追加
   for(let i=0;i<newCount;i++){
-    let _date='';
-    if(_base){
-      const[_y,_m,_d]=_base.split('-').map(Number);
-      const _dt=new Date(_y,_m-1,_d+i);
-      _date=[_dt.getFullYear(),String(_dt.getMonth()+1).padStart(2,'0'),String(_dt.getDate()).padStart(2,'0')].join('-');
-    }
     if(dayData[i]){
-      dayData[i].date=_date; // 日付のみ上書き（セッションは保持）
       if(!dayData[i].start) dayData[i].start=_evs;
       if(!dayData[i].end)   dayData[i].end=_eve;
-      // sessions/freeEvsが未定義の場合は空配列で初期化
       if(!dayData[i].sessions) dayData[i].sessions=[];
-      if(!dayData[i].freeEvs) dayData[i].freeEvs=[];
+      if(!dayData[i].freeEvs)  dayData[i].freeEvs=[];
+      // 既存DAYの日付は保持（上書きしない）
     } else {
-      dayData.push({sessions:[],freeEvs:[],start:_evs,end:_eve,date:_date});
+      dayData.push({sessions:[],freeEvs:[],start:_evs,end:_eve,date:''});
     }
   }
   // 縮小時はdayData自体は保持（配列の長さを変えない）→復活可能
@@ -4763,40 +4924,32 @@ function switchDay(d){
 
 // 基準日(evd)変更時に全DAYの日付を連動してずらす
 function shiftDayDataFromBase(){
-  if(dayCount<=1||!dayData||dayData.length===0) return;
-  const newBase=document.getElementById('evd').value;
-  if(!newBase) return;
-  const oldBase=dayData[0]&&dayData[0].date?dayData[0].date:'';
-  if(!oldBase||oldBase===newBase) return;
-  const [oy,om,od]=oldBase.split('-').map(Number);
-  const [ny,nm,nd]=newBase.split('-').map(Number);
-  const diffDays=Math.round((new Date(ny,nm-1,nd)-new Date(oy,om-1,od))/(1000*60*60*24));
-  if(diffDays===0) return;
-  dayData.forEach(dd=>{
-    if(dd&&dd.date){
-      const [dy,dm,dday]=dd.date.split('-').map(Number);
-      const dt=new Date(dy,dm-1,dday+diffDays);
-      dd.date=[dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');
-    }
-  });
+  // 基準日概念廃止: evd変更時は現在のDAYの日付のみ更新
+  const newDate=document.getElementById('evd').value;
+  if(!newDate) return;
+  if(dayCount<=1){
+    // 1DAYの場合はdayData[0].dateを更新
+    if(!dayData[0]) dayData[0]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs)),start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'17:00',date:''};
+    dayData[0].date=newDate;
+  } else {
+    // 複数DAYの場合は現在のDAYの日付のみ更新
+    if(!dayData[currentDay-1]) return;
+    dayData[currentDay-1].date=newDate;
+  }
   updateTopDateLabel();
 }
 
 function initDayTimes(){
-  const base=document.getElementById('evd').value;
+  // 基準日+i日ロジック廃止: 未設定のDAYのみデフォルト値で初期化
   const evs=document.getElementById('evs').value||'13:00';
   const eve=document.getElementById('eve').value||'17:00';
   for(let i=0;i<dayCount;i++){
     if(!dayData[i]) dayData[i]={sessions:[],freeEvs:[]};
-    // start/endが未設定の場合のみ設定
     if(!dayData[i].start) dayData[i].start=evs;
     if(!dayData[i].end)   dayData[i].end=eve;
-    // dateが未設定or空の場合のみ基準日+i日で設定
-    if(!dayData[i].date&&base){
-      const[y,m,d]=base.split('-').map(Number);
-      const dt=new Date(y,m-1,d+i);
-      dayData[i].date=[dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');
-    }
+    if(!dayData[i].sessions) dayData[i].sessions=[];
+    if(!dayData[i].freeEvs)  dayData[i].freeEvs=[];
+    // dateは設定しない（ユーザーが任意に設定する）
   }
 }
 
@@ -4826,23 +4979,7 @@ function saveDayTimeSetting(){
   const end=document.getElementById('dtp-end').value;
   if(!dayData[currentDay-1]) dayData[currentDay-1]={sessions:[],freeEvs:[]};
 
-  // 日付が変わった場合、後続DAYを連動してずらす
-  const oldDate=dayData[currentDay-1].date||'';
-  if(date && oldDate && date!==oldDate){
-    const [oy,om,od]=oldDate.split('-').map(Number);
-    const [ny,nm,nd]=date.split('-').map(Number);
-    const diffDays=Math.round((new Date(ny,nm-1,nd)-new Date(oy,om-1,od))/(1000*60*60*24));
-    if(diffDays!==0){
-      // 後続DAYの日付を同じ日数ずらす
-      for(let i=currentDay;i<dayData.length;i++){
-        if(dayData[i]&&dayData[i].date){
-          const [dy,dm,dd]=dayData[i].date.split('-').map(Number);
-          const dt=new Date(dy,dm-1,dd+diffDays);
-          dayData[i].date=[dt.getFullYear(),String(dt.getMonth()+1).padStart(2,'0'),String(dt.getDate()).padStart(2,'0')].join('-');
-        }
-      }
-    }
-  }
+  // 基準日概念廃止: このDAYの日付のみ更新（後続DAYは連動しない）
 
   dayData[currentDay-1].date=date;
   dayData[currentDay-1].start=start;
@@ -4932,7 +5069,7 @@ dayData=[{sessions:[],freeEvs:[]}];
 autoLoad();
 restoreSavedEvs();
 updateEvInfoPreview();
-uUR();sv('tl');render();setTimeout(fitz,0);setTimeout(initLiveMode,100);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
+uUR();sv('tl');render();setTimeout(fitz,0);setTimeout(initLiveMode,100);setTimeout(updateMultiDayChk,150);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
 
 // ================================================================
 // MOBILE VIEW
@@ -5065,6 +5202,15 @@ function mvUndo(){undo();mvUpdateUR();if(typeof mvRender==='function')mvRender()
 function mvRedo(){redo();mvUpdateUR();if(typeof mvRender==='function')mvRender();}
 
 
+
+function mvToggleMultiDay(checked){
+  const chk=document.getElementById('multi-day-chk');
+  if(chk){chk.checked=checked;}
+  toggleMultiDay();
+  // 編集ボタンの表示制御
+  const editBtn=document.getElementById('mv-multi-day-edit-btn');
+  if(editBtn) editBtn.style.display=dayCount>1?'block':'none';
+}
 
 function mvChangeDayCount(val){
   const sel=document.getElementById('day-count-sel');
@@ -5597,6 +5743,10 @@ function mvOpenEventEdit(){
   if(mvDcSel) mvDcSel.value=String(dayCount||1);
   const mvNdChk=document.getElementById('mv-no-date-chk');
   if(mvNdChk) mvNdChk.checked=!!noDate;
+  const mvMdChk=document.getElementById('mv-multi-day-chk');
+  if(mvMdChk) mvMdChk.checked=dayCount>1;
+  const editBtn=document.getElementById('mv-multi-day-edit-btn');
+  if(editBtn) editBtn.style.display=dayCount>1?'block':'none';
   // 現在値をviewに反映
   const title=document.getElementById('evt').value||'';
   const evd=document.getElementById('evd').value||'';
@@ -5957,6 +6107,7 @@ function fbListen(){
       }
 
       render(); updateDow(); updateTopDateLabel();
+      if(typeof updateMultiDayChk==='function') updateMultiDayChk();
       if(typeof mvRender==='function'){
         try{ mvRender(); }catch(mvErr){ console.error('mvRender error:',mvErr); }
       }
