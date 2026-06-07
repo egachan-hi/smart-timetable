@@ -4663,8 +4663,8 @@ function exportPDF(){
 function toggleNoDate(){
   noDate=document.getElementById('no-date-chk').checked;
   const evd=document.getElementById('evd');
+  // evd.valueは保持（日付データを消さない）
   if(noDate){
-    evd.value='';
     evd.disabled=true;
     evd.style.opacity='0.4';
   } else {
