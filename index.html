@@ -5266,7 +5266,7 @@ function mvOpenMore(){
         }
         btn.textContent=label;
         btn.style.cssText=`padding:8px 12px;border-radius:10px;font-size:13px;font-weight:${i===currentDay?'700':'400'};border:${i===currentDay?'2px solid var(--accent)':'1px solid var(--border)'};background:${i===currentDay?'var(--accent-bg, rgba(93,202,165,0.1))':'var(--bg2)'};color:${i===currentDay?'var(--accent)':'var(--text)'};cursor:pointer;`;
-        btn.onclick=(()=>{const day=i+1;return()=>{switchDay(day-currentDay);mvCloseMore();}; })();
+        btn.onclick=(()=>{const day=i;return()=>{switchDay(day-currentDay);mvCloseMore();}; })();
         btns.appendChild(btn);
       }
     } else {
