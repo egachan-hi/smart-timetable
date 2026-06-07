@@ -1639,7 +1639,7 @@ function onEvInfoChange(){
   evInfo.slideUrl =document.getElementById('evinfo-slide-url').value;
   evInfo.memo     =document.getElementById('evinfo-memo').value;
   updateEvInfoPreview();
-  autoSave();
+  autoSave();if(typeof fbPush==='function')fbPush();
 }
 
 function loadEvInfoToWidget(){
@@ -1767,7 +1767,7 @@ function autoLoad(){
   }catch(e){ console.warn('autoload error:', e); return false; }
 }
 
-function snap(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();setTimeout(autoSave,0);}
+function snap(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();setTimeout(autoSave,0);if(typeof fbPush==='function')fbPush();}
 function undo(){if(hi<=0)return;hi--;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
 function redo(){if(hi>=hist.length-1)return;hi++;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
 function uUR(){document.getElementById('bundo').disabled=hi<=0;document.getElementById('bredo').disabled=hi>=hist.length-1;}
@@ -2133,6 +2133,7 @@ function toggleLiveMode(forceVal){
   if(typeof updateNowLine==='function') updateNowLine();
   if(typeof mvRender==='function') mvRender();
   autoSave();
+  if(typeof fbPush==='function') fbPush();
 }
 
 function updateNowLine(){
@@ -4042,8 +4043,22 @@ function openEV(){restoreSavedEvs();document.getElementById('evname').value=docu
 function closeEV(){document.getElementById('evm').style.display='none';}
 document.getElementById('evm').addEventListener('click',function(e){if(e.target===this)closeEV();});
 function renderEVL(){document.getElementById('evlist').innerHTML=savedEvs.length===0?'<div style="font-size:11px;color:var(--text3)">保存されたイベントはありません</div>':savedEvs.map((ev,i)=>`<div class="eli"><span style="flex:1;font-size:11px">${esc(ev.name)}</span><span style="font-size:10px;color:var(--text2)">${ev.date||''}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="loadEV(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="delEV(${i})">×</span></div>`).join('');}
-function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();persistSavedEvs();alert(`「${name}」として保存しました`);}
-function loadEV(i){const ev=savedEvs[i];document.getElementById('evt').value=ev.title||'';document.getElementById('evd').value=ev.date||'';document.getElementById('evs').value=ev.start||'13:00';document.getElementById('eve').value=ev.end||'16:00';sessions=JSON.parse(JSON.stringify(ev.sessions));freeEvs=JSON.parse(JSON.stringify(ev.freeEvs));closeEV();snap();render();if(typeof mvRender==='function')mvRender();}
+function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);// 現在のDAYを保存してからセーブ
+  if(dayCount>1){
+    const _exd=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined?dayData[currentDay-1].date:document.getElementById('evd').value||'';
+    dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs)),start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'17:00',date:_exd};
+  }
+  const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs)),noDate:noDate,dayCount:dayCount,currentDay:currentDay,dayData:JSON.parse(JSON.stringify(dayData)),evInfo:JSON.parse(JSON.stringify(evInfo||{}))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();persistSavedEvs();alert(`「${name}」として保存しました`);}
+function loadEV(i){const ev=savedEvs[i];
+  document.getElementById('evt').value=ev.title||'';
+  document.getElementById('evd').value=ev.date||'';
+  document.getElementById('evs').value=ev.start||'13:00';
+  document.getElementById('eve').value=ev.end||'16:00';
+  sessions=JSON.parse(JSON.stringify(ev.sessions||[]));
+  freeEvs=JSON.parse(JSON.stringify(ev.freeEvs||[]));
+  if(ev.dayCount){dayCount=ev.dayCount;currentDay=ev.currentDay||1;dayData=ev.dayData||[];noDate=ev.noDate||false;const dcSel=document.getElementById('day-count-sel');if(dcSel)dcSel.value=String(dayCount);const ndChk=document.getElementById('no-date-chk');if(ndChk)ndChk.checked=noDate;const _t=dayData[currentDay-1];if(_t){sessions=JSON.parse(JSON.stringify(_t.sessions||[]));freeEvs=JSON.parse(JSON.stringify(_t.freeEvs||[]));if(_t.start)document.getElementById('evs').value=_t.start;if(_t.end)document.getElementById('eve').value=_t.end;if(_t.date)document.getElementById('evd').value=_t.date;}}
+  if(ev.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},ev.evInfo);loadEvInfoToWidget();}
+  closeEV();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();}
 function delEV(i){if(confirm('削除しますか？')){savedEvs.splice(i,1);renderEVL();persistSavedEvs();}}
 function quickSaveEV(){
   logEvent('save');
@@ -4460,7 +4475,29 @@ function loadSTTFile(e){
       freeEvs=data.freeEvs||[];
       if(data.tplName)tplName=data.tplName;
       if(data.TYPES)TYPES=data.TYPES;
-      closeEV();snap();render();updateDow();if(typeof mvRender==='function')mvRender();
+      // 複数日データを復元
+      if(data.dayCount){
+        dayCount=data.dayCount;
+        currentDay=data.currentDay||1;
+        dayData=data.dayData||[];
+        noDate=data.noDate||false;
+        const dcSel=document.getElementById('day-count-sel');
+        if(dcSel) dcSel.value=String(dayCount);
+        const ndChk=document.getElementById('no-date-chk');
+        if(ndChk) ndChk.checked=noDate;
+        // 現在のDAYのデータを反映
+        const _t=dayData[currentDay-1];
+        if(_t){
+          sessions=JSON.parse(JSON.stringify(_t.sessions||[]));
+          freeEvs=JSON.parse(JSON.stringify(_t.freeEvs||[]));
+          if(_t.start) document.getElementById('evs').value=_t.start;
+          if(_t.end)   document.getElementById('eve').value=_t.end;
+          if(_t.date)  document.getElementById('evd').value=_t.date;
+        }
+      }
+      if(data.evInfo) evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},data.evInfo);
+      loadEvInfoToWidget();
+      closeEV();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
     }catch(err){alert('読み込みエラー: '+err.message);}
   };
   reader.readAsText(file);
@@ -4639,7 +4676,7 @@ function toggleNoDate(){
     const _dc2=parseInt((document.getElementById('day-count-sel')||{}).value)||1;
     _fl2.style.display=(!noDate&&_dc2>1)?'':' none';
   }
-  updateDow();updateTopDateLabel();autoSave();
+  updateDow();updateTopDateLabel();autoSave();if(typeof fbPush==='function')fbPush();
 }
 
 function onDayCountChange(){
@@ -4679,7 +4716,7 @@ function onDayCountChange(){
     sessions=JSON.parse(JSON.stringify(target.sessions||[]));
     freeEvs=JSON.parse(JSON.stringify(target.freeEvs||[]));
   }
-  updateTopDateLabel();render();autoSave();
+  updateTopDateLabel();render();autoSave();if(typeof fbPush==='function')fbPush();
 }
 
 function switchDay(d){
@@ -4705,7 +4742,7 @@ function switchDay(d){
   if(target.start) document.getElementById('evs').value=target.start;
   if(target.end)   document.getElementById('eve').value=target.end;
   if(target.date!==undefined) document.getElementById('evd').value=target.date;
-  updateDow();updateTotalTime();updateTopDateLabel();snap();render();if(typeof mvRender==='function')mvRender();if(typeof fbPush==='function')fbPush();
+  updateDow();updateTotalTime();updateTopDateLabel();snap();render();if(typeof mvRender==='function')mvRender();
 }
 
 
@@ -5822,6 +5859,8 @@ window.fbPush = function(){
       sessions: JSON.parse(JSON.stringify(sessions)),
       freeEvs: JSON.parse(JSON.stringify(freeEvs)),
       evInfo: JSON.parse(JSON.stringify(evInfo || {})),
+      noDate: noDate||false,
+      liveMode: liveMode||false,
       dayCount: dayCount||1,
       dayData: JSON.parse(JSON.stringify(dayData||[])),
       ts: _fbLastPush
@@ -5881,6 +5920,9 @@ function fbListen(){
         if(ndChk) ndChk.checked=noDate;
         const evd=document.getElementById('evd');
         if(evd){evd.disabled=noDate;evd.style.opacity=noDate?'0.4':'1';}
+      }
+      if(data.liveMode!==undefined && data.liveMode!==liveMode){
+        toggleLiveMode(data.liveMode);
       }
       if(data.dayCount!==undefined){
         dayCount=data.dayCount||1;
