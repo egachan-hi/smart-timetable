@@ -2460,7 +2460,7 @@ function startSResize(e,edge,sid,hel){
         el.style.top=(st[i]*PPM+2)+'px';
         el.style.height=Math.max(sess.dur*PPM-2,16)+'px';
         const tmEl=el.querySelector('.stm');
-        if(tmEl)tmEl.textContent=hm(gSM()+st[i]);
+        if(tmEl)tmEl.textContent=hmn(gSM()+st[i]);
         const drEl=el.querySelector('.sdr');
         if(drEl)drEl.textContent=sess.dur+'分';
       });
@@ -2472,7 +2472,7 @@ function startSResize(e,edge,sid,hel){
     const idx=sessions.findIndex(x=>x.id===capturedSid);
     if(idx>=0){
       sTT(ev.clientX,ev.clientY,
-        `${hm(gSM()+st2[idx])}〜${hm(gSM()+st2[idx]+target.dur)}（${target.dur}分）`);
+        `${hmn(gSM()+st2[idx])}〜${hmn(gSM()+st2[idx]+target.dur)}（${target.dur}分）`);
     }
   }
 
@@ -2512,7 +2512,7 @@ function onFRM(e){
   if(edge==='b'){ev.toMin=Math.max(origFrom+SN,origTo+sd);}
   else{ev.fromMin=Math.min(origTo-SN,Math.max(0,origFrom+sd));}
   rFR();
-  sTT(e.clientX,e.clientY,`${hm(gSM()+ev.fromMin)}〜${hm(gSM()+ev.toMin)}（${ev.toMin-ev.fromMin}分）`);
+  sTT(e.clientX,e.clientY,`${hmn(gSM()+ev.fromMin)}〜${hmn(gSM()+ev.toMin)}（${ev.toMin-ev.fromMin}分）`);
 }
 function onFRU(){
   hTT();
@@ -2666,8 +2666,8 @@ function renderTbl(){
       <td style="cursor:grab;color:var(--text3);font-size:13px;text-align:center;width:20px;padding:6px 2px">⠿</td>
       <td style="color:var(--text3);font-size:10px;width:20px;padding:6px 4px">${i+1}</td>
       <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 7px"><span style="cursor:pointer;font-weight:600;font-size:11px" onclick="openSM(${s.id})">${esc(s.name)}</span></td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+st[i])}</td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+st[i]+s.dur)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+st[i])}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+st[i]+s.dur)}</td>
       <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px"><span style="cursor:pointer" onclick="openSM(${s.id})">${s.dur}分</span></td>
       <td style="font-size:11px;color:var(--text2);padding:6px 7px;white-space:pre-wrap;word-break:break-all">${s.comment?escLink(s.comment):'<span style="opacity:.3">—</span>'}</td>
       <td style="width:20px;text-align:center;padding:6px 4px"><span style="cursor:pointer;opacity:.3;font-size:13px" onclick="delS(event,${s.id})">×</span></td>
@@ -2684,8 +2684,8 @@ function renderTbl(){
       <td style="width:20px;padding:6px 2px"></td>
       <td style="color:var(--text3);font-size:10px;width:20px;padding:6px 4px">${i+1}</td>
       <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 7px"><span style="cursor:pointer;font-weight:600;font-size:11px" onclick="openFE(${ev.id})">${esc(ev.name)}${badge}</span></td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+ev.fromMin)}</td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+ev.toMin)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+ev.fromMin)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+ev.toMin)}</td>
       <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${dur}分</td>
       <td style="font-size:11px;color:var(--text2);padding:6px 7px;white-space:pre-wrap;word-break:break-all">${ev.comment?escLink(ev.comment):'<span style="opacity:.3">—</span>'}</td>
       <td style="width:20px;text-align:center;padding:6px 4px"><span style="cursor:pointer;opacity:.3;font-size:13px" onclick="delFid(${ev.id})">×</span></td>
@@ -2795,13 +2795,13 @@ function onFRo(e){
     document.getElementById('fov').classList.add('act');
     const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
     const _frsPT1=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM+_frsPT1)+'px';
-    sTT(e.clientX,e.clientY,`${hm(gSM()+fm)}〜${hm(gSM()+fm+gD)}`);
+    sTT(e.clientX,e.clientY,`${hmn(gSM()+fm)}〜${hmn(gSM()+fm+gD)}`);
     e.dataTransfer.dropEffect='copy';return;
   }
   if(gSrc==='fblock'&&fBD.id){
     const ry=frRY(e),dur=fBD.ot-fBD.of,nf=Math.max(0,Math.round((ry/PPM-dur/2)/SN)*SN);
     const _frsPT2=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM+_frsPT2)+'px';
-    sTT(e.clientX,e.clientY,`${hm(gSM()+nf)}〜${hm(gSM()+nf+dur)}（${dur}分）`);
+    sTT(e.clientX,e.clientY,`${hmn(gSM()+nf)}〜${hmn(gSM()+nf+dur)}（${dur}分）`);
     e.dataTransfer.dropEffect='move';
   }
 }
@@ -4531,7 +4531,7 @@ function gcalBuildSessionList(){
     row.innerHTML='<input type="checkbox" data-id="'+s.id+'" data-type="serial" '+(checked?'checked':'')+'/>'+
       '<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[s.color]||CDot.teal)+';flex-shrink:0"></div>'+
       '<span style="flex:1">'+esc(s.name)+'</span>'+
-      '<span style="font-size:10px;color:var(--text2)">'+hm(sm+c)+'〜'+hm(sm+c+s.dur)+'</span>';
+      '<span style="font-size:10px;color:var(--text2)">'+hmn(sm+c)+'〜'+hmn(sm+c+s.dur)+'</span>';
     row.querySelector('input').onchange=gcalUpdateCount;
     list.appendChild(row);
     c+=s.dur;
@@ -4549,7 +4549,7 @@ function gcalBuildSessionList(){
       row.innerHTML='<input type="checkbox" data-id="'+ev.id+'" data-type="free" '+(checked?'checked':'')+'/>'+
         '<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[ev.color]||CDot.teal)+';flex-shrink:0"></div>'+
         '<span style="flex:1">'+esc(ev.name)+'</span>'+
-        '<span style="font-size:10px;color:var(--text2)">'+hm(sm+ev.fromMin)+'〜'+hm(sm+ev.toMin)+'</span>';
+        '<span style="font-size:10px;color:var(--text2)">'+hmn(sm+ev.fromMin)+'〜'+hmn(sm+ev.toMin)+'</span>';
       row.querySelector('input').onchange=gcalUpdateCount;
       list.appendChild(row);
     });
@@ -4768,7 +4768,7 @@ function exportPDF(){
       <td class="bar-cell"><div class="bar"></div></td>
       <td class="num-cell">${i+1}</td>
       <td class="name-cell">${esc(s.name)}</td>
-      <td class="time-cell">${hm(sm+st2[i])}</td>
+      <td class="time-cell">${hmn(sm+st2[i])}</td>
       <td class="dur-cell">${s.dur}分</td>
       <td class="cmt-cell">${esc(s.comment||'')}</td>
     </tr>`;
@@ -4779,7 +4779,7 @@ function exportPDF(){
       frows+=`<tr>
       <td class="bar-cell"><div class="bar"></div></td>
       <td class="name-cell">${esc(ev.name)}</td>
-      <td class="time-cell">${hm(ev.fromMin)}〜${hm(ev.toMin)}</td>
+      <td class="time-cell">${hmn(ev.fromMin)}〜${hmn(ev.toMin)}</td>
       <td class="dur-cell">${ev.toMin-ev.fromMin}分</td>
       <td class="cmt-cell">${esc(ev.comment||'')}</td>
     </tr>`;
@@ -4812,7 +4812,7 @@ function exportPDF(){
   ${di>0?'<div style="page-break-before:always"></div>':''}
   <h1>${esc(title)}</h1>
   ${di===0?buildEvInfoHtml():''}
-  ${dayLabel?`<div class="meta">${dayLabel} ${hm(sm)}〜${hm(em)}</div>`:`<div class="meta">${hm(sm)}〜${hm(em)}</div>`}
+  ${dayLabel?`<div class="meta">${dayLabel} ${hmn(sm)}〜${hmn(em)}</div>`:`<div class="meta">${hmn(sm)}〜${hmn(em)}</div>`}
   <h2>シリアルセッション</h2>
   <table>
     <thead><tr>
@@ -5161,7 +5161,7 @@ function mvRender(){
   const metaEl=document.getElementById('mv-meta');
   if(metaEl){
     const dayPrefix=dayCount>1?`DAY${currentDay} `:'';
-    metaEl.textContent=`${dayPrefix}${dateStr} ${hm(sm)}〜${hm(em)}`;
+    metaEl.textContent=`${dayPrefix}${dateStr} ${hmn(sm)}〜${hmn(em)}`;
   }
 
   // 時計
@@ -5374,7 +5374,7 @@ function mvRenderSerial(nowMin,sm){
           iconHtml+
           '<div style="flex:1;min-width:0">'+
             '<div class="mv-card-name" style="'+(isPast?'opacity:0.5':'')+'">'+esc(s.name)+'</div>'+
-            '<div class="mv-card-time">'+hm(start)+'〜'+hm(end)+' ('+s.dur+'分)</div>'+
+            '<div class="mv-card-time">'+hmn(start)+'〜'+hmn(end)+' ('+s.dur+'分)</div>'+
           '</div>'+
           chevronHtml+
           '<button class="mv-edit-icon-btn" style="background:none;border:none;padding:7px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px">'+
@@ -5467,7 +5467,7 @@ function mvRenderFree(nowMin,sm){
           ${iconHtml}
           <div style="flex:1;min-width:0">
             <div class="mv-card-name">${esc(ev.name)}</div>
-            <div class="mv-card-time">${hm(start)}〜${hm(end)} (${dur}分)</div>
+            <div class="mv-card-time">${hmn(start)}〜${hmn(end)} (${dur}分)</div>
           </div>
           ${ev.comment?'<span class="mv-card-chevron" style="font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0">›</span>':''}
           <button class="mv-edit-icon-btn" title="編集" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" >
