@@ -6209,6 +6209,16 @@ if(document.readyState === 'loading'){
 } else {
   setTimeout(fbAutoStart, 800);
 }
+
+function createNewRoom(){
+  if(!confirm('新しいルームを作成します。\n現在のルームとの接続が切れ、新しいURLが発行されます。\nよろしいですか？')) return;
+  const newRoomId='room-'+Math.random().toString(36).slice(2,8);
+  localStorage.setItem('stt-room-id', newRoomId);
+  _fbRoomId=null;
+  const url=new URL(window.location.href);
+  url.searchParams.set('room', newRoomId);
+  window.location.href=url.toString();
+}
 </script>
 
 <!-- ============================================================ -->
@@ -6275,18 +6285,6 @@ if(document.readyState === 'loading'){
     </div>
   </div>
 </div>
+
 </body>
 </html>
-function createNewRoom(){
-  if(!confirm('新しいルームを作成します。\n現在のルームとの接続が切れ、新しいURLが発行されます。\nよろしいですか？')) return;
-  // 新しいルームIDを生成
-  const newRoomId='room-'+Math.random().toString(36).slice(2,8);
-  localStorage.setItem('stt-room-id', newRoomId);
-  _fbRoomId=null;
-  // 新しいURLに遷移
-  const url=new URL(window.location.href);
-  url.searchParams.set('room', newRoomId);
-  window.location.href=url.toString();
-}
-
-
