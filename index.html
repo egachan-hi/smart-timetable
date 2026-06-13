@@ -876,6 +876,7 @@ tbody tr:hover td{background:var(--bg2)}
       <div></div>
       <div class="mbtns">
         <button class="btn" onclick="closeQR()">閉じる</button>
+        <button class="btn" onclick="createNewRoom()" style="color:var(--text2);font-size:11px">新しいルームを作成</button>
         <button class="btn p" onclick="copyQRUrl()">URLをコピー</button>
       </div>
     </div>
@@ -6276,3 +6277,16 @@ if(document.readyState === 'loading'){
 </div>
 </body>
 </html>
+function createNewRoom(){
+  if(!confirm('新しいルームを作成します。\n現在のルームとの接続が切れ、新しいURLが発行されます。\nよろしいですか？')) return;
+  // 新しいルームIDを生成
+  const newRoomId='room-'+Math.random().toString(36).slice(2,8);
+  localStorage.setItem('stt-room-id', newRoomId);
+  _fbRoomId=null;
+  // 新しいURLに遷移
+  const url=new URL(window.location.href);
+  url.searchParams.set('room', newRoomId);
+  window.location.href=url.toString();
+}
+
+
