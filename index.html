@@ -254,8 +254,6 @@ tbody tr:hover td{background:var(--bg2)}
     <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
     スマートタイムテーブル
   </div>
-  <span id="room-name-label" style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;max-width:240px;overflow:hidden;text-overflow:ellipsis;display:none"></span>
-  <button class="tb" onclick="openRoomManager()" data-tip="ルーム管理" id="room-mgr-btn" style="display:none"><svg viewBox="0 0 24 24" width="14" height="14" style="width:14px;height:14px" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></button>
   <span id="fb-status-inline" style="font-size:12px;white-space:nowrap;color:#27500A;display:none"></span>
   <div class="sep"></div>
   <div class="view-tabs">
@@ -274,12 +272,12 @@ tbody tr:hover td{background:var(--bg2)}
   <button class="tb ai" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>AI生成</button>
   <button class="tb" id="btn-time-adj" onclick="openTimeAdj()" data-tip="時間調整"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg></button>
   <div class="sep"></div>
-  <button class="tb" onclick="newEV()" data-tip="新規イベント"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></button>
-  <button class="tb" onclick="duplicateEV()" data-tip="複製"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
-  <button class="tb" onclick="quickSaveEV()" data-tip="保存"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg></button>
-  <button class="tb" onclick="openEV()" data-tip="開く"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></button>
+  <button class="tb" onclick="newRoomBtn()" data-tip="新しいイベント"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></button>
+  <button class="tb" onclick="duplicateRoomBtn()" data-tip="このイベントを複製"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
+  <button class="tb" onclick="openRoomPicker()" data-tip="イベントを開く"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></button>
+  <button class="tb" onclick="openShareModal()" data-tip="共有"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
   <button class="tb" onclick="openExport()" data-tip="書き出し"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
-  <button class="tb danger" onclick="resetAll()" data-tip="全削除"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+  <button class="tb danger" onclick="deleteRoom()" data-tip="このイベントを削除"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
   <div class="sep"></div>
   <button class="tb" id="bundo" onclick="undo()" data-tip="元に戻す"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></button>
   <button class="tb" id="bredo" onclick="redo()" data-tip="やり直す"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg></button>
@@ -297,7 +295,7 @@ tbody tr:hover td{background:var(--bg2)}
       <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">セッションメニュー</span>
     </div>
     <div class="ei">
-      <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
+      <input type="text" id="evt" value="" placeholder="イベントタイトル" oninput="autoSave();if(typeof updateRoomHistoryName==='function'&&typeof fbGetRoomId==='function')updateRoomHistoryName(fbGetRoomId(),this.value);if(typeof fbPush==='function')fbPush();"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
         <!-- 1行目: 日付 + 曜日 + から + バッジ -->
         <div style="display:flex;align-items:center;gap:4px">
@@ -791,30 +789,22 @@ tbody tr:hover td{background:var(--bg2)}
     <div class="mb" style="gap:12px;font-size:12px;line-height:1.7">
 
       <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M3 21h18"/><path d="M5 21V7l8-4v18"/><path d="M19 21V11l-6-4"/><line x1="9" y1="9" x2="9" y2="9.01"/><line x1="9" y1="12" x2="9" y2="12.01"/><line x1="9" y1="15" x2="9" y2="15.01"/></svg>ルームとは？（最初にお読みください）</div>
-        <div style="margin-bottom:8px">「ルーム」は、タイムテーブルを<b>みんなで共有・同時編集するための部屋</b>です。同じルームのURLを開いた人は、全員が同じ画面を見て、リアルタイムで一緒に編集できます。Googleドキュメントの共有編集をイメージしてください。</div>
+        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>みんなで共同編集できます（最初にお読みください）</div>
+        <div style="margin-bottom:8px">このアプリは、1つのタイムテーブルを<b>みんなで共有・同時編集</b>できます。同じURLを開いた人は、全員が同じ画面を見て、リアルタイムで一緒に編集できます。Googleドキュメントの共有編集をイメージしてください。</div>
         <ul style="padding-left:18px;display:flex;flex-direction:column;gap:4px;margin:0">
-          <li><b>ルームには固有のURL</b>があり、末尾の <code style="background:var(--border);padding:1px 4px;border-radius:3px">?room=○○○</code> がルームの目印です。このURLを共有すれば、相手も同じタイムテーブルに参加できます</li>
-          <li>上部バーの<b>歯車アイコン</b>（ルーム管理）から、ルーム名の変更・QRコードでの共有・別ルームへの接続・新規ルーム作成ができます</li>
-          <li>上部バーの<b>「🟢 N人 同期中」</b>表示で、今このルームに何人が参加しているかが分かります</li>
-          <li>編集内容は<b>自動的に全員へ反映</b>されます（約1秒程度のタイムラグ）。手動保存は不要です</li>
+          <li>各イベントには<b>固有のURL</b>があります。ツールバーの<b>共有ボタン</b>（QRコード／URL）から相手に渡すと、同じイベントに参加して一緒に編集できます</li>
+          <li>上部バーの<b>「N人 同期中」</b>表示で、今このイベントを何人が開いているかが分かります</li>
+          <li>編集内容は<b>自動的に全員へ反映</b>され、常に自動保存されます（約1秒程度のタイムラグ）。手動保存は不要です</li>
+          <li>イベントは<b>イベントタイトル</b>（画面上部の入力欄）で区別します。分かりやすい名前を付けておくと、あとで「開く」から見つけやすくなります</li>
         </ul>
         <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-          <b>はじめてアクセスしたとき</b>は「ようこそ」画面が表示され、3つから選べます：<br>
-          ・<b>前回のルームを開く</b> … 前回使ったルームに戻る<br>
-          ・<b>新しくルームを作成</b> … 新しい空のルームを作る<br>
-          ・<b>ルームIDを指定して開く</b> … 共有されたIDを入力して参加する
+          <b>ツールバーのイベント操作</b><br>
+          ・<b>新しいイベント</b> … 空のイベントを新規作成<br>
+          ・<b>このイベントを複製</b> … 今の内容をコピーして別のイベントを作成<br>
+          ・<b>イベントを開く</b> … 最近開いたイベント・URL/ID・.sttファイルから開く<br>
+          ・<b>共有</b> … QRコード／URLで共有<br>
+          ・<b>このイベントを削除</b> … 現在のイベントを削除
         </div>
-      </div>
-
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>「ルーム」と「保存」の違い</div>
-        <div>少しややこしいので整理します。データの保管には2つの仕組みがあります。</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:4px;margin:6px 0 0">
-          <li><b>ルーム（共有・同期）</b>…「今みんなで編集している1つのタイムテーブル」。常に自動保存され、参加者全員で共有されます</li>
-          <li><b>名前付き保存（保存ボタン）</b>…「4月研修」「5月WS」のように<b>イベントに名前を付けて、自分の端末のライブラリに保存</b>する機能。複数のイベントを使い分けたいときに使い、「開く」ボタンから呼び出せます</li>
-        </ul>
-        <div style="margin-top:6px;color:var(--text2)">※ ルームはみんなで使う「作業中の机」、名前付き保存は自分専用の「引き出し」とイメージすると分かりやすいです。</div>
       </div>
 
       <div>
@@ -928,7 +918,7 @@ tbody tr:hover td{background:var(--bg2)}
 <div class="mbg" id="qr-modal" style="display:none" onclick="if(event.target===this)closeQR()">
   <div class="mc" style="width:320px" onclick="event.stopPropagation()">
     <div class="mh">
-      <h3>🔗 ルーム共有</h3>
+      <h3>🔗 イベントを共有</h3>
       <button class="mx" onclick="closeQR()">×</button>
     </div>
     <div class="mb" style="align-items:center;gap:12px">
@@ -940,7 +930,7 @@ tbody tr:hover td{background:var(--bg2)}
       <div></div>
       <div class="mbtns">
         <button class="btn" onclick="closeQR()">閉じる</button>
-        <button class="btn" onclick="createNewRoom()" style="color:var(--text2);font-size:11px">新しいルームを作成</button>
+        <button class="btn" onclick="createNewRoom()" style="color:var(--text2);font-size:11px">新しいイベントを作成</button>
         <button class="btn p" onclick="copyQRUrl()">URLをコピー</button>
       </div>
     </div>
@@ -6243,18 +6233,11 @@ function fbUpdateStatus(){
     }
   }
 
-  // ルーム管理ボタン表示
-  var mgrBtn = document.getElementById('room-mgr-btn');
-  var nameLabel = document.getElementById('room-name-label');
+  // ルーム履歴に記録（タイトルはFirebase受信時に更新される）
   var roomId = typeof fbGetRoomId==='function' ? fbGetRoomId() : '';
   if(roomId){
-    if(mgrBtn) mgrBtn.style.display='flex';
-    var rName = localStorage.getItem('stt-room-name-'+roomId)||'';
-    if(nameLabel){
-      setRoomNameLabel(rName);
-    }
-    // 最近開いたルームとして履歴に記録
-    if(typeof recordRoomHistory==='function') recordRoomHistory(roomId, rName);
+    var curTitle = (document.getElementById('evt')||{}).value || '';
+    if(typeof recordRoomHistory==='function') recordRoomHistory(roomId, curTitle);
   }
 }
 
@@ -6278,6 +6261,8 @@ function fbListen(){
     _fbSyncing = true;
     try{
       document.getElementById('evt').value = data.title || '';
+      // ルーム履歴の名前をイベントタイトルで更新
+      if(typeof updateRoomHistoryName==='function') updateRoomHistoryName(roomId, data.title||'');
       document.getElementById('evd').value = data.date || '';
       document.getElementById('evs').value = data.start || '13:00';
       document.getElementById('eve').value = data.end || '16:00';
@@ -6410,10 +6395,6 @@ function openRoomManager(){
   if(!modal) return;
   const roomId = fbGetRoomId();
 
-  // ルームID表示
-  const idDisplay = document.getElementById('room-mgr-id-display');
-  if(idDisplay) idDisplay.textContent = 'ルームID: ' + roomId;
-
   // ルーム名入力欄
   const nameInput = document.getElementById('room-name-input');
   if(nameInput) nameInput.value = localStorage.getItem('stt-room-name-'+roomId)||'';
@@ -6458,8 +6439,8 @@ function renderRoomMgrHistory(){
     var isCur = r.id===curId;
     var row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);'+(isCur?'':'cursor:pointer');
-    var nameTxt = r.name ? esc(r.name) : '<span style="color:var(--text2)">（名前なし）</span>';
-    var curBadge = isCur ? ' <span style="font-size:10px;color:var(--text3);font-weight:400">(現在のルーム)</span>' : '';
+    var nameTxt = r.name ? esc(r.name) : '<span style="color:var(--text2)">（無題）</span>';
+    var curBadge = isCur ? ' <span style="font-size:10px;color:var(--text3);font-weight:400">(編集中)</span>' : '';
     var nameColor = isCur ? 'var(--accent)' : 'var(--text)';
     var xBtn = isCur ? '' : '<button class="rmm-recent-x" style="border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:15px;padding:0 4px;flex-shrink:0;line-height:1">×</button>';
     row.innerHTML='<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden">'
@@ -6530,7 +6511,7 @@ function joinRoom(){
     }catch(e){}
   }
   if(!val.startsWith('room-')){
-    alert('ルームIDの形式が正しくありません（例: room-abc123）');
+    alert('URLまたはIDの形式が正しくありません');
     return;
   }
   if(!confirm('ルーム「'+val+'」に接続します。よろしいですか？')) return;
@@ -6542,19 +6523,19 @@ function joinRoom(){
 
 function deleteRoom(){
   const roomId = fbGetRoomId();
-  if(!confirm('ルーム「'+roomId+'」のデータをFirebaseから削除します。\nこの操作は取り消せません。よろしいですか？')) return;
+  if(!confirm('このイベントのデータを削除します。\nこの操作は取り消せません。よろしいですか？')) return;
   if(_fbDB){
     _fbDB.ref('rooms/'+roomId).remove().then(()=>{
       localStorage.removeItem('stt-room-id');
       localStorage.removeItem('stt-room-name-'+roomId);
-      alert('ルームを削除しました。新しいルームを作成します。');
+      alert('イベントを削除しました。新しいイベントを作成します。');
       location.reload();
     }).catch(e=>alert('削除に失敗しました: '+e.message));
   }
 }
 
 function createNewRoom(){
-  if(!confirm('新しいルームを作成します。\n現在のルームとの接続が切れ、新しいURLが発行されます。\nよろしいですか？')) return;
+  if(!confirm('新しいイベントを作成します。\n現在のイベントとは別の新しいURLが発行されます。\nよろしいですか？')) return;
   const newRoomId='room-'+Math.random().toString(36).slice(2,8);
   localStorage.setItem('stt-room-id', newRoomId);
   _fbRoomId=null;
@@ -6564,7 +6545,146 @@ function createNewRoom(){
 }
 
 // ================================================================
-// ウェルカムモーダル（URLにroomパラメータがない新規アクセス時）
+// ツールバー: 新ルーム運用ボタン
+// ================================================================
+// 新規ルーム（空のルームを作成）
+function newRoomBtn(){
+  createNewRoom();
+}
+// このルームを複製（現在の内容をコピーした新ルームを作成）
+function duplicateRoomBtn(){
+  if(!confirm('このイベントの内容をコピーして、新しいイベントを作成します。\nよろしいですか？')) return;
+  // 現在の状態をペイロード化（fbPushと同じ構造）
+  var payload={
+    title: (document.getElementById('evt').value||'')+' のコピー',
+    date: document.getElementById('evd').value||'',
+    start: document.getElementById('evs').value||'13:00',
+    end: document.getElementById('eve').value||'16:00',
+    sessions: JSON.parse(JSON.stringify(sessions)),
+    freeEvs: JSON.parse(JSON.stringify(freeEvs)),
+    evInfo: JSON.parse(JSON.stringify(evInfo||{})),
+    noDate: noDate||false,
+    liveMode: liveMode||false,
+    dayCount: dayCount||1,
+    dayData: JSON.parse(JSON.stringify(dayData||[])),
+    ts: Date.now()
+  };
+  var newRoomId='room-'+Math.random().toString(36).slice(2,8);
+  if(_fbDB){
+    _fbDB.ref('rooms/'+newRoomId+'/data').set(payload).then(function(){
+      localStorage.setItem('stt-room-id', newRoomId);
+      _fbRoomId=null;
+      var url=new URL(window.location.href);
+      url.searchParams.set('room', newRoomId);
+      window.location.href=url.toString();
+    }).catch(function(e){ alert('複製に失敗しました: '+e.message); });
+  } else {
+    alert('Firebase未接続のため複製できません');
+  }
+}
+// ルームを開く（ピッカーモーダル）
+function openRoomPicker(){
+  var modal=document.getElementById('room-picker-modal');
+  if(!modal) return;
+  renderRoomPickerHistory();
+  var inp=document.getElementById('room-picker-join-input');
+  if(inp) inp.value='';
+  modal.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center';
+}
+function closeRoomPicker(){
+  var modal=document.getElementById('room-picker-modal');
+  if(modal) modal.style.display='none';
+}
+function renderRoomPickerHistory(){
+  var wrap=document.getElementById('room-picker-recent-wrap');
+  var listEl=document.getElementById('room-picker-recent-list');
+  if(!wrap||!listEl) return;
+  var curId=(typeof fbGetRoomId==='function')?fbGetRoomId():'';
+  var hist=getRoomHistory();
+  if(!hist.length){ wrap.style.display='none'; listEl.innerHTML=''; return; }
+  wrap.style.display='flex';
+  listEl.innerHTML='';
+  hist.forEach(function(r){
+    var isCur=r.id===curId;
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);'+(isCur?'':'cursor:pointer');
+    var nameTxt=r.name?esc(r.name):'<span style="color:var(--text2)">（無題）</span>';
+    var curBadge=isCur?' <span style="font-size:10px;color:var(--text3);font-weight:400">(編集中)</span>':'';
+    var nameColor=isCur?'var(--accent)':'var(--text)';
+    var xBtn=isCur?'':'<button class="rpk-recent-x" style="border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:15px;padding:0 4px;flex-shrink:0;line-height:1">×</button>';
+    row.innerHTML='<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden">'
+      +'<span style="font-size:13px;font-weight:600;color:'+nameColor+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nameTxt+curBadge+'</span>'
+      +'<span style="font-size:10px;color:var(--text2)">'+esc(r.id)+' ・ '+fmtHistoryTime(r.ts)+'</span>'
+      +'</span>'+xBtn;
+    if(!isCur){
+      row.addEventListener('click',function(e){
+        if(e.target.classList.contains('rpk-recent-x')) return;
+        welcomeGoToRoom(r.id);
+      });
+      var xb=row.querySelector('.rpk-recent-x');
+      if(xb) xb.addEventListener('click',function(e){
+        e.stopPropagation();
+        removeRoomHistory(r.id);
+        renderRoomPickerHistory();
+      });
+    }
+    listEl.appendChild(row);
+  });
+}
+function roomPickerJoin(){
+  var input=document.getElementById('room-picker-join-input');
+  if(!input) return;
+  var val=input.value.trim();
+  if(!val){ alert('共有URLまたはIDを入力してください'); return; }
+  if(val.includes('?')||val.includes('room=')){
+    try{
+      var u=new URL(val.startsWith('http')?val:'https://dummy.com/?'+val.split('?').pop());
+      var r=u.searchParams.get('room');
+      if(r) val=r;
+    }catch(e){}
+  }
+  if(!val.startsWith('room-')){ alert('URLまたはIDの形式が正しくありません'); return; }
+  welcomeGoToRoom(val);
+}
+// 共有モーダル
+function openShareModal(){
+  var modal=document.getElementById('share-modal');
+  if(!modal) return;
+  var roomId=fbGetRoomId();
+  var url=window.location.origin+window.location.pathname+'?room='+roomId;
+  var urlEl=document.getElementById('share-url');
+  if(urlEl) urlEl.textContent=url;
+  var qrEl=document.getElementById('share-qr');
+  if(qrEl){
+    qrEl.innerHTML='';
+    function genQR(){
+      try{ new QRCode(qrEl,{text:url,width:148,height:148,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M}); }
+      catch(e){ qrEl.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px">QRコード生成失敗</div>'; }
+    }
+    if(!window.QRCode){
+      var s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
+      s.onload=genQR; document.head.appendChild(s);
+    } else { genQR(); }
+  }
+  modal.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center';
+}
+function closeShareModal(){
+  var modal=document.getElementById('share-modal');
+  if(modal) modal.style.display='none';
+}
+function copyShareUrl(){
+  var roomId=fbGetRoomId();
+  var url=window.location.origin+window.location.pathname+'?room='+roomId;
+  navigator.clipboard.writeText(url).then(function(){alert('URLをコピーしました');}).catch(function(){
+    var ta=document.createElement('textarea');
+    ta.value=url; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('URLをコピーしました');
+  });
+}
+
+
 // ================================================================
 // _isNewVisit はメインscript冒頭で定義済み（autoLoadより前に評価するため）
 
@@ -6588,7 +6708,7 @@ function renderWelcomeRecent(){
   hist.forEach(function(r){
     var row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);cursor:pointer';
-    var nameTxt = r.name ? esc(r.name) : '<span style="color:var(--text2)">（名前なし）</span>';
+    var nameTxt = r.name ? esc(r.name) : '<span style="color:var(--text2)">（無題）</span>';
     row.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5db4f0" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>'
       +'<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden">'
       +'<span style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nameTxt+'</span>'
@@ -6641,7 +6761,7 @@ function welcomeBackToChoose(){
 function welcomeConnectId(){
   var inp = document.getElementById('welcome-id-input');
   var id = inp ? inp.value.trim() : '';
-  if(!id){ alert('ルームIDを入力してください'); return; }
+  if(!id){ alert('共有URLまたはIDを入力してください'); return; }
   welcomeGoToRoom(id);
 }
 
@@ -6754,63 +6874,53 @@ if(_isNewVisit){
 </div>
 
 
-<!-- ルーム管理モーダル -->
-<div id="room-mgr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center" onclick="if(event.target===this)closeRoomManager()">
+<!-- ルームを開く モーダル -->
+<div id="room-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center" onclick="if(event.target===this)closeRoomPicker()">
   <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;width:90%;max-width:420px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
-    <div style="font-size:14px;font-weight:700;color:var(--text)">ルーム管理</div>
-
-    <!-- 現在のルームID -->
-    <div style="font-size:11px;color:var(--text3);padding:8px 10px;background:var(--bg2);border-radius:8px;font-family:monospace" id="room-mgr-id-display"></div>
-
-    <!-- ルーム名編集 -->
-    <div style="display:flex;flex-direction:column;gap:4px">
-      <label style="font-size:11px;color:var(--text2)">ルーム名</label>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="room-name-input" placeholder="ルーム名を入力" maxlength="30"
-          style="flex:1;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"/>
-        <button onclick="saveRoomName()" style="padding:6px 14px;font-size:12px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-weight:600">保存</button>
-      </div>
-    </div>
+    <div style="font-size:14px;font-weight:700;color:var(--text)">イベントを開く</div>
 
     <!-- 最近開いたルーム -->
-    <div id="room-mgr-recent-wrap" style="display:none;flex-direction:column;gap:4px">
-      <label style="font-size:11px;color:var(--text2)">最近開いたルーム</label>
-      <div id="room-mgr-recent-list" style="display:flex;flex-direction:column;gap:6px;max-height:150px;overflow-y:auto"></div>
+    <div id="room-picker-recent-wrap" style="display:none;flex-direction:column;gap:4px">
+      <label style="font-size:11px;color:var(--text2)">最近開いたイベント</label>
+      <div id="room-picker-recent-list" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto"></div>
     </div>
 
-    <!-- ルームのQRコード共有 -->
-    <div style="display:flex;flex-direction:column;gap:6px">
-      <label style="font-size:11px;color:var(--text2)">QRコードで共有</label>
-      <div id="room-mgr-qr" style="width:160px;height:160px;background:#fff;padding:6px;border-radius:8px;border:1px solid var(--border)"></div>
-      <div style="font-size:10px;color:var(--text3);font-family:monospace;word-break:break-all" id="room-mgr-url"></div>
-      <button onclick="copyRoomMgrUrl()" style="align-self:flex-start;font-size:12px;padding:4px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">URLをコピー</button>
-    </div>
-
-    <!-- ルームを変更 -->
+    <!-- 別のルームに接続 -->
     <div style="display:flex;flex-direction:column;gap:4px">
-      <label style="font-size:11px;color:var(--text2)">別のルームに接続（URLまたはルームID）</label>
+      <label style="font-size:11px;color:var(--text2)">別のイベントを開く（URLまたはID）</label>
       <div style="display:flex;gap:8px">
-        <input type="text" id="room-join-input" placeholder="room-xxxxxx または URL"
-          style="flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"/>
-        <button onclick="joinRoom()" style="padding:6px 14px;font-size:12px;border:none;border-radius:8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);cursor:pointer">接続</button>
+        <input type="text" id="room-picker-join-input" placeholder="共有URL または ID"
+          style="flex:1;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"
+          onkeydown="if(event.key==='Enter')roomPickerJoin()"/>
+        <button onclick="roomPickerJoin()" style="padding:6px 14px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">接続</button>
       </div>
     </div>
 
-    <!-- 区切り -->
-    <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:8px">
-      <!-- 新しいルームを作成 -->
-      <button onclick="createNewRoom()" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        新しいルームを作成
-      </button>
-      <!-- ルームを削除 -->
-      <button onclick="deleteRoom()" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #F7C1C1;border-radius:8px;background:#FEF2F2;color:#A32D2D;font-size:13px;cursor:pointer">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        このルームを削除
-      </button>
+    <!-- .sttファイルから開く -->
+    <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--border);padding-top:12px">
+      <label style="font-size:11px;color:var(--text2)">ファイルから開く</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        .sttファイルを開く
+        <input type="file" accept=".stt,.json" style="display:none" onchange="loadSTTFile(event);closeRoomPicker();"/>
+      </label>
     </div>
 
-    <button onclick="closeRoomManager()" style="align-self:flex-end;padding:6px 16px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);cursor:pointer">閉じる</button>
+    <button onclick="closeRoomPicker()" style="align-self:flex-end;padding:6px 16px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);cursor:pointer">閉じる</button>
+  </div>
+</div>
+
+<!-- 共有 モーダル -->
+<div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center" onclick="if(event.target===this)closeShareModal()">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;width:90%;max-width:380px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="font-size:14px;font-weight:700;color:var(--text)">このイベントを共有</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6">QRコードをスキャン、またはURLを共有すると、相手も同じイベントに参加して一緒に編集できます。</div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+      <div id="share-qr" style="width:160px;height:160px;background:#fff;padding:6px;border-radius:8px;border:1px solid var(--border)"></div>
+      <div style="font-size:10px;color:var(--text3);font-family:monospace;word-break:break-all;width:100%" id="share-url"></div>
+      <button onclick="copyShareUrl()" style="align-self:stretch;font-size:13px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">URLをコピー</button>
+    </div>
+    <button onclick="closeShareModal()" style="align-self:flex-end;padding:6px 16px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);cursor:pointer">閉じる</button>
   </div>
 </div>
 
@@ -6823,19 +6933,19 @@ if(_isNewVisit){
         <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
         <div style="font-size:16px;font-weight:700;color:var(--text)">ようこそ</div>
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">ルームを選んで始めましょう。</div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">イベントを選んで始めましょう。</div>
       <div id="welcome-recent-wrap" style="display:none;margin-bottom:14px">
-        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600">最近開いたルーム</div>
+        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600">最近開いたイベント</div>
         <div id="welcome-recent-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto"></div>
       </div>
       <div style="display:flex;flex-direction:column;gap:9px">
         <button onclick="welcomeCreateNew()" style="display:flex;align-items:center;gap:10px;padding:13px 15px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);cursor:pointer;text-align:left;font-size:13px;font-weight:600">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5db4f0" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M12 5v14M5 12h14"/></svg>
-          新しくルームを作成
+          新しくイベントを作成
         </button>
         <button onclick="welcomeShowIdInput()" style="display:flex;align-items:center;gap:10px;padding:13px 15px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);cursor:pointer;text-align:left;font-size:13px;font-weight:600">
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5db4f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-          ルームIDを指定して開く
+          URL／IDを指定して開く
         </button>
       </div>
     </div>
@@ -6844,15 +6954,15 @@ if(_isNewVisit){
     <div id="welcome-idinput" style="display:none">
       <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
         <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
-        <div style="font-size:16px;font-weight:700;color:var(--text)">ルームIDを指定</div>
+        <div style="font-size:16px;font-weight:700;color:var(--text)">URL／IDを指定</div>
       </div>
-      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">共有されたルームIDを入力してください。</div>
-      <input type="text" id="welcome-id-input" placeholder="例: room-a3x9k2" maxlength="40"
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">共有されたURLまたはIDを入力してください。</div>
+      <input type="text" id="welcome-id-input" placeholder="共有URL または ID" maxlength="40"
         style="width:100%;box-sizing:border-box;font-size:14px;padding:11px 13px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text);outline:none;margin-bottom:14px"
         onkeydown="if(event.key==='Enter')welcomeConnectId()"/>
       <div style="display:flex;gap:9px">
         <button onclick="welcomeBackToChoose()" style="flex:0 0 auto;padding:11px 18px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text2);cursor:pointer;font-size:13px">戻る</button>
-        <button onclick="welcomeConnectId()" style="flex:1;padding:11px 18px;border:none;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:600">このルームに接続</button>
+        <button onclick="welcomeConnectId()" style="flex:1;padding:11px 18px;border:none;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:600">このイベントを開く</button>
       </div>
     </div>
 
