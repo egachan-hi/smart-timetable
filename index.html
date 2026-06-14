@@ -277,6 +277,7 @@ tbody tr:hover td{background:var(--bg2)}
   <button class="tb" onclick="openRoomPicker()" data-tip="イベントを開く"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></button>
   <button class="tb" onclick="openShareModal()" data-tip="共有"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></button>
   <button class="tb" onclick="openExport()" data-tip="書き出し"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></button>
+  <button class="tb" onclick="resetAll()" data-tip="セッションを全削除"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
   <button class="tb danger" onclick="deleteRoom()" data-tip="このイベントを削除"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
   <div class="sep"></div>
   <button class="tb" id="bundo" onclick="undo()" data-tip="元に戻す"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></button>
@@ -665,29 +666,6 @@ tbody tr:hover td{background:var(--bg2)}
     </div>
   </div>
 </div>
-<!-- EV modal -->
-<div class="mbg" id="evm" style="display:none">
-  <div class="mc" style="width:360px" onclick="event.stopPropagation()">
-    <div class="mh"><h3>イベントを開く</h3><button class="mx" onclick="closeEV()">×</button></div>
-    <div class="mb">
-      <div style="display:flex;gap:4px;margin-bottom:5px">
-        <input class="mi" id="evname" placeholder="別名で保存（空白=タイトル名）" style="flex:1"/>
-        <button class="btn p" onclick="saveEV()">別名保存</button>
-      </div>
-      <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">ファイルから開く</div>
-      <div style="display:flex;gap:4px;margin-bottom:8px">
-        <label style="flex:1;padding:6px 10px;border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-size:11px;color:var(--text2);text-align:center;display:flex;align-items:center;justify-content:center;gap:5px">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          .sttファイルを開く
-          <input type="file" accept=".stt,.json" style="display:none" onchange="loadSTTFile(event)"/>
-        </label>
-      </div>
-      <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">保存済みイベント</div>
-      <div id="evlist" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"></div>
-    </div>
-    <div class="mft"><div></div><button class="btn" onclick="closeEV()">閉じる</button></div>
-  </div>
-</div>
 <!-- Export modal -->
 <div class="mbg" id="expm" style="display:none">
   <div class="mc" style="width:380px" onclick="event.stopPropagation()">
@@ -914,29 +892,6 @@ tbody tr:hover td{background:var(--bg2)}
   </div>
 </div>
 
-<!-- QR共有モーダル -->
-<div class="mbg" id="qr-modal" style="display:none" onclick="if(event.target===this)closeQR()">
-  <div class="mc" style="width:320px" onclick="event.stopPropagation()">
-    <div class="mh">
-      <h3>🔗 イベントを共有</h3>
-      <button class="mx" onclick="closeQR()">×</button>
-    </div>
-    <div class="mb" style="align-items:center;gap:12px">
-      <div style="font-size:11px;color:var(--text2);text-align:center">QRコードをスキャンまたはURLをコピーして共有</div>
-      <div id="qr-code" style="width:200px;height:200px;margin:0 auto;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--border)"></div>
-      <div style="width:100%;background:var(--bg2);border-radius:6px;padding:8px 10px;font-size:10px;word-break:break-all;color:var(--text2);font-family:monospace" id="qr-url"></div>
-    </div>
-    <div class="mft">
-      <div></div>
-      <div class="mbtns">
-        <button class="btn" onclick="closeQR()">閉じる</button>
-        <button class="btn" onclick="createNewRoom()" style="color:var(--text2);font-size:11px">新しいイベントを作成</button>
-        <button class="btn p" onclick="copyQRUrl()">URLをコピー</button>
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- AI生成確認モーダル -->
 <div class="mbg" id="ai-confirm-modal" style="display:none;z-index:2000" onclick="if(event.target===this)aiConfirmClose()">
   <div class="mc" style="width:360px" onclick="event.stopPropagation()">
@@ -1001,14 +956,14 @@ tbody tr:hover td{background:var(--bg2)}
   <div class="mv-toolbar" style="display:flex;align-items:stretch;padding:0 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid var(--border);background:var(--bg)">
 
     <!-- 新規 -->
-    <button class="mv-tbtn" onclick="newEV()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+    <button class="mv-tbtn" onclick="newRoomBtn()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
       <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">新規</span>
     </button>
-    <!-- 保存 -->
-    <button class="mv-tbtn" onclick="quickSaveEV()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">保存</span>
+    <!-- 開く -->
+    <button class="mv-tbtn" onclick="openRoomPicker()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">開く</span>
     </button>
     <!-- AI生成 -->
     <button class="mv-tbtn" onclick="openAI()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
@@ -1021,7 +976,7 @@ tbody tr:hover td{background:var(--bg2)}
       <span style="font-size:9px;color:var(--text2);pointer-events:none;line-height:1">時間調整</span>
     </button>
     <!-- 共有 -->
-    <button class="mv-tbtn" onclick="if(typeof fbShowRoom==='function')fbShowRoom()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+    <button class="mv-tbtn" onclick="openShareModal()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">共有</span>
     </button>
@@ -1164,14 +1119,17 @@ tbody tr:hover td{background:var(--bg2)}
       </button>
 
     </div>
-    <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
-    </button>
     <button onclick="openExport();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し
     </button>
-    <button onclick="resetAll();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #F7C1C1;border-radius:12px;background:#FEF2F2;color:#A32D2D;font-size:14px;cursor:pointer">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>全削除
+    <button onclick="duplicateRoomBtn();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>このイベントを複製
+    </button>
+    <button onclick="resetAll();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>セッションを全削除
+    </button>
+    <button onclick="deleteRoom();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #F7C1C1;border-radius:12px;background:#FEF2F2;color:#A32D2D;font-size:14px;cursor:pointer">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>このイベントを削除
     </button>
     <button onclick="mvCloseMore()" style="display:flex;align-items:center;justify-content:center;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text2);font-size:14px;cursor:pointer;width:100%">
       閉じる
@@ -4312,100 +4270,6 @@ async function extractPptxText(file){
 }
 
 // ================================================================
-// EVENT MANAGER
-// ================================================================
-function openEV(){restoreSavedEvs();document.getElementById('evname').value=document.getElementById('evt').value||'';renderEVL();document.getElementById('evm').style.display='flex';}
-function closeEV(){document.getElementById('evm').style.display='none';}
-document.getElementById('evm').addEventListener('click',function(e){if(e.target===this)closeEV();});
-function renderEVL(){document.getElementById('evlist').innerHTML=savedEvs.length===0?'<div style="font-size:11px;color:var(--text3)">保存されたイベントはありません</div>':savedEvs.map((ev,i)=>`<div class="eli"><span style="flex:1;font-size:11px">${esc(ev.name)}</span><span style="font-size:10px;color:var(--text2)">${ev.date||''}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="loadEV(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="delEV(${i})">×</span></div>`).join('');}
-function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);// 現在のDAYを保存してからセーブ
-  if(dayCount>1){
-    const _exd=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined?dayData[currentDay-1].date:document.getElementById('evd').value||'';
-    dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs)),start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'17:00',date:_exd};
-  }
-  const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs)),noDate:noDate,dayCount:dayCount,currentDay:currentDay,dayData:JSON.parse(JSON.stringify(dayData)),evInfo:JSON.parse(JSON.stringify(evInfo||{}))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();persistSavedEvs();alert(`「${name}」として保存しました`);}
-function loadEV(i){const ev=savedEvs[i];
-  document.getElementById('evt').value=ev.title||'';
-  document.getElementById('evd').value=ev.date||'';
-  document.getElementById('evs').value=ev.start||'13:00';
-  document.getElementById('eve').value=ev.end||'16:00';
-  sessions=JSON.parse(JSON.stringify(ev.sessions||[]));
-  freeEvs=JSON.parse(JSON.stringify(ev.freeEvs||[]));
-  if(ev.dayCount){dayCount=ev.dayCount;currentDay=ev.currentDay||1;dayData=ev.dayData||[];noDate=ev.noDate||false;const dcSel=document.getElementById('day-count-sel');if(dcSel)dcSel.value=String(dayCount);const ndChk=document.getElementById('no-date-chk');if(ndChk)ndChk.checked=noDate;const _t=dayData[currentDay-1];if(_t){sessions=JSON.parse(JSON.stringify(_t.sessions||[]));freeEvs=JSON.parse(JSON.stringify(_t.freeEvs||[]));if(_t.start)document.getElementById('evs').value=_t.start;if(_t.end)document.getElementById('eve').value=_t.end;if(_t.date)document.getElementById('evd').value=_t.date;}}
-  if(ev.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},ev.evInfo);loadEvInfoToWidget();}
-  closeEV();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();}
-function delEV(i){if(confirm('削除しますか？')){savedEvs.splice(i,1);renderEVL();persistSavedEvs();}}
-function saveEvByTitle(title){
-  // 指定タイトルで名前付き保存（alertなし・内部利用）。成功時true
-  title=(title||'').trim();
-  if(!title) return false;
-  const idx=savedEvs.findIndex(e=>e.name===title);
-  const d={name:title,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
-  if(idx>=0){savedEvs[idx]=d;} else {savedEvs.push(d);}
-  persistSavedEvs();
-  return true;
-}
-function quickSaveEV(){
-  logEvent('save');
-  const title=(document.getElementById('evt').value||'').trim();
-  if(!title){
-    alert('イベントタイトルを入力してください。');
-    document.getElementById('evt').focus();
-    return;
-  }
-  const existed=savedEvs.findIndex(e=>e.name===title)>=0;
-  saveEvByTitle(title);
-  alert(existed?`「${title}」を上書き保存しました`:`「${title}」として保存しました`);
-}
-function duplicateEV(){
-  logEvent('duplicate');
-  const curTitle=(document.getElementById('evt').value||'').trim();
-  if(!curTitle){
-    alert('複製の前にイベントタイトルを入力してください。');
-    document.getElementById('evt').focus();
-    return;
-  }
-  // 元の状態を名前付き保存（ライブラリに確実に残す）
-  saveEvByTitle(curTitle);
-  // コピーを作成
-  const title=curTitle+' のコピー';
-  document.getElementById('evt').value=title;
-  sessions=sessions.map(s=>({...s,id:nid++}));
-  freeEvs=freeEvs.map(e=>({...e,id:nfid++}));
-  snap();render();
-  if(typeof mvRender==='function') setTimeout(mvRender,50);
-  alert(`「${curTitle}」を保存し、「${title}」として複製しました`);
-}
-
-function newEV(){
-  const curTitle=(document.getElementById('evt').value||'').trim();
-  // 現在の内容がある（タイトルまたはセッション/フリー）のに無題なら入力を促す
-  const hasContent = (sessions&&sessions.length>0) || (freeEvs&&freeEvs.length>0);
-  if(!curTitle && hasContent){
-    alert('新規作成の前に、現在のイベントにタイトルを入力してください。\n（タイトルを付けて保存してから新規作成します）');
-    document.getElementById('evt').focus();
-    return;
-  }
-  if(!confirm('現在の内容を保存してから、新規イベントを作成します。よろしいですか？'))return;
-  // 現在の状態を名前付き保存（タイトルがあれば）
-  if(curTitle) saveEvByTitle(curTitle);
-  sessions=[];freeEvs=[];
-  // 複数日程をリセットして1日に戻す
-  dayCount=1;currentDay=1;dayData=[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}];
-  const dcSel=document.getElementById('day-count-sel');
-  if(dcSel) dcSel.value='1';
-  document.getElementById('evt').value='';
-  document.getElementById('evd').value='';
-  document.getElementById('evs').value='13:00';
-  document.getElementById('eve').value='16:00';
-  // evInfoもリセット
-  evInfo={location:'',owner:'',members:'',memo:'',slideUrl:''};
-  loadEvInfoToWidget();
-  closeEV();snap();render();updateDow();updateTopDateLabel();
-  if(typeof mvRender==='function')mvRender();
-}
-
-// ================================================================
 // CSV
 // ================================================================
 function openCSV(){document.getElementById('csvexp').value=buildCSV();document.getElementById('csvimp').value='';document.getElementById('csvm').style.display='flex';}
@@ -4418,18 +4282,6 @@ function impCSV(){const text=document.getElementById('csvimp').value.trim();if(!
 function pcsv(l){const res=[];let cur='',q=false;for(let i=0;i<l.length;i++){const c=l[i];if(c==='"'&&q&&l[i+1]==='"'){cur+='"';i++;}else if(c==='"'){q=!q;}else if(c===','&&!q){res.push(cur);cur='';}else cur+=c;}res.push(cur);return res;}
 
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
-function setRoomNameLabel(name){
-  var el=document.getElementById('room-name-label');
-  if(!el) return;
-  if(name){
-    el.innerHTML='<span style="font-size:10px;font-weight:400;color:var(--text2);margin-right:4px">ルーム名</span>'+esc(name);
-    el.style.display='inline';
-  } else {
-    el.innerHTML='';
-    el.style.display='none';
-  }
-}
-
 // ================================================================
 // ルーム履歴（最近開いたルーム）
 // ================================================================
@@ -4860,7 +4712,7 @@ function loadSTTFile(e){
       }
       if(data.evInfo) evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},data.evInfo);
       loadEvInfoToWidget();
-      closeEV();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
+      if(typeof closeRoomPicker==='function')closeRoomPicker();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
     }catch(err){alert('読み込みエラー: '+err.message);}
   };
   reader.readAsText(file);
@@ -5421,9 +5273,6 @@ function mvSwitchDayUI(){
   mvRender._scrolled=false;
 }
 
-function mvOpenShare(){
-  if(typeof fbShowRoom==='function') fbShowRoom();
-}
 function mvOpenMore(){
   // 日程数セレクト同期
   const mvDcSel=document.getElementById('mv-day-count-sel');
@@ -6078,6 +5927,9 @@ function mvSaveEventInfoLive(){
   if(typeof isActuallyToday==='function'&&isActuallyToday()&&!liveMode){
     toggleLiveMode(true);
   }
+  // タイムラインを即時再描画（変更がすぐ反映されるように）
+  render();
+  if(typeof mvRender==='function') mvRender();
   autoSave();
   if(typeof fbPush==='function') fbPush();
 }
@@ -6143,47 +5995,6 @@ function fbShowStatus(text, color){
   var el = document.getElementById('fb-status');
   if(el){ el.textContent = text; el.style.color = color || '#27500A'; }
 }
-
-window.closeQR = function(){
-  document.getElementById('qr-modal').style.display='none';
-  document.getElementById('qr-code').innerHTML='';
-};
-window.copyQRUrl = function(){
-  var url = document.getElementById('qr-url').textContent;
-  navigator.clipboard.writeText(url).then(function(){
-    var btn = event.target;
-    btn.textContent='✅ コピー済み';
-    setTimeout(function(){btn.textContent='URLをコピー';},2000);
-  }).catch(function(){prompt('このURLをコピーしてください：',url);});
-};
-window.fbShowRoom = function(){
-  var url = window.location.href;
-  // QRモーダルを表示
-  var qrEl = document.getElementById('qr-code');
-  if(qrEl){
-    document.getElementById('qr-url').textContent = url;
-    qrEl.innerHTML = '';
-    function generateQR(){
-      try{
-        new QRCode(qrEl,{text:url,width:184,height:184,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-      }catch(e){qrEl.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px">QRコード生成失敗</div>';}
-    }
-    if(!window.QRCode){
-      var s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-      s.onload=generateQR;
-      document.head.appendChild(s);
-    } else { generateQR(); }
-    document.getElementById('qr-modal').style.display='flex';
-  } else {
-    // QRモーダルがない場合はクリップボードコピー
-    if(navigator.clipboard){
-      navigator.clipboard.writeText(url).then(function(){alert('✅ 共有URLをコピーしました！\n\n' + url);});
-    } else {
-      prompt('このURLを共有してください：', url);
-    }
-  }
-};
 
 var _fbPushTimer = null;
 window.fbPush = function(){
@@ -6386,140 +6197,6 @@ if(document.readyState === 'loading'){
   setTimeout(fbAutoStart, 800);
 }
 
-
-// ============================================================
-// ルーム管理
-// ============================================================
-function openRoomManager(){
-  const modal = document.getElementById('room-mgr-modal');
-  if(!modal) return;
-  const roomId = fbGetRoomId();
-
-  // ルーム名入力欄
-  const nameInput = document.getElementById('room-name-input');
-  if(nameInput) nameInput.value = localStorage.getItem('stt-room-name-'+roomId)||'';
-
-  // URL表示
-  const url = window.location.origin + window.location.pathname + '?room=' + roomId;
-  const urlEl = document.getElementById('room-mgr-url');
-  if(urlEl) urlEl.textContent = url;
-
-  // QRコード生成
-  const qrEl = document.getElementById('room-mgr-qr');
-  if(qrEl){
-    qrEl.innerHTML = '';
-    function genQR(){
-      try{
-        new QRCode(qrEl,{text:url,width:148,height:148,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-      }catch(e){qrEl.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px">QRコード生成失敗</div>';}
-    }
-    if(!window.QRCode){
-      var s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-      s.onload=genQR; document.head.appendChild(s);
-    } else { genQR(); }
-  }
-
-  // 最近開いたルームのリスト
-  renderRoomMgrHistory();
-
-  modal.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center';
-}
-
-function renderRoomMgrHistory(){
-  var wrap=document.getElementById('room-mgr-recent-wrap');
-  var listEl=document.getElementById('room-mgr-recent-list');
-  if(!wrap||!listEl) return;
-  var curId = (typeof fbGetRoomId==='function') ? fbGetRoomId() : '';
-  var hist=getRoomHistory();
-  if(!hist.length){ wrap.style.display='none'; listEl.innerHTML=''; return; }
-  wrap.style.display='flex';
-  listEl.innerHTML='';
-  hist.forEach(function(r){
-    var isCur = r.id===curId;
-    var row=document.createElement('div');
-    row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);'+(isCur?'':'cursor:pointer');
-    var nameTxt = r.name ? esc(r.name) : '<span style="color:var(--text2)">（無題）</span>';
-    var curBadge = isCur ? ' <span style="font-size:10px;color:var(--text3);font-weight:400">(編集中)</span>' : '';
-    var nameColor = isCur ? 'var(--accent)' : 'var(--text)';
-    var xBtn = isCur ? '' : '<button class="rmm-recent-x" style="border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:15px;padding:0 4px;flex-shrink:0;line-height:1">×</button>';
-    row.innerHTML='<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden">'
-      +'<span style="font-size:13px;font-weight:600;color:'+nameColor+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nameTxt+curBadge+'</span>'
-      +'<span style="font-size:10px;color:var(--text2)">'+esc(r.id)+' ・ '+fmtHistoryTime(r.ts)+'</span>'
-      +'</span>'+xBtn;
-    if(!isCur){
-      row.addEventListener('click',function(e){
-        if(e.target.classList.contains('rmm-recent-x')) return;
-        welcomeGoToRoom(r.id);
-      });
-      var xb=row.querySelector('.rmm-recent-x');
-      if(xb) xb.addEventListener('click',function(e){
-        e.stopPropagation();
-        removeRoomHistory(r.id);
-        renderRoomMgrHistory();
-      });
-    }
-    listEl.appendChild(row);
-  });
-}
-
-function closeRoomManager(){
-  const modal = document.getElementById('room-mgr-modal');
-  if(modal) modal.style.display='none';
-}
-
-function saveRoomName(){
-  const roomId = fbGetRoomId();
-  const input = document.getElementById('room-name-input');
-  if(!input) return;
-  const name = input.value.trim();
-  if(name){
-    localStorage.setItem('stt-room-name-'+roomId, name);
-  } else {
-    localStorage.removeItem('stt-room-name-'+roomId);
-  }
-  // ラベル更新
-  setRoomNameLabel(name);
-  // 履歴の名前も更新
-  if(typeof updateRoomHistoryName==='function') updateRoomHistoryName(roomId, name);
-  if(typeof renderRoomMgrHistory==='function') renderRoomMgrHistory();
-  alert('ルーム名を保存しました');
-}
-
-function copyRoomMgrUrl(){
-  const roomId = fbGetRoomId();
-  const url = window.location.origin + window.location.pathname + '?room=' + roomId;
-  navigator.clipboard.writeText(url).then(()=>alert('URLをコピーしました')).catch(()=>{
-    const ta=document.createElement('textarea');
-    ta.value=url; document.body.appendChild(ta); ta.select();
-    document.execCommand('copy'); document.body.removeChild(ta);
-    alert('URLをコピーしました');
-  });
-}
-
-function joinRoom(){
-  const input = document.getElementById('room-join-input');
-  if(!input) return;
-  let val = input.value.trim();
-  if(!val) return;
-  // URLからroomパラメータを抽出
-  if(val.includes('?') || val.includes('room=')){
-    try{
-      const u = new URL(val.startsWith('http') ? val : 'https://dummy.com/?' + val.split('?').pop());
-      const r = u.searchParams.get('room');
-      if(r) val = r;
-    }catch(e){}
-  }
-  if(!val.startsWith('room-')){
-    alert('URLまたはIDの形式が正しくありません');
-    return;
-  }
-  if(!confirm('ルーム「'+val+'」に接続します。よろしいですか？')) return;
-  localStorage.setItem('stt-room-id', val);
-  const url = new URL(window.location.href);
-  url.searchParams.set('room', val);
-  window.location.href = url.toString();
-}
 
 function deleteRoom(){
   const roomId = fbGetRoomId();
