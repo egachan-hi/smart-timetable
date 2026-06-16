@@ -771,127 +771,61 @@ tbody tr:hover td{background:var(--bg2)}
 <div class="mbg" id="hm" style="display:none">
   <div class="mc" style="width:520px;max-height:85vh" onclick="event.stopPropagation()">
     <div class="mh"><h3>操作ガイド</h3><button class="mx" onclick="closeHelp()">×</button></div>
-    <div class="mb" style="gap:12px;font-size:12px;line-height:1.7">
+    <div class="mb" style="gap:16px;font-size:12.5px;line-height:1.75">
 
-      <div style="background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:12px 14px">
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:6px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>みんなで共同編集できます（最初にお読みください）</div>
-        <div style="margin-bottom:8px">このアプリは、1つのタイムテーブルを<b>みんなで共有・同時編集</b>できます。同じURLを開いた人は、全員が同じ画面を見て、リアルタイムで一緒に編集できます。Googleドキュメントの共有編集をイメージしてください。</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:4px;margin:0">
-          <li>各イベントには<b>固有のURL</b>があります。ツールバーの<b>共有ボタン</b>（QRコード／URL）から相手に渡すと、同じイベントに参加して一緒に編集できます</li>
-          <li>上部バーの<b>「N人 同期中」</b>表示で、今このイベントを何人が開いているかが分かります</li>
-          <li>編集内容は<b>自動的に全員へ反映</b>され、常に自動保存されます（約1秒程度のタイムラグ）。手動保存は不要です</li>
-          <li>イベントは<b>イベントタイトル</b>（画面上部の入力欄）で区別します。分かりやすい名前を付けておくと、あとで「開く」から見つけやすくなります</li>
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:var(--accent)">はじめに</div>
+        <div>スマートタイムテーブルは、イベントやワークショップ、学校での講義、旅行などのタイムテーブルを簡単に作成・編集するアプリです。</div>
+        <div style="margin-top:6px">同じURLを開いた人は全員が同じ画面を見て、リアルタイムで一緒に編集することも可能です。スマホでも操作でき、講師やスタッフと進行状況を共有するのにも便利です。</div>
+        <div style="margin-top:6px">ライブモードでは現在のイベントの進行状況を確認したり、時間が押している場合に後続の時間調整も行えます。</div>
+        <div style="margin-top:6px">AI生成では、テキスト入力やパワーポイント・音声ファイルなどをアップロードすることで、その内容を反映したタイムラインを自動生成します。</div>
+      </div>
+
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:var(--accent)">シリアルセッション</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:5px;margin:0">
+          <li>時間を隙間なく連続して積み上げる本編のスケジュールです。学校の講義やイベントなど、あらかじめ決められた時間でのタイムライン作成に最適です。</li>
+          <li>セッションメニューからドラッグ＆ドロップ、またはメニュー項目をダブルクリックしてセッションを追加します。</li>
+          <li>見出しの「＋」で追加、ゴミ箱アイコンでそのエリアをまとめてクリアできます。</li>
+          <li>ブロックの下端をドラッグして所要時間を調整したり、ドラッグで順番を並び替えできます。</li>
+          <li>セッションをダブルクリックすると、名前・アイコン・時間・メモの編集や、複製・削除ができます。</li>
         </ul>
-        <div style="margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">
-          <b>ツールバーのイベント操作</b><br>
-          ・<b>新しいイベント</b> … 空のイベントを新規作成<br>
-          ・<b>このイベントを複製</b> … 今の内容をコピーして別のイベントを作成<br>
-          ・<b>イベントを開く</b> … 最近開いたイベント・URL/ID・.sttファイルから開く<br>
-          ・<b>共有</b> … QRコード／URLで共有<br>
-          ・<b>このイベントを削除</b> … 現在のイベントを削除
+      </div>
+
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:var(--accent)">フリーエリア</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:5px;margin:0">
+          <li>時間帯を自由に決めて置くスケジュールです。講師・会場・準備など、本編と並行する予定や情報を自由に追加できます。</li>
+          <li>セッションメニューからドラッグ、または「＋」で追加します。</li>
+          <li>ブロックの下端をドラッグして所要時間を調整したり、ドラッグで時間帯を変更できます。</li>
+          <li>見出しの「＋」で追加、ゴミ箱アイコンでそのエリアをまとめてクリアできます。</li>
+        </ul>
+      </div>
+
+      <div>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--accent)">イベントの操作（ツールバー）</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span><div style="flex:1"><b>新規</b> — 空のイベントを新しく作成します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span><div style="flex:1"><b>複製</b> — 今の内容をコピーして別のイベントを作成します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span><div style="flex:1"><b>開く</b> — 最近開いたイベント、URL／ID、または保存した.sttファイルから開きます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span><div style="flex:1"><b>共有</b> — QRコードやURLで他の人にイベントを共有します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span><div style="flex:1"><b>書き出し</b> — PDFまたは.sttファイルで書き出します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:#E53E3E;margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></span><div style="flex:1"><b>削除</b> — 今のイベントを削除します。</div></div>
         </div>
       </div>
 
       <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>シリアルセッション</div>
-        <ol style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>隙間なく連続してセッションを積み上げる方法です。左列「セッションメニュー」からセッションを<b>ドラッグ&amp;ドロップ</b>して中央「シリアルセッション」に追加</li>
-          <li>ブロックの<b>下端ハンドル</b>（ホバーで表示）を上下にドラッグして時間を調整</li>
-          <li>ブロックを<b>ダブルクリック</b>すると名前・アイコン・時間・メモを編集。編集画面から<b>複製</b>ボタンで直後にコピーを作成</li>
-          <li>ブロックを<b>ドラッグ&amp;ドロップ</b>して並び順を変更</li>
-          <li>左列セッションメニューのアイテムを<b>ダブルクリック</b>するとシリアルセッションの末尾に即追加</li>
-        </ol>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>フリーエリア</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>時間帯を自由に設定してセッションを配置します。セッション以外にも、講師名・会場名・裏方の準備などを自由に設定してください</li>
-          <li>セッションメニューから右列「フリーエリア」にドラッグして任意の時間帯に配置</li>
-          <li>ブロックをドラッグして時間帯を移動、上下ハンドルで開始・終了時刻を調整</li>
-          <li>ブロックを<b>ダブルクリック</b>すると編集。編集画面から<b>複製</b>ボタンで末尾にコピーを作成</li>
-          <li>左列「フリーエリア用」のアイテムを<b>ダブルクリック</b>するとフリーエリアの末尾に即追加</li>
-          <li>同じ時間帯に複数配置すると自動で2〜3列に分割表示（4つ以上は不可）</li>
-        </ul>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>セッションテンプレート設定（歯車アイコン）</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>左列メニューのセッション名・時間・色を自由に編集</li>
-          <li>「テンプレートとして保存」で複数のメニューセットを保存・切り替え可能</li>
-          <li>「現在のシリアルセッションを取り込む」でスケジュールをテンプレート化</li>
-        </ul>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>イベント管理</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li><b>「新規」</b>現在のイベントを名前付き保存してから、画面をクリアして新しいイベントを作成（タイトル未入力のときは入力を促します）</li>
-          <li><b>「保存」</b>現在のタイムラインに名前を付けて、自分の端末のライブラリに保存。「開く」から呼び出せます</li>
-          <li><b>「開く」</b>過去に名前付き保存したタイムテーブルや、.sttファイルの読み込み</li>
-          <li><b>「書き出し」</b>現在のタイムラインをPDFまたは.sttファイルで書き出し</li>
-          <li><b>「複製」</b>現在のイベントを名前付き保存したうえで、「〜のコピー」を作成。バリエーション作成に便利です</li>
-        </ul>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Googleカレンダー書き出し</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>タイムラインビューの右上「📅 GCal」ボタンから書き出し画面を開く</li>
-          <li>書き出したいセッションを選択（シリアル・フリー個別に選択可能）</li>
-          <li>「Googleカレンダーで開く」ボタンでブラウザが開き、そのままGoogleカレンダーに追加できる</li>
-          <li>日付を設定済みの場合は実際の日時で書き出し、未設定の場合は今日の日付で書き出し</li>
-        </ul>
-      </div>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>AI生成</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>イベントの概要・目的をテキストで入力、またはPDF・画像・Word・PPT・音声ファイルをアップロード</li>
-          <li>3つの生成モードから選択：<b>設定時間にぴったり合わせる</b>／<b>ファイルに最適化する</b>／<b>音声を時間どおりに再現する</b></li>
-          <li>🎤 音声モード（Gemini専用）：mp3・m4a・wav等の音声ファイルを文字起こしして実際の発言・時間をそのままセッションとして再現</li>
-          <li>生成結果をチェックして「取り込む」→上書きまたは末尾に追加</li>
-        </ul>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>その他の操作</div>
-        <table style="width:100%;border-collapse:collapse;font-size:11px">
-          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></td><td style="padding:3px 6px;font-weight:600">元に戻す</td><td style="padding:3px 6px">操作を最大80ステップ遡れるUndo/Redo</td></tr>
-          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><line x1="5" y1="12" x2="19" y2="12"/></svg><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></td><td style="padding:3px 6px;font-weight:600">ズーム</td><td style="padding:3px 6px">タイムラインの表示倍率を6段階で調整</td></tr>
-          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></td><td style="padding:3px 6px;font-weight:600">テーブル</td><td style="padding:3px 6px">セッション一覧を表形式で確認・編集・並び替え</td></tr>
-          <tr><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></td><td style="padding:3px 6px;font-weight:600">全削除</td><td style="padding:3px 6px">シリアル・フリー全セッションを一括削除</td></tr>
-        </table>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>ライブモード（LIVE）</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>当日の進行管理に使います。ONにすると現在時刻のライン（赤線）が表示され、今どのセッションを進行中かが一目で分かります</li>
-          <li>日付エリアの<b>「LIVE」チェックボックス</b>でON/OFF。イベント当日は自動でONになります</li>
-          <li>当日でない日にONにする場合は確認メッセージが表示されます</li>
-        </ul>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>複数日程（DAY1〜7）</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>研修や合宿など複数日のイベントに対応。日付エリアの<b>「複数日程にする」</b>にチェックを入れると設定画面が開きます</li>
-          <li>各DAYごとに日付・開始時刻・終了時刻を個別に設定でき、DAYごとに別々のタイムテーブルを組めます</li>
-          <li>上部のDAYバッジや切替ボタンで、編集するDAYを切り替えます</li>
-          <li><b>「日付を設定しない」</b>にチェックを入れると、特定の日付なしのテンプレートとして使えます</li>
-        </ul>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="14" y="3" rx="1"/><rect width="7" height="7" x="14" y="14" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/></svg>スマホでの利用</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>スマホでは画面に合わせたカード表示になります。当日の進行確認に便利です</li>
-          <li>下部のツールバーから新規・保存・AI生成・時間調整・共有・LIVEなどを操作できます</li>
-          <li>「その他」メニューに、元に戻す・やり直す・書き出し・複製などがまとまっています。タイトルをタッチすると概要や日程切替が開きます</li>
-        </ul>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--accent)">便利な機能</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><div style="flex:1"><b>セッションテンプレート</b> — よく使うセッションのセット（名前・時間・色）を登録しておける機能です。左側のセッションメニュー上部の歯車から、項目の編集や複数テンプレートの保存・切り替えができます。「現在のシリアルセッションを取り込む」で、作成済みのスケジュールをそのままテンプレート化することもできます。</div></div>
+                    <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></span><div style="flex:1"><b>テーブル表示</b> — セッションを一覧表で確認・編集できます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z"/><circle cx="5" cy="16" r="1.3"/></svg></span><div style="flex:1"><b>AI生成</b> — イベントの概要やファイル（PDF・画像・音声など）から、タイムテーブルを自動生成します。設定時間に合わせる／ファイルに忠実に／音声を再現する、の3モードから選べます。生成結果は確認してから取り込めます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div style="flex:1"><b>時間調整</b> — 全体の開始時刻に合わせて、各セッションの時間をまとめて調整します。ライブモードでは、イベントの途中で後続のセッションを調整する機能もあります。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49"/></svg></span><div style="flex:1"><b>ライブモード（LIVE）</b> — 当日の進行管理用です。現在時刻の赤いラインが表示され、今どのセッションかが一目で分かります。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div style="flex:1"><b>複数日程</b> — 研修や合宿など複数日のイベントに対応。日付エリアの「複数日程にする」から、DAYごとに日付・時刻・内容を設定できます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></span><div style="flex:1"><b>Googleカレンダー書き出し</b> — 選んだセッションをGoogleカレンダーに追加できます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></span><div style="flex:1"><b>スマホでの利用</b> — スマホでは画面に合わせたカード表示になります。</div></div>
+        </div>
       </div>
 
     </div>
