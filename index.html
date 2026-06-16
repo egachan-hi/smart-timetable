@@ -5205,7 +5205,16 @@ sessionStorage.setItem('st-auth','1');
 setTimeout(function(){ if((typeof _isNewVisit!=='undefined' && _isNewVisit)) return; if(typeof fbWaitAndInit==='function') fbWaitAndInit(); }, 300);
 // 自動保存データを復元
 dayData=[{sessions:[],freeEvs:[]}];
-if(!(typeof _isNewVisit!=='undefined' && _isNewVisit)) autoLoad();
+// 新規作成された空イベントの場合は前回データを読み込まない
+var _freshRoom=null;
+try{ _freshRoom=sessionStorage.getItem('stt-fresh-room'); }catch(e){}
+var _curRoom=(typeof fbGetRoomId==='function')?fbGetRoomId():null;
+var _isFresh=(_freshRoom && _curRoom && _freshRoom===_curRoom);
+if(_isFresh){
+  try{ sessionStorage.removeItem('stt-fresh-room'); localStorage.removeItem('stt-autosave'); }catch(e){}
+} else if(!(typeof _isNewVisit!=='undefined' && _isNewVisit)) {
+  autoLoad();
+}
 restoreSavedEvs();
 updateEvInfoPreview();
 uUR();sv('tl');render();setTimeout(fitz,0);setTimeout(initLiveMode,100);setTimeout(updateMultiDayChk,150);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
@@ -6102,7 +6111,6 @@ window.fbPush = function(){
       freeEvs: JSON.parse(JSON.stringify(freeEvs)),
       evInfo: JSON.parse(JSON.stringify(evInfo || {})),
       noDate: noDate||false,
-      liveMode: liveMode||false,
       dayCount: dayCount||1,
       dayData: JSON.parse(JSON.stringify(dayData||[])),
       ts: _fbLastPush
@@ -6173,9 +6181,7 @@ function fbListen(){
         const evd=document.getElementById('evd');
         if(evd){evd.disabled=noDate;evd.style.opacity=noDate?'0.4':'1';}
       }
-      if(data.liveMode!==undefined && data.liveMode!==liveMode){
-        toggleLiveMode(data.liveMode);
-      }
+      // ライブモードは端末ごとに独立（同期しない）
       if(data.dayCount!==undefined){
         dayCount=data.dayCount||1;
         if(data.dayData&&data.dayData.length>0) dayData=JSON.parse(JSON.stringify(data.dayData));
@@ -6299,12 +6305,25 @@ function deleteRoom(){
 
 function createNewRoom(){
   if(!confirm('新しいイベントを作成します。\n現在のイベントとは別の新しいURLが発行されます。\nよろしいですか？')) return;
+  // 保留中の自動保存(fbPush)を止める。古いルームへの遅延書き込みを防ぐ
+  try{ if(typeof _fbPushTimer!=='undefined') clearTimeout(_fbPushTimer); }catch(e){}
   const newRoomId='room-'+Math.random().toString(36).slice(2,8);
-  localStorage.setItem('stt-room-id', newRoomId);
-  _fbRoomId=null;
-  const url=new URL(window.location.href);
-  url.searchParams.set('room', newRoomId);
-  window.location.href=url.toString();
+  // 空イベントとして起動するフラグ（autoLoadで前回データを読まない）
+  try{ sessionStorage.setItem('stt-fresh-room', newRoomId); localStorage.removeItem('stt-autosave'); }catch(e){}
+  function go(){
+    localStorage.setItem('stt-room-id', newRoomId);
+    _fbRoomId=null;
+    const url=new URL(window.location.href);
+    url.searchParams.set('room', newRoomId);
+    window.location.href=url.toString();
+  }
+  // 新ルームのFirebaseを空データで初期化してから遷移（前イベントの混入を防ぐ）
+  if(_fbDB){
+    var emptyData={title:'',date:'',start:'13:00',end:'16:00',sessions:[],freeEvs:[],evInfo:{location:'',owner:'',members:'',memo:'',slideUrl:''},noDate:false,dayCount:1,dayData:[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}],ts:Date.now()};
+    _fbDB.ref('rooms/'+newRoomId+'/data').set(emptyData).then(go).catch(go);
+  } else {
+    go();
+  }
 }
 
 // ================================================================
@@ -6327,7 +6346,6 @@ function duplicateRoomBtn(){
     freeEvs: JSON.parse(JSON.stringify(freeEvs)),
     evInfo: JSON.parse(JSON.stringify(evInfo||{})),
     noDate: noDate||false,
-    liveMode: liveMode||false,
     dayCount: dayCount||1,
     dayData: JSON.parse(JSON.stringify(dayData||[])),
     ts: Date.now()
