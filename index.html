@@ -890,7 +890,7 @@ tbody tr:hover td{background:var(--bg2)}
         <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
           <li>スマホでは画面に合わせたカード表示になります。当日の進行確認に便利です</li>
           <li>下部のツールバーから新規・保存・AI生成・時間調整・共有・LIVEなどを操作できます</li>
-          <li>「その他」メニューに、元に戻す・やり直す・日程切替・開く・書き出しなどがまとまっています</li>
+          <li>「その他」メニューに、元に戻す・やり直す・書き出し・複製などがまとまっています。タイトルをタッチすると概要や日程切替が開きます</li>
         </ul>
       </div>
 
@@ -920,29 +920,29 @@ tbody tr:hover td{background:var(--bg2)}
   <!-- ヘッダー：タイトル＋日時（参照のみ）＋概要1行 -->
   <div class="mv-header">
     <div style="display:flex;align-items:flex-start;gap:6px">
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:6px"><div class="mv-title" id="mv-title" style="font-size:14px;font-weight:700;color:var(--text)">タイムテーブル</div><span id="mv-live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">● LIVE</span></div>
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="mvToggleAccordion()">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="mv-title" id="mv-title" style="font-size:14px;font-weight:700;color:var(--text)">タイムテーブル</div>
+          <span id="mv-live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">● LIVE</span>
+          <svg id="mv-acc-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text3);transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
         <div class="mv-meta" id="mv-meta" style="font-size:14px;font-weight:400;color:var(--text2);margin-top:1px"></div>
         <div id="mv-live-countdown" style="display:none;font-size:12px;font-weight:700;color:#E53E3E;margin-top:2px"></div>
       </div>
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
-      <!-- スライドリンクボタン（右上） -->
       <button id="mv-slide-btn" onclick="openSlideUrl()" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text2);flex-shrink:0;display:none;align-items:center;justify-content:center;border-radius:6px" title="スライドを開く">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       </button>
-      <!-- 鉛筆アイコン（右上） -->
-      <button onclick="mvOpenEventEdit()" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:6px">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
     </div>
-    <!-- イベント概要1行参照 -->
-    <div id="mv-evinfo-bar" style="margin-top:4px">
-      <div id="mv-evinfo-header" style="display:flex;align-items:center;gap:5px;min-height:18px">
-        <svg id="mv-evinfo-pencil" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text3);pointer-events:none;display:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        <span id="evinfo-preview-mv" style="flex:1;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)"></span>
+    <div id="mv-accordion" style="display:none;margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div id="mv-acc-content" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px"></div>
+        <button onclick="mvOpenEventEdit()" style="flex-shrink:0;display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--accent);border-radius:8px;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          編集
+        </button>
       </div>
     </div>
-    <!-- 進行バー＋時刻 -->
     <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
       <div class="mv-progress" style="flex:1;margin-top:0"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
       <span id="mv-clock" style="display:none;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
@@ -1117,16 +1117,6 @@ tbody tr:hover td{background:var(--bg2)}
     </button>
 
 
-    <!-- 複数日切替（dayCount>1のときのみ表示） -->
-    <div id="mv-more-day-section" style="display:none;flex-direction:column;gap:6px">
-      <div style="font-size:11px;color:var(--text2);padding:0 4px">日程切替</div>
-      <div id="mv-more-day-btns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      <button onclick="openMultiDayModal();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer;margin-top:4px">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        日程設定を編集
-      </button>
-
-    </div>
     <button onclick="openExport();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し
     </button>
@@ -1442,6 +1432,87 @@ function updateEvInfoPreview(){
       val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px';
       mvP.appendChild(val);
     }
+  }
+  if(typeof mvAccordionOpen!=='undefined' && mvAccordionOpen && typeof mvRenderAccordion==='function') mvRenderAccordion();
+}
+
+// スマホ: ヘッダーのイベント概要アコーディオン
+var mvAccordionOpen=false;
+function mvToggleAccordion(){
+  mvAccordionOpen=!mvAccordionOpen;
+  const panel=document.getElementById('mv-accordion');
+  const chevron=document.getElementById('mv-acc-chevron');
+  if(!panel) return;
+  if(mvAccordionOpen){
+    mvRenderAccordion();
+    panel.style.display='block';
+    if(chevron) chevron.style.transform='rotate(180deg)';
+  } else {
+    panel.style.display='none';
+    if(chevron) chevron.style.transform='';
+  }
+}
+function mvRenderAccordion(){
+  const wrap=document.getElementById('mv-acc-content');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  const ei=evInfo||{};
+  if(dayCount>1){
+    const daySec=document.createElement('div');
+    daySec.style.cssText='display:flex;flex-direction:column;gap:5px';
+    const dayLbl=document.createElement('div');
+    dayLbl.textContent='日程';
+    dayLbl.style.cssText='font-size:11px;color:var(--text3)';
+    daySec.appendChild(dayLbl);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;flex-wrap:wrap;gap:6px';
+    for(let d=1;d<=dayCount;d++){
+      const b=document.createElement('button');
+      b.textContent='DAY'+d;
+      const on=(d===currentDay);
+      b.style.cssText='padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid '+(on?'var(--accent)':'var(--border)')+';background:'+(on?'var(--accent)':'transparent')+';color:'+(on?'#fff':'var(--text)');
+      b.onclick=(function(dd){return function(e){e.stopPropagation();switchDay(dd-currentDay);mvRenderAccordion();};})(d);
+      btns.appendChild(b);
+    }
+    daySec.appendChild(btns);
+    wrap.appendChild(daySec);
+  }
+  const fields=[
+    {label:'場所/ID', val:ei.location},
+    {label:'オーナー', val:ei.owner},
+    {label:'参加者', val:ei.members},
+    {label:'スライドURL', val:ei.slideUrl},
+    {label:'メモ', val:ei.memo}
+  ];
+  let hasAny=false;
+  fields.forEach(function(f){
+    if(!f.val) return;
+    hasAny=true;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;flex-direction:column;gap:1px';
+    const l=document.createElement('div');
+    l.textContent=f.label;
+    l.style.cssText='font-size:11px;color:var(--text3)';
+    row.appendChild(l);
+    if(/^https?:\/\//i.test(f.val)){
+      const a=document.createElement('a');
+      a.href=f.val;a.target='_blank';a.rel='noopener noreferrer';a.textContent=f.val;
+      a.style.cssText='font-size:14px;color:var(--acc,#5DCAA5);text-decoration:underline;word-break:break-all';
+      a.addEventListener('click',function(e){e.stopPropagation();});
+      row.appendChild(a);
+    } else {
+      const v=document.createElement('div');
+      v.textContent=f.val;
+      v.style.cssText='font-size:14px;color:var(--text);white-space:pre-wrap;word-break:break-all';
+      row.appendChild(v);
+    }
+    wrap.appendChild(row);
+  });
+  if(!hasAny && dayCount<=1){
+    const empty=document.createElement('div');
+    empty.textContent='概要は未入力です。編集から追加できます。';
+    empty.style.cssText='font-size:12px;color:var(--text3)';
+    wrap.appendChild(empty);
   }
 }
 
@@ -5370,7 +5441,12 @@ function mvRenderSerial(nowMin,sm){
 
     const chevronHtml=s.comment?('<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3);transform:'+(isActive?'rotate(90deg)':'')+'"><polyline points="9 18 15 12 9 6"/></svg>'):'';
     const remainHtml=isActive?('<div class="mv-card-remain">▶ 進行中 — あと'+(end-nowMin)+'分</div>'):'';
-    const commentHtml=s.comment?('<div class="mv-card-comment" style="display:'+(isActive?'block':'none')+';padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">'+esc(s.comment)+'</div>'):'';
+    const commentHtml=s.comment?('<div class="mv-card-comment" style="display:'+(isActive?'block':'none')+';padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px">'+
+        '<div style="flex:1;min-width:0;white-space:pre-wrap;word-break:break-all">'+esc(s.comment)+'</div>'+
+        '<button class="mv-memo-edit-btn" style="flex-shrink:0;display:flex;align-items:center;gap:4px;padding:4px 9px;border:1px solid var(--accent);border-radius:7px;background:transparent;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>編集</button>'+
+      '</div>'+
+    '</div>'):'';
     card.innerHTML=
       '<div class="mv-card-bar" style="background:'+(CD[s.color]||'#B4B2A9')+'"></div>'+
       '<div class="mv-card-body" style="min-width:0;padding:9px 8px 9px 10px">'+
@@ -5381,27 +5457,17 @@ function mvRenderSerial(nowMin,sm){
             '<div class="mv-card-time">'+hmn(start)+'〜'+hmn(end)+' ('+s.dur+'分)</div>'+
           '</div>'+
           chevronHtml+
-          '<button class="mv-edit-icon-btn" style="background:none;border:none;padding:7px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px">'+
-            '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
-          '</button>'+
         '</div>'+
         remainHtml+
         commentHtml+
       '</div>';
 
-    // 鉛筆ボタン → 編集モーダルを開く
-    const editBtn=card.querySelector('.mv-edit-icon-btn');
-    editBtn.addEventListener('touchstart',e=>{e.stopPropagation();editBtn.style.background='var(--bg3)';},{passive:true});
-    const resetBtnBg=()=>{editBtn.style.background='';};
-    editBtn.addEventListener('touchend',e=>{
-      e.stopPropagation();e.preventDefault();
-      resetBtnBg();
-      mvOpenSM(s.id);
-    },{passive:false});
-    editBtn.addEventListener('touchcancel',e=>{resetBtnBg();});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
+    const memoEditBtn=card.querySelector('.mv-memo-edit-btn');
+    if(memoEditBtn){
+      memoEditBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
+      memoEditBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenSM(s.id);},{passive:false});
+    }
 
-    // タップ → メモアコーディオン展開
     let tapMoved=false,tapStartY=0,tapStartTime=0;
     card.addEventListener('touchstart',e=>{
       tapMoved=false;tapStartY=e.touches[0].clientY;tapStartTime=Date.now();
@@ -5417,12 +5483,16 @@ function mvRenderSerial(nowMin,sm){
       clearTimeout(mvLongPressTimer);
       if(mvDragId){mvEndDrag(e);return;}
       if(!tapMoved&&Date.now()-tapStartTime<500){
-        const commentEl=card.querySelector('.mv-card-comment');
-        const chevron=card.querySelector('.mv-card-chevron');
-        if(commentEl){
-          const open=commentEl.style.display==='none'||commentEl.style.display==='';
-          commentEl.style.display=open?'block':'none';
-          if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
+        if(s.comment){
+          const commentEl=card.querySelector('.mv-card-comment');
+          const chevron=card.querySelector('.mv-card-chevron');
+          if(commentEl){
+            const open=commentEl.style.display==='none'||commentEl.style.display==='';
+            commentEl.style.display=open?'block':'none';
+            if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
+          }
+        } else {
+          mvOpenSM(s.id);
         }
       }
     });
@@ -5474,27 +5544,17 @@ function mvRenderFree(nowMin,sm){
             <div class="mv-card-time">${hmn(start)}〜${hmn(end)} (${dur}分)</div>
           </div>
           ${ev.comment?'<span class="mv-card-chevron" style="font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0">›</span>':''}
-          <button class="mv-edit-icon-btn" title="編集" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" >
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
         </div>
         ${isActive?`<div class="mv-card-remain" style="color:var(--accent);margin-top:4px">▶ 進行中</div>`:''}
-        ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(ev.comment)}</div>`:''}
+        ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)"><div style="display:flex;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0;white-space:pre-wrap;word-break:break-all">${esc(ev.comment)}</div><button class="mv-memo-edit-btn" style="flex-shrink:0;display:flex;align-items:center;gap:4px;padding:4px 9px;border:1px solid var(--accent);border-radius:7px;background:transparent;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>編集</button></div></div>`:''}
       </div>`;
 
-    // 鉛筆ボタン → 編集モーダルを開く
-    const editBtn=card.querySelector('.mv-edit-icon-btn');
-    editBtn.addEventListener('touchstart',e=>{e.stopPropagation();editBtn.style.background='var(--bg3)';},{passive:true});
-    const resetFBtnBg=()=>{editBtn.style.background='';};
-    editBtn.addEventListener('touchend',e=>{
-      e.stopPropagation();e.preventDefault();
-      resetFBtnBg();
-      mvOpenFM(ev.id);
-    },{passive:false});
-    editBtn.addEventListener('touchcancel',e=>{resetFBtnBg();});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenFM(ev.id);});
+    const fMemoEditBtn=card.querySelector('.mv-memo-edit-btn');
+    if(fMemoEditBtn){
+      fMemoEditBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenFM(ev.id);});
+      fMemoEditBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenFM(ev.id);},{passive:false});
+    }
 
-    // タップ → メモ展開のみ
     let fTapMoved=false,fTapStart=0,fTapStartY=0;
     card.addEventListener('touchstart',e=>{fTapMoved=false;fTapStart=Date.now();fTapStartY=e.touches[0].clientY;},{passive:true});
     card.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientY-fTapStartY)>8)fTapMoved=true;},{passive:true});
@@ -5504,6 +5564,8 @@ function mvRenderFree(nowMin,sm){
           const open=card.classList.toggle('open');
           const chev=card.querySelector('.mv-card-chevron');
           if(chev)chev.style.transform=open?'rotate(90deg)':'';
+        } else {
+          mvOpenFM(ev.id);
         }
       }
     });
