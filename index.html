@@ -46,10 +46,7 @@ body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;backgroun
 .ib.clearbtn:hover{background:rgba(229,62,62,.15);color:#E53E3E}
 /* ロック中: 編集エリアの操作を無効化（表示系は維持） */
 body.stt-locked #bl,
-body.stt-locked #sc,
-body.stt-locked #frs,
 body.stt-locked #vtb,
-body.stt-locked #mv-body,
 body.stt-locked #evt,
 body.stt-locked #evd,
 body.stt-locked #evs,
@@ -66,6 +63,8 @@ body.stt-locked #mnb{pointer-events:none;opacity:.55}
 body.stt-locked #bl{opacity:.6}
 /* 概要の入力欄は編集不可だが、開閉トグルでの参照は可能 */
 body.stt-locked .evinfo-field{opacity:.85}
+/* ロック中はメモ内の編集ボタンを隠す（メモ参照は可能） */
+body.stt-locked .mv-memo-edit-btn{display:none}
 /* ライブモードはロック対象外（例外的に操作可能に） */
 body.stt-locked #live-mode-label,
 body.stt-locked #live-mode-chk{pointer-events:auto}
@@ -2477,6 +2476,7 @@ function updateNowLine(){
 // - ドラッグ中はDOM styleのみ更新（innerHTML書き換えなし）
 // ================================================================
 function startSResize(e,edge,sid,hel){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   const s=sessions.find(x=>x.id===sid);
   if(!s)return;
 
@@ -2548,6 +2548,7 @@ function startSResize(e,edge,sid,hel){
 // ================================================================
 let fR=null;
 function onFH(e,edge,id,hel){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   e.preventDefault();e.stopPropagation();
   const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
   hel.classList.add('act');
@@ -2837,6 +2838,7 @@ let fBD={id:null,of:0,ot:0};
 
 function onMD(e,el){gSrc='menu';gN=el.dataset.n;gD=parseInt(el.dataset.d)||10;gC=el.dataset.c||'teal';e.dataTransfer.effectAllowed='copy';document.addEventListener('dragend',onGDE,{once:true});}
 function onSD(e,el){
+  if(typeof isLocked!=="undefined"&&isLocked){e.preventDefault&&e.preventDefault();return false;}
   gSrc='serial';sD.src='serial';sD.id=parseInt(el.dataset.id);
   const s=sessions.find(x=>x.id===sD.id);
   if(s){gN=s.name;gD=s.dur;gC=s.color;}
@@ -2890,6 +2892,7 @@ function onSCd(e){
 
 function frRY(e){const frs=document.getElementById('frs'),r=frs.getBoundingClientRect();const pt=parseInt(getComputedStyle(frs).paddingTop)||0;return e.clientY-r.top+frs.scrollTop-pt;}
 function onFD(e,id){
+  if(typeof isLocked!=="undefined"&&isLocked){e.preventDefault&&e.preventDefault();return false;}
   const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
   gSrc='fblock';fBD={id,of:ev.fromMin,ot:ev.toMin};
   e.dataTransfer.effectAllowed='move';
@@ -3107,10 +3110,27 @@ function openSM(id){
   document.getElementById('scc').textContent=(s.comment||'').length;
   document.getElementById('sdel').style.display='';
   document.getElementById('sm').style.display='flex';
-  document.getElementById('sname').focus();
+  applySMLock();
+  if(!isLocked) document.getElementById('sname').focus();
+}
+function applySMLock(){
+  const ro=!!isLocked;
+  ['sname','sdur','scmt'].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el){ el.readOnly=ro; el.style.opacity=ro?'0.7':''; }
+  });
+  const scolors=document.getElementById('scolors');
+  if(scolors) scolors.style.pointerEvents=ro?'none':'';
+  const sdel=document.getElementById('sdel');
+  if(sdel) sdel.style.display=ro?'none':'';
+  const ssave=document.getElementById('sm').querySelector('.btn.p');
+  if(ssave) ssave.style.display=ro?'none':'';
+  const sdupBtn=document.getElementById('sm').querySelector('[onclick*="dupSM"],[onclick*="dupSession"]');
+  if(sdupBtn) sdupBtn.style.display=ro?'none':'';
 }
 function closeSM(){document.getElementById('sm').style.display='none';smId=null;}
 function saveSM(){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   if(smId===null)return;const s=sessions.find(x=>x.id===smId);if(!s)return;
   const n=document.getElementById('sname').value.trim();if(n)s.name=n;
   const d=parseInt(document.getElementById('sdur').value);if(!isNaN(d)&&d>=1)s.dur=d;
@@ -3146,7 +3166,7 @@ function dupFM(){
   freeEvs.push(copy);
   closeFM();snap();rFR();if(cv==='tb')renderTbl();
 }
-function delSM(){if(smId===null)return;sessions=sessions.filter(s=>s.id!==smId);closeSM();snap();rTL();if(cv==='tb')renderTbl();}
+function delSM(){if(typeof isLocked!=="undefined"&&isLocked)return;if(smId===null)return;sessions=sessions.filter(s=>s.id!==smId);closeSM();snap();rTL();if(cv==='tb')renderTbl();}
 function delS(e,id){e.stopPropagation();sessions=sessions.filter(s=>s.id!==id);snap();rTL();if(cv==='tb')renderTbl();}
 document.getElementById('scmt').addEventListener('input',function(){document.getElementById('scc').textContent=this.value.length;});
 document.getElementById('sm').addEventListener('click',function(e){if(e.target===this)closeSM();});
@@ -3170,10 +3190,25 @@ function openFE(id){
   document.getElementById('fcc').textContent=(ev?.comment||'').length;
   document.getElementById('fdel').style.display=ev?'':'none';
   document.getElementById('fm').style.display='flex';
-  setTimeout(()=>document.getElementById('fname').focus(),50);
+  applyFMLock();
+  if(!isLocked) setTimeout(()=>document.getElementById('fname').focus(),50);
+}
+function applyFMLock(){
+  const ro=!!isLocked;
+  ['fname','ffrom','fto','fcmt'].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el){ el.readOnly=ro; el.style.opacity=ro?'0.7':''; }
+  });
+  const fcolors=document.getElementById('fcolors');
+  if(fcolors) fcolors.style.pointerEvents=ro?'none':'';
+  const fdel=document.getElementById('fdel');
+  if(fdel && ro) fdel.style.display='none';
+  const fsave=document.getElementById('fm').querySelector('.btn.p');
+  if(fsave) fsave.style.display=ro?'none':'';
 }
 function closeFM(){document.getElementById('fm').style.display='none';fmId=null;}
 function saveFM(){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   const name=document.getElementById('fname').value.trim()||'イベント';
   const fa=h2m(document.getElementById('ffrom').value),ta=h2m(document.getElementById('fto').value);
   const sm=gSM();let fm=fa-sm,to=ta-sm;if(to<=fm)to=fm+10;
@@ -3184,7 +3219,7 @@ function saveFM(){
   else{const ev=freeEvs.find(x=>x.id===fmId);if(ev){ev.name=name;ev.color=fmC;ev.comment=cmt;ev.fromMin=fm;ev.toMin=to;}}
   closeFM();snap();rFR();if(cv==='tb')renderTbl();
 }
-function delFM(){if(fmId===null)return;freeEvs=freeEvs.filter(x=>x.id!==fmId);closeFM();snap();rFR();if(cv==='tb')renderTbl();}
+function delFM(){if(typeof isLocked!=="undefined"&&isLocked)return;if(fmId===null)return;freeEvs=freeEvs.filter(x=>x.id!==fmId);closeFM();snap();rFR();if(cv==='tb')renderTbl();}
 document.getElementById('fcmt').addEventListener('input',function(){document.getElementById('fcc').textContent=this.value.length;});
 document.getElementById('fm').addEventListener('click',function(e){if(e.target===this)closeFM();});
 
@@ -5597,6 +5632,7 @@ function mvRenderFree(nowMin,sm){
 
 
 function mvStartDrag(e,id,card){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   mvDragId=id;
   mvDragFromIdx=sessions.findIndex(s=>s.id===id);
   mvDragOverIdx=mvDragFromIdx;
@@ -5700,6 +5736,7 @@ function mvEndDrag(e){
 
 // ---- シリアルセッション編集モーダル ----
 function mvOpenSM(id){
+  if(typeof lockGuard==="function"&&lockGuard())return;
   const s=sessions.find(x=>x.id===id);if(!s)return;
   // 他のモーダルを全部閉じる
   ['mv-sm','mv-fm','mv-event-edit'].forEach(mid=>{
@@ -5805,6 +5842,7 @@ function mvDeleteS(){
 
 // ---- フリーエリア編集モーダル ----
 function mvOpenFM(id){
+  if(typeof lockGuard==="function"&&lockGuard())return;
   const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
   mvEditId=id;
   const sm=gSM();
