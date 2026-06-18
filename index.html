@@ -960,6 +960,11 @@ tbody tr:hover td{background:var(--bg2)}
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="mv-live-btn-icon" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
       <span id="mv-live-btn-label" style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">ライブ</span>
     </button>
+    <!-- ロック -->
+    <button id="mv-lock-btn" class="mv-tbtn" onclick="toggleLock()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+      <svg id="mv-lock-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+      <span id="mv-lock-label" style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">ロック</span>
+    </button>
     <!-- その他 -->
     <button class="mv-tbtn" onclick="mvOpenMore()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
@@ -1086,9 +1091,6 @@ tbody tr:hover td{background:var(--bg2)}
 
     <button onclick="openExport();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し
-    </button>
-    <button onclick="toggleLock();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
-      <svg id="mv-lock-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg><span id="mv-lock-label">ロック</span>
     </button>
     <button onclick="duplicateRoomBtn();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>このイベントを複製
@@ -2892,7 +2894,9 @@ function applyLockUI(){
   const mvIcon=document.getElementById('mv-lock-icon');
   if(mvIcon) mvIcon.innerHTML=isLocked?'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>':'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>';
   const mvLbl=document.getElementById('mv-lock-label');
-  if(mvLbl) mvLbl.textContent=isLocked?'ロック中':'ロック';
+  if(mvLbl){ mvLbl.textContent=isLocked?'ロック中':'ロック'; mvLbl.style.color=isLocked?'#E5A93E':'var(--text2)'; }
+  const mvIcon2=document.getElementById('mv-lock-icon');
+  if(mvIcon2) mvIcon2.style.stroke=isLocked?'#E5A93E':'currentColor';
 }
 function lockGuard(){
   if(isLocked){
@@ -5667,7 +5671,7 @@ function mvRenderFree(nowMin,sm){
   if(sf.length===0){body.innerHTML='<div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">フリーエリアはありません</div>';return;}
   const dk=isDark();
   sf.forEach(ev=>{
-    const start=ev.fromMin,end=ev.toMin,dur=ev.toMin-ev.fromMin;
+    const start=sm+ev.fromMin,end=sm+ev.toMin,dur=ev.toMin-ev.fromMin;
     const isActive=nowMin>=start&&nowMin<end;
     const card=document.createElement('div');
     card.className='mv-card'+(isActive?' active':'');
