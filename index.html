@@ -2284,9 +2284,99 @@ function renderMultiDayList(){
       '<input type="time" value="'+(d.start||'13:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-start"/>'+
       '<span style="font-size:11px;color:var(--text3)">〜</span>'+
       '<input type="time" value="'+(d.end||'17:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-end"/>'+
+      (dayCount>1?'<button onclick="openDayMoveMenu('+i+')" title="このDAYの内容を移動／複製／交換" style="background:transparent;border:1px solid var(--border);cursor:pointer;color:var(--text2);padding:3px 8px;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;border-radius:6px;font-size:11px"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>日程変更</button>':'')+
       (i>0?'<button onclick="removeMultiDayEntry('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 4px;font-size:16px;flex-shrink:0">×</button>':'<span style="width:24px"></span>');
     list.appendChild(row);
   }
+}
+// DAYの内容を別の日へ移動／コピーするメニュー
+function openDayMoveMenu(fromIdx){
+  _syncModalToDayData();
+  if(dayData[currentDay-1]){
+    dayData[currentDay-1].sessions=JSON.parse(JSON.stringify(sessions));
+    dayData[currentDay-1].freeEvs=JSON.parse(JSON.stringify(freeEvs));
+  }
+  const others=[];
+  for(let i=0;i<dayCount;i++){ if(i!==fromIdx) others.push(i); }
+  if(others.length===0){ alert('対象となる日程がありません'); return; }
+  let ov=document.getElementById('day-op-overlay');
+  if(ov) ov.remove();
+  ov=document.createElement('div');
+  ov.id='day-op-overlay';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8300;display:flex;align-items:center;justify-content:center';
+  ov.onclick=function(e){ if(e.target===ov) ov.remove(); };
+  function dlabel(i){
+    const d=dayData[i]||{};
+    let s='DAY'+(i+1);
+    if(d.date){ const p=d.date.split('-'); if(p.length===3) s+='（'+parseInt(p[1])+'/'+parseInt(p[2])+'）'; }
+    return s;
+  }
+  const opts=others.map(i=>'<option value="'+i+'">'+dlabel(i)+'</option>').join('');
+  const box=document.createElement('div');
+  box.style.cssText='background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:18px;width:300px;max-width:90vw';
+  box.innerHTML=
+    '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px">'+dlabel(fromIdx)+' の内容を変更</div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:14px">相手の日程と操作を選んでください</div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:5px">相手の日程</div>'+
+    '<select id="day-op-dest" style="width:100%;margin-bottom:14px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px">'+opts+'</select>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:5px">操作</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px">'+
+      '<button onclick="applyDayOpFromDialog('+fromIdx+',\'move\')" style="border:1px solid var(--border);background:transparent;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span><span style="font-weight:600">移動</span><br><span style="font-size:11px;color:var(--text3)">相手へ移す。元は空になる</span></span></button>'+
+      '<button onclick="applyDayOpFromDialog('+fromIdx+',\'copy\')" style="border:1px solid var(--border);background:transparent;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2)"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span><span style="font-weight:600">複製</span><br><span style="font-size:11px;color:var(--text3)">相手へコピー。元も残る</span></span></button>'+
+      '<button onclick="applyDayOpFromDialog('+fromIdx+',\'swap\')" style="border:1px solid var(--border);background:transparent;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2)"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span><span style="font-weight:600">交換</span><br><span style="font-size:11px;color:var(--text3)">相手と内容を入れ替える</span></span></button>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:flex-end;margin-top:14px"><button onclick="document.getElementById(\'day-op-overlay\').remove()" style="border:none;background:transparent;color:var(--text3);font-size:13px;cursor:pointer;padding:6px 10px">キャンセル</button></div>';
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+}
+function applyDayOpFromDialog(fromIdx, op){
+  const sel=document.getElementById('day-op-dest');
+  if(!sel) return;
+  const destIdx=parseInt(sel.value);
+  if(isNaN(destIdx)) return;
+  if(op==='move'||op==='copy'){
+    const dd=dayData[destIdx]||{};
+    const has=((dd.sessions&&dd.sessions.length>0)||(dd.freeEvs&&dd.freeEvs.length>0));
+    if(has){
+      if(!confirm('DAY'+(destIdx+1)+' にはすでにセッションがあります。\n上書きすると DAY'+(destIdx+1)+' の既存内容は削除されます。\n\n続けてよろしいですか？')) return;
+    }
+  }
+  const ov=document.getElementById('day-op-overlay'); if(ov) ov.remove();
+  applyDayOp(fromIdx, destIdx, op);
+}
+function applyDayOp(fromIdx, destIdx, op){
+  const A=dayData[fromIdx]||{sessions:[],freeEvs:[],start:'13:00',end:'17:00',date:''};
+  const B=dayData[destIdx]||{sessions:[],freeEvs:[],start:'13:00',end:'17:00',date:''};
+  const aDate=A.date||'', bDate=B.date||'';
+  function clone(o){ return JSON.parse(JSON.stringify(o||[])); }
+  if(op==='swap'){
+    dayData[fromIdx]={ sessions:clone(B.sessions), freeEvs:clone(B.freeEvs), start:B.start||'13:00', end:B.end||'17:00', date:aDate };
+    dayData[destIdx]={ sessions:clone(A.sessions), freeEvs:clone(A.freeEvs), start:A.start||'13:00', end:A.end||'17:00', date:bDate };
+  } else {
+    dayData[destIdx]={ sessions:clone(A.sessions), freeEvs:clone(A.freeEvs), start:A.start||'13:00', end:A.end||'17:00', date:bDate };
+    if(op==='move'){
+      dayData[fromIdx]={ sessions:[], freeEvs:[], start:A.start||'13:00', end:A.end||'17:00', date:aDate };
+    }
+  }
+  if(currentDay-1===destIdx || currentDay-1===fromIdx){
+    const cur=dayData[currentDay-1];
+    sessions=JSON.parse(JSON.stringify(cur.sessions||[]));
+    freeEvs=JSON.parse(JSON.stringify(cur.freeEvs||[]));
+    const evsEl=document.getElementById('evs');
+    const eveEl=document.getElementById('eve');
+    const evdEl=document.getElementById('evd');
+    if(evsEl && cur.start) evsEl.value=cur.start;
+    if(eveEl && cur.end) eveEl.value=cur.end;
+    if(evdEl && cur.date!==undefined) evdEl.value=cur.date;
+    if(typeof updateDow==='function') updateDow();
+    if(typeof updateTotalTime==='function') updateTotalTime();
+    if(typeof updateTopDateLabel==='function') updateTopDateLabel();
+  }
+  renderMultiDayList();
+  snap();render();if(typeof mvRender==='function')mvRender();
+  const label={move:'移動',copy:'複製',swap:'交換'}[op]||'';
+  if(op==='swap') alert('DAY'+(fromIdx+1)+' と DAY'+(destIdx+1)+' の内容を交換しました');
+  else alert('DAY'+(fromIdx+1)+' の内容を DAY'+(destIdx+1)+' へ'+label+'しました');
 }
 
 function addMultiDayEntry(){
