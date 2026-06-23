@@ -2414,20 +2414,20 @@ function _syncModalToDayData(){
 }
 
 function saveMultiDayModal(){
+  // 現在DAYのセッション内容を先に退避（start/end/dateはモーダルの設定を優先するため触らない）
+  const _curSessions=JSON.parse(JSON.stringify(sessions));
+  const _curFreeEvs=JSON.parse(JSON.stringify(freeEvs));
+  // モーダルの入力値（各DAYの日付・開始・終了）をdayDataに反映
   _syncModalToDayData();
-  // 現在のDAYのデータも先に保存
-  const _exd=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined?dayData[currentDay-1].date:document.getElementById('evd').value||'';
-  dayData[currentDay-1]={
-    sessions:JSON.parse(JSON.stringify(sessions)),
-    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
-    start:document.getElementById('evs').value||'13:00',
-    end:document.getElementById('eve').value||'17:00',
-    date:_exd
-  };
-  // DAY1の日付・時間をPC表示に反映
+  // 現在DAYのsessions/freeEvsだけ書き戻す（時刻・日付はモーダルで設定済みの値を維持）
+  if(dayData[currentDay-1]){
+    dayData[currentDay-1].sessions=_curSessions;
+    dayData[currentDay-1].freeEvs=_curFreeEvs;
+  }
+  // 現在DAYの日付・時間をPC表示に反映（モーダルで変更した値が画面に出るように）
   if(dayData[currentDay-1]){
     const d=dayData[currentDay-1];
-    if(d.date)  document.getElementById('evd').value=d.date;
+    if(d.date!==undefined) document.getElementById('evd').value=d.date;
     if(d.start) document.getElementById('evs').value=d.start;
     if(d.end)   document.getElementById('eve').value=d.end;
   }
