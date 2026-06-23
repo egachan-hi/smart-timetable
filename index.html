@@ -5348,6 +5348,18 @@ var _curRoom=(typeof fbGetRoomId==='function')?fbGetRoomId():null;
 var _isFresh=(_freshRoom && _curRoom && _freshRoom===_curRoom);
 if(_isFresh){
   try{ sessionStorage.removeItem('stt-fresh-room'); localStorage.removeItem('stt-autosave'); }catch(e){}
+  sessions=[]; freeEvs=[];
+  dayCount=1; currentDay=1;
+  dayData=[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}];
+  noDate=false;
+  evInfo={location:'',owner:'',members:'',memo:'',slideUrl:''};
+  try{
+    const _evt=document.getElementById('evt'); if(_evt) _evt.value='';
+    const _evd=document.getElementById('evd'); if(_evd) _evd.value='';
+    const _evs=document.getElementById('evs'); if(_evs) _evs.value='13:00';
+    const _eve=document.getElementById('eve'); if(_eve) _eve.value='16:00';
+    if(typeof loadEvInfoToWidget==='function') loadEvInfoToWidget();
+  }catch(e){}
 } else if(!(typeof _isNewVisit!=='undefined' && _isNewVisit)) {
   autoLoad();
 }
@@ -6805,7 +6817,7 @@ if(_isNewVisit){
     <div style="font-size:14px;font-weight:700;color:var(--text)">イベントを開く</div>
 
     <!-- 新規イベントを作成 -->
-    <button onclick="closeRoomPicker();createNewRoom()" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--accent);border-radius:10px;background:transparent;color:var(--accent);cursor:pointer;text-align:left;font-size:13px;font-weight:600">
+    <button onclick="createNewRoom()" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--accent);border-radius:10px;background:transparent;color:var(--accent);cursor:pointer;text-align:left;font-size:13px;font-weight:600">
       <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
       新規イベントを作成
     </button>
