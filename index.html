@@ -1794,16 +1794,18 @@ function autoLoad(){
       if(currentDay>dayCount) currentDay=1;
       const sel=document.getElementById('day-count-sel');
       if(sel) sel.value=String(dayCount);
-      // 現在のDAYのセッションを読み込む
-      const target=dayData[currentDay-1];
-      if(target){
-        sessions=JSON.parse(JSON.stringify(target.sessions||[]));
-        freeEvs=JSON.parse(JSON.stringify(target.freeEvs||[]));
-        nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
-        nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-        if(target.start) document.getElementById('evs').value=target.start;
-        if(target.end)   document.getElementById('eve').value=target.end;
-        if(target.date!==undefined) document.getElementById('evd').value=target.date;
+      // 複数日程のときだけ現在DAYのセッションで上書き。単日はdata.sessions/freeEvsを維持
+      if(dayCount>1){
+        const target=dayData[currentDay-1];
+        if(target){
+          sessions=JSON.parse(JSON.stringify(target.sessions||[]));
+          freeEvs=JSON.parse(JSON.stringify(target.freeEvs||[]));
+          nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
+          nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
+          if(target.start) document.getElementById('evs').value=target.start;
+          if(target.end)   document.getElementById('eve').value=target.end;
+          if(target.date!==undefined) document.getElementById('evd').value=target.date;
+        }
       }
     }
     try{
@@ -6344,16 +6346,20 @@ function fbListen(){
         if(currentDay>dayCount) currentDay=1;
         const dcSel=document.getElementById('day-count-sel');
         if(dcSel) dcSel.value=String(dayCount);
-        // 現在のDAYのデータを反映
-        const _target=dayData[currentDay-1];
-        if(_target){
-          sessions=JSON.parse(JSON.stringify(_target.sessions||[]));
-          freeEvs=JSON.parse(JSON.stringify(_target.freeEvs||[]));
-          nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
-          nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-          if(_target.start) document.getElementById('evs').value=_target.start;
-          if(_target.end)   document.getElementById('eve').value=_target.end;
-          if(_target.date!==undefined) document.getElementById('evd').value=_target.date;
+        // 複数日程のときだけ、現在のDAYのデータでsessions/freeEvsを反映する。
+        // 単日(dayCount<=1)のときはトップレベルのdata.sessions/data.freeEvsを維持する
+        // （単日イベントでdayData[0]が空でも、上のdata.sessions反映を打ち消さないため）
+        if(dayCount>1){
+          const _target=dayData[currentDay-1];
+          if(_target){
+            sessions=JSON.parse(JSON.stringify(_target.sessions||[]));
+            freeEvs=JSON.parse(JSON.stringify(_target.freeEvs||[]));
+            nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
+            nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
+            if(_target.start) document.getElementById('evs').value=_target.start;
+            if(_target.end)   document.getElementById('eve').value=_target.end;
+            if(_target.date!==undefined) document.getElementById('evd').value=_target.date;
+          }
         }
       }
 
