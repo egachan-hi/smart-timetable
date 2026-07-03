@@ -6255,6 +6255,17 @@ window.fbPush = function(){
     if(_fbSyncing) return;
     _fbLastPush = Date.now();
   try{
+    // 複数日程時は現在DAYの編集内容をdayDataへ反映してから送信
+    // （autoSaveを経ない呼び出し経路でも受信側dayDataが古くならないように）
+    if(dayCount>1 && dayData[currentDay-1]){
+      dayData[currentDay-1]={
+        sessions:JSON.parse(JSON.stringify(sessions)),
+        freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+        start:document.getElementById('evs').value||'13:00',
+        end:document.getElementById('eve').value||'17:00',
+        date:document.getElementById('evd').value||''
+      };
+    }
     var data = {
       title: document.getElementById('evt').value || '',
       date: document.getElementById('evd').value || '',
