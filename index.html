@@ -284,6 +284,7 @@ tbody tr:hover td{background:var(--bg2)}
 </style>
 </head>
 <body>
+<div id="lock-banner" style="display:none;position:fixed;top:6px;left:50%;transform:translateX(-50%);z-index:9500;pointer-events:none;background:rgba(229,169,62,.95);color:#fff;font-size:12px;font-weight:700;padding:5px 14px;border-radius:999px;box-shadow:0 2px 8px rgba(0,0,0,.25);align-items:center;gap:6px"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>ロック中（閲覧のみ）</div>
 <div class="top-bar">
   <div class="logo">
     <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
@@ -332,7 +333,7 @@ tbody tr:hover td{background:var(--bg2)}
       <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">セッションメニュー</span>
     </div>
     <div class="ei">
-      <input type="text" id="evt" value="" placeholder="イベントタイトル" oninput="autoSave();if(typeof updateRoomHistoryName==='function'&&typeof fbGetRoomId==='function')updateRoomHistoryName(fbGetRoomId(),this.value);if(typeof fbPush==='function')fbPush();"/>
+      <input type="text" id="evt" value="" placeholder="イベントタイトル" oninput="autoSave();if(typeof updateDocTitle==='function')updateDocTitle();if(typeof updateRoomHistoryName==='function'&&typeof fbGetRoomId==='function')updateRoomHistoryName(fbGetRoomId(),this.value);if(typeof fbPush==='function')fbPush();"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
         <!-- 1行目: 日付 + 曜日 + から + バッジ -->
         <div style="display:flex;align-items:center;gap:4px">
@@ -2548,8 +2549,25 @@ function updateNowLine(){
     if(cdPC){cdPC.textContent=txt;cdPC.style.display='inline';}
     if(cdMV){cdMV.textContent=txt;cdMV.style.display='block';}
   } else {
-    if(cdPC){cdPC.textContent='';cdPC.style.display='none';}
-    if(cdMV){cdMV.textContent='';cdMV.style.display='none';}
+    // 進行中: 現在のシリアルセッションの残り時間を表示
+    let liveTxt='';
+    try{
+      const st2=gSt();
+      for(let i=0;i<sessions.length;i++){
+        const s2=sm2+st2[i], e2=s2+sessions[i].dur;
+        if(nowMin2>=s2&&nowMin2<e2){
+          liveTxt=`${sessions[i].name} あと${e2-nowMin2}分`;
+          break;
+        }
+      }
+    }catch(e){}
+    if(liveTxt){
+      if(cdPC){cdPC.textContent=liveTxt;cdPC.style.display='inline';}
+      if(cdMV){cdMV.textContent=liveTxt;cdMV.style.display='block';}
+    } else {
+      if(cdPC){cdPC.textContent='';cdPC.style.display='none';}
+      if(cdMV){cdMV.textContent='';cdMV.style.display='none';}
+    }
   }
 }
 
@@ -2861,6 +2879,11 @@ function resetAll(){
   if(dcSel) dcSel.value='1';
   snap();render();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
 }
+// ブラウザタブのタイトルをイベント名に
+function updateDocTitle(){
+  const t=((document.getElementById('evt')||{}).value||'').trim();
+  document.title=t?(t+' | スマートタイムテーブル'):'スマートタイムテーブル';
+}
 // ================================================================
 // ロック機能（編集不可）— Firebase同期
 // ================================================================
@@ -2893,6 +2916,8 @@ function applyLockUI(){
   if(mvLbl){ mvLbl.textContent=isLocked?'ロック中':'ロック'; mvLbl.style.color=isLocked?'#E5A93E':'var(--text2)'; }
   const mvIcon2=document.getElementById('mv-lock-icon');
   if(mvIcon2) mvIcon2.style.stroke=isLocked?'#E5A93E':'currentColor';
+  const banner=document.getElementById('lock-banner');
+  if(banner) banner.style.display=isLocked?'flex':'none';
 }
 function lockGuard(){
   if(isLocked){
@@ -5367,7 +5392,7 @@ if(_isFresh){
 }
 restoreSavedEvs();
 updateEvInfoPreview();
-uUR();sv('tl');render();if(typeof applyLockUI==='function')applyLockUI();setTimeout(fitz,0);setTimeout(initLiveMode,100);setTimeout(updateMultiDayChk,150);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
+uUR();sv('tl');render();if(typeof applyLockUI==='function')applyLockUI();if(typeof updateDocTitle==='function')updateDocTitle();setTimeout(fitz,0);setTimeout(initLiveMode,100);setTimeout(updateMultiDayChk,150);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
 
 // ================================================================
 // MOBILE VIEW
@@ -6214,6 +6239,12 @@ var _fbDB = null;
 var _fbRoomId = null;
 var _fbSyncing = false;
 var _fbLastPush = 0;
+var _fbLastDataTs = 0; // 最後にデータが更新された時刻（送信/受信の新しい方）
+function _fbFmtTs(ts){
+  if(!ts) return '';
+  const d=new Date(ts);
+  return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+}
 var _fbClientId = null;
 var _fbOnlineCount = 0;
 
@@ -6254,6 +6285,7 @@ window.fbPush = function(){
   _fbPushTimer = setTimeout(function(){
     if(_fbSyncing) return;
     _fbLastPush = Date.now();
+    if(typeof fbUpdateStatus==='function') setTimeout(fbUpdateStatus,0);
   try{
     // 複数日程時は現在DAYの編集内容をdayDataへ反映してから送信
     // （autoSaveを経ない呼び出し経路でも受信側dayDataが古くならないように）
@@ -6287,14 +6319,16 @@ window.fbPush = function(){
 };
 
 function fbUpdateStatus(){
+  var _last=Math.max(_fbLastPush||0,_fbLastDataTs||0);
+  var _upd=_last>0?(' ・更新 '+_fbFmtTs(_last)):'';
   var el = document.getElementById('fb-status');
-  if(el) el.textContent = _fbOnlineCount>=2 ? '🟢 '+_fbOnlineCount+'人 同期中' : '';
+  if(el) el.textContent = _fbOnlineCount>=2 ? '🟢 '+_fbOnlineCount+'人 同期中'+_upd : '';
 
   // インライン同期表示
   var inlineEl = document.getElementById('fb-status-inline');
   if(inlineEl){
     if(_fbOnlineCount >= 2){
-      inlineEl.textContent = '🟢 '+_fbOnlineCount+'人 同期中';
+      inlineEl.textContent = '🟢 '+_fbOnlineCount+'人 同期中'+_upd;
       inlineEl.style.color = '#27500A';
       inlineEl.style.display = 'inline';
     } else {
@@ -6331,6 +6365,9 @@ function fbListen(){
     _fbSyncing = true;
     try{
       document.getElementById('evt').value = data.title || '';
+      if(typeof updateDocTitle==='function') updateDocTitle();
+      _fbLastDataTs = data.ts || Date.now();
+      if(typeof fbUpdateStatus==='function') setTimeout(fbUpdateStatus,0);
       // ルーム履歴の名前をイベントタイトルで更新
       if(typeof updateRoomHistoryName==='function') updateRoomHistoryName(roomId, data.title||'');
       document.getElementById('evd').value = data.date || '';
