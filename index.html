@@ -17,23 +17,64 @@
 :root{--bg:#fff;--bg2:#f8f8f8;--bg3:#f0f0f0;--bg-info:#EFF6FF;--border:#e2e2e2;--border-min:rgba(0,0,0,0.05);--border2:#d0d0d0;--border-info:#BFDBFE;--text:#1a1a1a;--text2:#666;--text3:#999;--text-info:#1D4ED8;--accent:#4F46E5}
 @media(prefers-color-scheme:dark){:root{--bg:#1a1a1a;--bg2:#242424;--bg3:#2e2e2e;--bg-info:#1e3a5f;--border:#3a3a3a;--border-min:rgba(255,255,255,0.055);--border2:#4a4a4a;--border-info:#2563EB;--text:#e8e8e8;--text2:#aaa;--text3:#666;--text-info:#93C5FD;--accent:#6366F1}}
 body{font-family:'Hiragino Sans','Yu Gothic',sans-serif;font-size:12px;background:var(--bg);color:var(--text);height:100vh;display:flex;flex-direction:column;overflow:hidden}
-.top-bar{display:flex;align-items:center;gap:6px;padding:5px 10px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;background:var(--bg)}
-.logo{display:flex;align-items:center;gap:5px;font-size:13px;font-weight:700;white-space:nowrap;color:var(--text)}
+.top-bar{display:flex;align-items:center;gap:6px;padding:3px 10px;border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;background:var(--bg)}
+.logo{display:flex;align-items:center;gap:6px;font-size:14px;font-weight:700;white-space:nowrap;color:var(--text)}
 .spacer{flex:1}
-.view-tabs{display:flex;border:1px solid var(--border);border-radius:5px;overflow:hidden}
-.vtab{font-size:11px;padding:3px 10px;border:none;background:transparent;cursor:pointer;color:var(--text2)}
+.view-tabs{display:flex;border:1px solid var(--border);border-radius:7px;overflow:hidden}
+.vtab{font-size:12px;padding:5px 10px;border:none;background:transparent;cursor:pointer;color:var(--text2);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;transition:background .12s}
+.vtab .tblbl{font-size:9px;color:var(--text3);line-height:1}
+.vtab:hover{background:rgba(128,128,128,.1)}
 .vtab.on{background:var(--bg-info);color:var(--text-info);font-weight:600}
-.tb{height:25px;min-width:25px;padding:0 6px;border:1px solid var(--border);border-radius:4px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text);font-size:11px;gap:3px;white-space:nowrap}
-.tb:hover{background:var(--bg2)}
+.tb{height:34px;min-width:34px;padding:0;border:none;border-radius:6px;background:transparent;cursor:pointer;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:11px;gap:3px;white-space:nowrap;transition:background .12s}
+.tb.labeled{height:auto;min-width:44px;flex-direction:column;padding:5px 4px;gap:3px}
+.tb.labeled .tblbl{font-size:9px;color:var(--text3);line-height:1;margin-top:1px}
+.tb:hover{background:rgba(128,128,128,.18);color:var(--text)}
 .tb:disabled{opacity:.35;cursor:default}
-.tb svg{width:12px;height:12px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;pointer-events:none}
-.tb.danger:hover{background:#FCEBEB;color:#A32D2D;border-color:#F7C1C1}
-.tb.ai{background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;border:none;font-weight:600;padding:0 10px}
-.sep{width:1px;height:14px;background:var(--border);margin:0 2px;flex-shrink:0}
+.tb:disabled:hover{background:transparent}
+#stt-tooltip{position:fixed;background:rgba(0,0,0,.82);color:#fff;font-size:11px;white-space:nowrap;padding:3px 7px;border-radius:4px;pointer-events:none;z-index:99999;transition:opacity .1s;opacity:0}
+.tb svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex-shrink:0;pointer-events:none}
+.tb.danger{color:#e05555}
+.tb.danger:hover{background:rgba(224,85,85,.15);color:#e05555}
+.tb.ai{background:linear-gradient(135deg,#6B4FBB,#2D8CF0);color:#fff;border:none;font-weight:600;padding:0 12px;min-width:auto}
+.tb.ai:hover{background:linear-gradient(135deg,#5d43a8,#2479d8)}
+.tb.ai svg{width:14px;height:14px}
+.sep{width:1px;height:18px;background:var(--border);margin:0 3px;flex-shrink:0}
 .body{display:flex;flex:1;overflow:hidden}
 .left{width:278px;flex-shrink:0;display:flex;flex-direction:column;overflow:hidden;background:var(--bg2)}
 .ph{padding:5px 8px;border-bottom:1px solid var(--border);font-size:11px;font-weight:700;color:var(--text2);display:flex;align-items:center;justify-content:space-between;flex-shrink:0}
 .ib{width:18px;height:18px;border:none;background:transparent;cursor:pointer;color:var(--text2);display:flex;align-items:center;justify-content:center;border-radius:3px}
+.ib.clearbtn:hover{background:rgba(229,62,62,.15);color:#E53E3E}
+/* ロック中: 編集エリアの操作を無効化（表示系は維持） */
+body.stt-locked #bl,
+body.stt-locked #vtb,
+body.stt-locked #evt,
+body.stt-locked #evd,
+body.stt-locked #evs,
+body.stt-locked #eve,
+body.stt-locked #multi-day-chk,
+body.stt-locked #multi-day-label,
+body.stt-locked #no-date-chk,
+body.stt-locked #no-date-label,
+body.stt-locked #multi-day-badge,
+body.stt-locked #day-count-sel,
+body.stt-locked .evinfo-field,
+body.stt-locked .ch .ib{pointer-events:none}
+body.stt-locked #mnb{pointer-events:none;opacity:.55}
+body.stt-locked #bl{opacity:.6}
+/* 概要の入力欄は編集不可だが、開閉トグルでの参照は可能 */
+body.stt-locked .evinfo-field{opacity:.85}
+/* ロック中はメモ内の編集ボタンを隠す（メモ参照は可能） */
+body.stt-locked .mv-memo-edit-btn{display:none}
+/* ライブモードはロック対象外（例外的に操作可能に） */
+body.stt-locked #live-mode-label,
+body.stt-locked #live-mode-chk{pointer-events:auto}
+/* ロック中に非活性化するツールバーボタン */
+body.stt-locked #btn-ai,
+body.stt-locked #btn-time-adj,
+body.stt-locked #bundo,
+body.stt-locked #bredo,
+body.stt-locked #mv-btn-ai,
+body.stt-locked #mv-btn-time-adj{pointer-events:none;opacity:.4}
 .ib:hover{background:var(--bg2);color:var(--text)}
 .ib svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 .ei{padding:7px 8px;border-bottom:1px solid var(--border);display:flex;flex-direction:column;gap:4px;flex-shrink:0}
@@ -245,45 +286,45 @@ tbody tr:hover td{background:var(--bg2)}
 <body>
 <div class="top-bar">
   <div class="logo">
-    <svg width="22" height="22" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
+    <svg width="20" height="20" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="7" y="7" width="2" height="20" rx="1" fill="white" opacity=".4"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
     スマートタイムテーブル
   </div>
-  <span id="room-name-label" style="font-size:10px;font-weight:600;color:var(--text2);white-space:nowrap;max-width:120px;overflow:hidden;text-overflow:ellipsis;display:none"></span>
-  <span id="fb-status-inline" style="font-size:10px;white-space:nowrap;color:#27500A;display:none"></span>
-  <button onclick="openRoomManager()" style="font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text);cursor:pointer;white-space:nowrap;display:none" id="room-mgr-btn">ルーム管理</button>
+  <span id="fb-status-inline" style="font-size:12px;white-space:nowrap;color:#27500A;display:none"></span>
   <div class="sep"></div>
   <div class="view-tabs">
     <button class="vtab on" id="tab-tl" onclick="sv('tl')">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>タイムライン
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      <span class="tblbl">タイムライン</span>
     </button>
     <button class="vtab" id="tab-tb" onclick="sv('tb')">
-      <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>テーブル
+      <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>
+      <span class="tblbl">テーブル</span>
     </button>
   </div>
   <div class="sep"></div>
-  <button class="tb" id="btn-prev-day" onclick="shiftDay(-1)" title="前日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
+  <button class="tb" id="btn-prev-day" onclick="shiftDay(-1)" data-tip="前日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg></button>
   <span id="top-date-label" style="font-size:10px;font-weight:600;color:var(--text);white-space:nowrap;padding:0 2px;cursor:pointer" onclick="openDayTimeSetting()" title="クリックして日時設定"></span>
-  <button class="tb" id="btn-next-day" onclick="shiftDay(1)" title="翌日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
+  <button class="tb" id="btn-next-day" onclick="shiftDay(1)" data-tip="翌日" disabled style="opacity:.3"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg></button>
   <div class="spacer"></div>
-  <button class="tb ai" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>AI生成</button>
-  <button class="tb" id="btn-time-adj" onclick="openTimeAdj()" title="時間調整"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg>時間調整</button>
+  <button class="tb labeled" id="btn-ai" style="background:linear-gradient(135deg,#a78bfa,#60a5fa);color:#fff" onclick="openAI()"><svg viewBox="0 0 24 24" width="13" height="13" fill="currentColor"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg><span class="tblbl" style="color:#fff">AI生成</span></button>
+  <button class="tb labeled" id="btn-time-adj" onclick="openTimeAdj()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/><line x1="12" y1="2" x2="12" y2="4"/><line x1="12" y1="20" x2="12" y2="22"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/></svg><span class="tblbl">時間調整</span></button>
   <div class="sep"></div>
-  <button class="tb" onclick="newEV()" title="新規"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>新規</button>
-  <button class="tb" onclick="duplicateEV()" title="複製"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>複製</button>
-  <button class="tb" onclick="quickSaveEV()" title="保存"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>保存</button>
-  <button class="tb" onclick="openEV()" title="開く"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く</button>
-  <button class="tb" onclick="openExport()" title="書き出し"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し</button>
-  <button class="tb danger" onclick="resetAll()" title="全削除"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></button>
+  <button class="tb labeled" onclick="duplicateRoomBtn()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span class="tblbl">複製</span></button>
+  <button class="tb labeled" onclick="openRoomPicker()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><span class="tblbl">開く</span></button>
+  <button class="tb labeled" onclick="openShareModal()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg><span class="tblbl">共有</span></button>
+  <button class="tb labeled" onclick="openExport()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span class="tblbl">書き出し</span></button>
+  <button class="tb labeled" id="lock-btn" onclick="toggleLock()"><svg id="lock-icon" viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg><span class="tblbl" id="lock-label">ロック</span></button>
+  <button class="tb labeled" onclick="deleteRoom()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg><span class="tblbl">削除</span></button>
   <div class="sep"></div>
-  <button class="tb" id="bundo" onclick="undo()" title="元に戻す"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></button>
-  <button class="tb" id="bredo" onclick="redo()" title="やり直す"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg></button>
+  <button class="tb labeled" id="bundo" onclick="undo()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg><span class="tblbl">戻す</span></button>
+  <button class="tb labeled" id="bredo" onclick="redo()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 14 20 9 15 4"/><path d="M4 20v-7a4 4 0 0 0 4-4h12"/></svg><span class="tblbl">やり直し</span></button>
   <div class="sep"></div>
-  <button class="tb" onclick="cz(-1)" title="縮小"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-  <button class="tb" onclick="cz(1)" title="拡大"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></button>
-  <button class="tb" onclick="fitz()" title="全体表示"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="3" x2="20" y2="3"/><line x1="4" y1="21" x2="20" y2="21"/><line x1="12" y1="7" x2="12" y2="17"/><polyline points="7 7 12 3 17 7"/><polyline points="7 17 12 21 17 17"/></svg></button>
+  <button class="tb labeled" onclick="cz(-1)"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="tblbl">縮小</span></button>
+  <button class="tb labeled" onclick="cz(1)"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="tblbl">拡大</span></button>
+  <button class="tb labeled" onclick="fitz()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="3" x2="20" y2="3"/><line x1="4" y1="21" x2="20" y2="21"/><line x1="12" y1="7" x2="12" y2="17"/><polyline points="7 7 12 3 17 7"/><polyline points="7 17 12 21 17 17"/></svg><span class="tblbl">全体</span></button>
   <div class="sep"></div>
   <span id="fb-status" style="display:none">⚪ 未接続</span>
-  <button class="tb" onclick="openHelp()" title="操作ガイド"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></button>
+  <button class="tb labeled" onclick="openHelp()"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg><span class="tblbl">ヘルプ</span></button>
 </div>
 <div class="body">
   <div class="left">
@@ -291,7 +332,7 @@ tbody tr:hover td{background:var(--bg2)}
       <span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">セッションメニュー</span>
     </div>
     <div class="ei">
-      <input type="text" id="evt" value="ワークショップ_260513" placeholder="イベントタイトル" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
+      <input type="text" id="evt" value="" placeholder="イベントタイトル" oninput="autoSave();if(typeof updateDocTitle==='function')updateDocTitle();if(typeof updateRoomHistoryName==='function'&&typeof fbGetRoomId==='function')updateRoomHistoryName(fbGetRoomId(),this.value);if(typeof fbPush==='function')fbPush();"/>
       <div style="display:flex;flex-direction:column;gap:3px;width:100%">
         <!-- 1行目: 日付 + 曜日 + から + バッジ -->
         <div style="display:flex;align-items:center;gap:4px">
@@ -311,13 +352,13 @@ tbody tr:hover td{background:var(--bg2)}
         </div>
         <!-- 2行目: 複数日程 + 日付設定しない + ライブ -->
         <div style="display:flex;align-items:center;gap:8px;margin-top:2px">
-          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
+          <label id="multi-day-label" style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
             <input type="checkbox" id="multi-day-chk" onchange="toggleMultiDay()" style="margin:0;width:12px;height:12px"/>複数日程にする
           </label>
-          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto">
+          <label id="no-date-label" style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer;margin-left:auto">
             <input type="checkbox" id="no-date-chk" onchange="toggleNoDate()" style="margin:0;width:12px;height:12px"/>日付設定しない
           </label>
-          <label style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
+          <label id="live-mode-label" style="display:flex;align-items:center;gap:3px;font-size:11px;color:var(--text2);cursor:pointer">
             <input type="checkbox" id="live-mode-chk" onchange="toggleLiveMode()" style="margin:0;width:12px;height:12px"/>LIVE
           </label>
           <span id="live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">●</span>
@@ -325,7 +366,7 @@ tbody tr:hover td{background:var(--bg2)}
       </div>
       <div style="display:flex;align-items:center;gap:4px;margin-top:2px">
         <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">開始</span>
-        <input type="time" id="evs" value="13:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('evs');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
+        <input type="time" id="evs" value="13:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onfocus="this.dataset.prev=this.value;" onchange="onStartTimeChange();" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
         <span style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap">終了</span>
         <input type="time" id="eve" value="16:00" style="width:68px;font-size:11px;text-align:center;padding:2px 2px" onchange="validateTimeRange('eve');render();autoSave();if(typeof fbPush==='function')fbPush();setTimeout(fitz,50);updateTotalTime();" oninput="autoSave();if(typeof fbPush==='function')fbPush();"/>
         <span id="total-time-lbl" style="font-size:11px;font-weight:600;color:var(--text2);white-space:nowrap;margin-left:6px"></span>
@@ -376,7 +417,7 @@ tbody tr:hover td{background:var(--bg2)}
   <div class="cr">
     <div class="tlv" id="vtl">
       <div class="tlp">
-        <div class="ch"><span>シリアルセッション</span><span id="live-countdown" style="display:none;font-size:10px;font-weight:700;color:#E53E3E;margin-left:8px;white-space:nowrap"></span><span style="flex:1"></span><span style="font-size:10px;font-weight:600;white-space:nowrap;color:var(--text);margin-right:4px" id="trl">13:00〜17:00</span><span class="db ok" id="dbd">ぴったり！</span><button class="ib" onclick="addAnyEvent()" style="font-size:15px;width:18px;height:18px;margin-left:4px" title="任意のセッションを追加">+</button></div>
+        <div class="ch"><span>シリアルセッション</span><span id="live-countdown" style="display:none;font-size:10px;font-weight:700;color:#E53E3E;margin-left:8px;white-space:nowrap"></span><span style="flex:1"></span><span style="font-size:10px;font-weight:600;white-space:nowrap;color:var(--text);margin-right:4px" id="trl">13:00〜17:00</span><span class="db ok" id="dbd">ぴったり！</span><button class="ib" onclick="addAnyEvent()" style="font-size:15px;width:18px;height:18px;margin-left:4px" data-tip="任意のセッションを追加">+</button><button class="ib clearbtn" onclick="resetSerial()" style="width:18px;height:18px;margin-left:2px;display:inline-flex;align-items:center;justify-content:center" data-tip="すべてのシリアルセッションをクリア"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button></div>
         <div class="tls" id="tls" onscroll="syncScroll('tls')">
           <div class="tlb" id="tlb">
             <div class="tc" id="tc"></div>
@@ -387,7 +428,9 @@ tbody tr:hover td{background:var(--bg2)}
       <div class="frp">
         <div class="ch">
           <span>フリーエリア</span>
-          <button class="ib" onclick="openFE(null)" style="font-size:15px;width:18px;height:18px">+</button>
+          <span style="flex:1"></span>
+          <button class="ib" onclick="openFE(null)" style="font-size:15px;width:18px;height:18px" data-tip="フリーエリアに追加">+</button>
+          <button class="ib clearbtn" onclick="resetFree()" style="width:18px;height:18px;margin-left:2px;display:inline-flex;align-items:center;justify-content:center" data-tip="すべてのフリーエリアをクリア"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
         </div>
         <div class="frs" id="frs" style="position:relative">
           <div class="fdl2" id="fdl" style="position:absolute;left:0;right:0;height:2px;background:#BA7517;z-index:20;pointer-events:none;display:none"></div>
@@ -443,9 +486,9 @@ tbody tr:hover td{background:var(--bg2)}
       <div class="mr"><div class="ml">名前</div><input class="mi" id="sname" maxlength="40" placeholder="セッション名"/></div>
       <div class="mr"><div class="ml">色</div><div class="cr2" id="scolors"></div></div>
       <div class="mr"><div class="ml">時間（分）</div><input type="number" class="mi din" id="sdur" min="1" max="480"/></div>
-      <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="scmt" maxlength="100"></textarea></div>
+      <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="scmt" maxlength="300"></textarea></div>
     </div>
-    <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="scc">0</span>/100</span>
+    <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="scc">0</span>/300</span>
       <div class="mbtns"><button class="btn d" id="sdel" onclick="delSM()">削除</button><button class="btn" onclick="dupSM()">複製</button><button class="btn" onclick="closeSM()">キャンセル</button><button class="btn p" onclick="saveSM()">保存</button></div>
     </div>
   </div>
@@ -458,9 +501,9 @@ tbody tr:hover td{background:var(--bg2)}
       <div class="mr"><div class="ml">名前</div><input class="mi" id="fname" maxlength="40" placeholder="イベント名"/></div>
       <div class="mr"><div class="ml">色</div><div class="cr2" id="fcolors"></div></div>
       <div class="mr"><div class="ml">時間帯</div><div class="trr"><input class="tin" id="ffrom" type="time"/><span style="font-size:11px;color:var(--text2)">〜</span><input class="tin" id="fto" type="time"/></div></div>
-      <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="fcmt" maxlength="100"></textarea></div>
+      <div class="mr"><div class="ml">メモ</div><textarea class="mta" id="fcmt" maxlength="300"></textarea></div>
     </div>
-    <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="fcc">0</span>/100</span>
+    <div class="mft"><span style="font-size:10px;color:var(--text2)"><span id="fcc">0</span>/300</span>
       <div class="mbtns"><button class="btn d" id="fdel" style="display:none" onclick="delFM()">削除</button><button class="btn" onclick="dupFM()">複製</button><button class="btn" onclick="closeFM()">キャンセル</button><button class="btn p" onclick="saveFM()">保存</button></div>
     </div>
   </div>
@@ -661,29 +704,6 @@ tbody tr:hover td{background:var(--bg2)}
     </div>
   </div>
 </div>
-<!-- EV modal -->
-<div class="mbg" id="evm" style="display:none">
-  <div class="mc" style="width:360px" onclick="event.stopPropagation()">
-    <div class="mh"><h3>イベントを開く</h3><button class="mx" onclick="closeEV()">×</button></div>
-    <div class="mb">
-      <div style="display:flex;gap:4px;margin-bottom:5px">
-        <input class="mi" id="evname" placeholder="別名で保存（空白=タイトル名）" style="flex:1"/>
-        <button class="btn p" onclick="saveEV()">別名保存</button>
-      </div>
-      <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">ファイルから開く</div>
-      <div style="display:flex;gap:4px;margin-bottom:8px">
-        <label style="flex:1;padding:6px 10px;border:1px dashed var(--border);border-radius:3px;cursor:pointer;font-size:11px;color:var(--text2);text-align:center;display:flex;align-items:center;justify-content:center;gap:5px">
-          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-          .sttファイルを開く
-          <input type="file" accept=".stt,.json" style="display:none" onchange="loadSTTFile(event)"/>
-        </label>
-      </div>
-      <div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">保存済みイベント</div>
-      <div id="evlist" style="max-height:160px;overflow-y:auto;display:flex;flex-direction:column;gap:2px"></div>
-    </div>
-    <div class="mft"><div></div><button class="btn" onclick="closeEV()">閉じる</button></div>
-  </div>
-</div>
 <!-- Export modal -->
 <div class="mbg" id="expm" style="display:none">
   <div class="mc" style="width:380px" onclick="event.stopPropagation()">
@@ -782,107 +802,66 @@ tbody tr:hover td{background:var(--bg2)}
 <div class="mbg" id="hm" style="display:none">
   <div class="mc" style="width:520px;max-height:85vh" onclick="event.stopPropagation()">
     <div class="mh"><h3>操作ガイド</h3><button class="mx" onclick="closeHelp()">×</button></div>
-    <div class="mb" style="gap:12px;font-size:12px;line-height:1.7">
+    <div class="mb" style="gap:16px;font-size:12.5px;line-height:1.75">
 
       <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="13" x2="15" y2="13"/><line x1="9" y1="17" x2="12" y2="17"/></svg>シリアルセッション</div>
-        <ol style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>隙間なく連続してセッションを積み上げる方法です。左列「セッションメニュー」からセッションを<b>ドラッグ&amp;ドロップ</b>して中央「シリアルセッション」に追加</li>
-          <li>ブロックの<b>下端ハンドル</b>（ホバーで表示）を上下にドラッグして時間を調整</li>
-          <li>ブロックを<b>ダブルクリック</b>すると名前・アイコン・時間・メモを編集。編集画面から<b>複製</b>ボタンで直後にコピーを作成</li>
-          <li>ブロックを<b>ドラッグ&amp;ドロップ</b>して並び順を変更</li>
-          <li>左列セッションメニューのアイテムを<b>ダブルクリック</b>するとシリアルセッションの末尾に即追加</li>
-        </ol>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:var(--accent)">はじめに</div>
+        <div>スマートタイムテーブルは、イベントやワークショップ、学校での講義、旅行などのタイムテーブルを簡単に作成・編集するアプリです。</div>
+        <div style="margin-top:6px">同じURLを開いた人は全員が同じ画面を見て、リアルタイムで一緒に編集することも可能です。スマホでも操作でき、講師やスタッフと進行状況を共有するのにも便利です。</div>
+        <div style="margin-top:6px">ライブモードでは現在のイベントの進行状況を確認したり、時間が押している場合に後続の時間調整も行えます。</div>
+        <div style="margin-top:6px">AI生成では、テキスト入力やパワーポイント・音声ファイルなどをアップロードすることで、その内容を反映したタイムラインを自動生成します。</div>
       </div>
 
       <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg>フリーエリア</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>時間帯を自由に設定してセッションを配置します。セッション以外にも、講師名・会場名・裏方の準備などを自由に設定してください</li>
-          <li>セッションメニューから右列「フリーエリア」にドラッグして任意の時間帯に配置</li>
-          <li>ブロックをドラッグして時間帯を移動、上下ハンドルで開始・終了時刻を調整</li>
-          <li>ブロックを<b>ダブルクリック</b>すると編集。編集画面から<b>複製</b>ボタンで末尾にコピーを作成</li>
-          <li>左列「フリーエリア用」のアイテムを<b>ダブルクリック</b>するとフリーエリアの末尾に即追加</li>
-          <li>同じ時間帯に複数配置すると自動で2〜3列に分割表示（4つ以上は不可）</li>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:var(--accent)">シリアルセッション</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:5px;margin:0">
+          <li>時間を隙間なく連続して積み上げる本編のスケジュールです。学校の講義やイベントなど、あらかじめ決められた時間でのタイムライン作成に最適です。</li>
+          <li>セッションメニューからドラッグ＆ドロップ、またはメニュー項目をダブルクリックしてセッションを追加します。</li>
+          <li>見出しの「＋」で追加、ゴミ箱アイコンでそのエリアをまとめてクリアできます。</li>
+          <li>ブロックの下端をドラッグして所要時間を調整したり、ドラッグで順番を並び替えできます。</li>
+          <li>セッションをダブルクリックすると、名前・アイコン・時間・メモの編集や、複製・削除ができます。</li>
         </ul>
       </div>
 
       <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>セッションテンプレート設定（歯車アイコン）</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>左列メニューのセッション名・時間・色を自由に編集</li>
-          <li>「テンプレートとして保存」で複数のメニューセットを保存・切り替え可能</li>
-          <li>「現在のシリアルセッションを取り込む」でスケジュールをテンプレート化</li>
+        <div style="font-size:14px;font-weight:700;margin-bottom:6px;color:var(--accent)">フリーエリア</div>
+        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:5px;margin:0">
+          <li>時間帯を自由に決めて置くスケジュールです。講師・会場・準備など、本編と並行する予定や情報を自由に追加できます。</li>
+          <li>セッションメニューからドラッグ、または「＋」で追加します。</li>
+          <li>ブロックの下端をドラッグして所要時間を調整したり、ドラッグで時間帯を変更できます。</li>
+          <li>見出しの「＋」で追加、ゴミ箱アイコンでそのエリアをまとめてクリアできます。</li>
         </ul>
       </div>
 
       <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>イベント管理</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>「新規」現在のデータをリセットして新しいイベントを作成</li>
-          <li>「保存」現在のタイムラインを名前をつけて保存</li>
-          <li>「開く」.sttファイルや過去に作成したタイムテーブルの読み込み</li>
-          <li>「書き出し」現在のタイムラインをPDFまたは.sttファイルで書き出し</li>
-          <li>「複製」現在のイベントをコピーして新しいイベントとして保存</li>
-        </ul>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--accent)">イベントの操作（ツールバー）</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg></span><div style="flex:1"><b>新規</b> — 空のイベントを新しく作成します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></span><div style="flex:1"><b>複製</b> — 今の内容をコピーして別のイベントを作成します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span><div style="flex:1"><b>開く</b> — 最近開いたイベント、URL／ID、または保存した.sttファイルから開きます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span><div style="flex:1"><b>共有</b> — QRコードやURLで他の人にイベントを共有します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg></span><div style="flex:1"><b>書き出し</b> — PDFまたは.sttファイルで書き出します。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></span><div style="flex:1"><b>削除</b> — 今のイベントを削除します。</div></div>
+        </div>
       </div>
 
       <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Googleカレンダー書き出し</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>タイムラインビューの右上「📅 GCal」ボタンから書き出し画面を開く</li>
-          <li>書き出したいセッションを選択（シリアル・フリー個別に選択可能）</li>
-          <li>「Googleカレンダーで開く」ボタンでブラウザが開き、そのままGoogleカレンダーに追加できる</li>
-          <li>日付を設定済みの場合は実際の日時で書き出し、未設定の場合は今日の日付で書き出し</li>
-        </ul>
-      </div>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="currentColor" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>AI生成</div>
-        <ul style="padding-left:18px;display:flex;flex-direction:column;gap:3px">
-          <li>イベントの概要・目的をテキストで入力、またはPDF・画像・Word・PPT・音声ファイルをアップロード</li>
-          <li>3つの生成モードから選択：<b>設定時間にぴったり合わせる</b>／<b>ファイルに最適化する</b>／<b>音声を時間どおりに再現する</b></li>
-          <li>🎤 音声モード（Gemini専用）：mp3・m4a・wav等の音声ファイルを文字起こしして実際の発言・時間をそのままセッションとして再現</li>
-          <li>生成結果をチェックして「取り込む」→上書きまたは末尾に追加</li>
-        </ul>
-      </div>
-
-      <div>
-        <div style="display:flex;align-items:center;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--accent)"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>その他の操作</div>
-        <table style="width:100%;border-collapse:collapse;font-size:11px">
-          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg></td><td style="padding:3px 6px;font-weight:600">元に戻す</td><td style="padding:3px 6px">操作を最大80ステップ遡れるUndo/Redo</td></tr>
-          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><line x1="5" y1="12" x2="19" y2="12"/></svg><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></td><td style="padding:3px 6px;font-weight:600">ズーム</td><td style="padding:3px 6px">タイムラインの表示倍率を6段階で調整</td></tr>
-          <tr style="border-bottom:1px solid var(--border)"><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></td><td style="padding:3px 6px;font-weight:600">テーブル</td><td style="padding:3px 6px">セッション一覧を表形式で確認・編集・並び替え</td></tr>
-          <tr><td style="padding:3px 6px"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:5px;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg></td><td style="padding:3px 6px;font-weight:600">全削除</td><td style="padding:3px 6px">シリアル・フリー全セッションを一括削除</td></tr>
-        </table>
+        <div style="font-size:14px;font-weight:700;margin-bottom:8px;color:var(--accent)">便利な機能</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+<div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg></span><div style="flex:1"><b>セッションテンプレート</b> — よく使うセッションのセット（名前・時間・色）を登録しておける機能です。左側のセッションメニュー上部の歯車から、項目の編集や複数テンプレートの保存・切り替えができます。「現在のシリアルセッションを取り込む」で、作成済みのスケジュールをそのままテンプレート化することもできます。</div></div>
+                    <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="3" y1="15" x2="21" y2="15"/><line x1="9" y1="3" x2="9" y2="21"/></svg></span><div style="flex:1"><b>テーブル表示</b> — セッションを一覧表で確認・編集できます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="currentColor"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z"/><circle cx="5" cy="16" r="1.3"/></svg></span><div style="flex:1"><b>AI生成</b> — イベントの概要やファイル（PDF・画像・音声など）から、タイムテーブルを自動生成します。設定時間に合わせる／ファイルに忠実に／音声を再現する、の3モードから選べます。生成結果は確認してから取り込めます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div style="flex:1"><b>時間調整</b> — 全体の開始時刻に合わせて、各セッションの時間をまとめて調整します。ライブモードでは、イベントの途中で後続のセッションを調整する機能もあります。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M16.24 7.76a6 6 0 0 1 0 8.49M7.76 16.24a6 6 0 0 1 0-8.49"/></svg></span><div style="flex:1"><b>ライブモード（LIVE）</b> — 当日の進行管理用です。現在時刻の赤いラインが表示され、今どのセッションかが一目で分かります。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div style="flex:1"><b>複数日程</b> — 研修や合宿など複数日のイベントに対応。日付エリアの「複数日程にする」から、DAYごとに日付・時刻・内容を設定できます。</div></div>
+          <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><polyline points="9 16 11 18 15 14"/></svg></span><div style="flex:1"><b>Googleカレンダー書き出し</b> — 選んだセッションをGoogleカレンダーに追加できます。</div></div>
+<div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><div style="flex:1"><b>ロック</b> — 編集できないようにロックします。錠前ボタンを押すたびにロック／解除を切り替えます。ロック中はセッションや日程・概要の編集が止まり、表示の確認やライブモードはそのまま使えます。ロックは共有相手の画面にも連動します。</div></div>
+                    <div style="display:flex;align-items:flex-start;gap:9px"><span style="flex-shrink:0;width:26px;height:26px;border:1px solid var(--border);border-radius:6px;display:inline-flex;align-items:center;justify-content:center;color:var(--text2);margin-top:1px"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12" y2="18"/></svg></span><div style="flex:1"><b>スマホでの利用</b> — スマホでは画面に合わせたカード表示になります。</div></div>
+        </div>
       </div>
 
     </div>
     <div class="mft"><div></div><button class="btn p" onclick="closeHelp()">閉じる</button></div>
-  </div>
-</div>
-
-<!-- QR共有モーダル -->
-<div class="mbg" id="qr-modal" style="display:none" onclick="if(event.target===this)closeQR()">
-  <div class="mc" style="width:320px" onclick="event.stopPropagation()">
-    <div class="mh">
-      <h3>🔗 ルーム共有</h3>
-      <button class="mx" onclick="closeQR()">×</button>
-    </div>
-    <div class="mb" style="align-items:center;gap:12px">
-      <div style="font-size:11px;color:var(--text2);text-align:center">QRコードをスキャンまたはURLをコピーして共有</div>
-      <div id="qr-code" style="width:200px;height:200px;margin:0 auto;background:#fff;padding:8px;border-radius:8px;border:1px solid var(--border)"></div>
-      <div style="width:100%;background:var(--bg2);border-radius:6px;padding:8px 10px;font-size:10px;word-break:break-all;color:var(--text2);font-family:monospace" id="qr-url"></div>
-    </div>
-    <div class="mft">
-      <div></div>
-      <div class="mbtns">
-        <button class="btn" onclick="closeQR()">閉じる</button>
-        <button class="btn" onclick="createNewRoom()" style="color:var(--text2);font-size:11px">新しいルームを作成</button>
-        <button class="btn p" onclick="copyQRUrl()">URLをコピー</button>
-      </div>
-    </div>
   </div>
 </div>
 
@@ -907,29 +886,29 @@ tbody tr:hover td{background:var(--bg2)}
   <!-- ヘッダー：タイトル＋日時（参照のみ）＋概要1行 -->
   <div class="mv-header">
     <div style="display:flex;align-items:flex-start;gap:6px">
-      <div style="flex:1;min-width:0">
-        <div style="display:flex;align-items:center;gap:6px"><div class="mv-title" id="mv-title" style="font-size:14px;font-weight:700;color:var(--text)">タイムテーブル</div><span id="mv-live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">● LIVE</span></div>
+      <div style="flex:1;min-width:0;cursor:pointer" onclick="mvToggleAccordion()">
+        <div style="display:flex;align-items:center;gap:6px">
+          <div class="mv-title" id="mv-title" style="font-size:14px;font-weight:700;color:var(--text)">タイムテーブル</div>
+          <span id="mv-live-badge" style="display:none;font-size:11px;font-weight:700;color:#E53E3E">● LIVE</span>
+          <svg id="mv-acc-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text3);transition:transform .2s"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
         <div class="mv-meta" id="mv-meta" style="font-size:14px;font-weight:400;color:var(--text2);margin-top:1px"></div>
         <div id="mv-live-countdown" style="display:none;font-size:12px;font-weight:700;color:#E53E3E;margin-top:2px"></div>
       </div>
       <select id="mv-day-sel" class="mv-day-sel" style="display:none" onchange="mvSwitchDayUI()"></select>
-      <!-- スライドリンクボタン（右上） -->
       <button id="mv-slide-btn" onclick="openSlideUrl()" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text2);flex-shrink:0;display:none;align-items:center;justify-content:center;border-radius:6px" title="スライドを開く">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
       </button>
-      <!-- 鉛筆アイコン（右上） -->
-      <button onclick="mvOpenEventEdit()" style="background:none;border:none;padding:4px;cursor:pointer;color:var(--text2);flex-shrink:0;display:flex;align-items:center;justify-content:center;border-radius:6px">
-        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-      </button>
     </div>
-    <!-- イベント概要1行参照 -->
-    <div id="mv-evinfo-bar" style="margin-top:4px">
-      <div id="mv-evinfo-header" style="display:flex;align-items:center;gap:5px;min-height:18px">
-        <svg id="mv-evinfo-pencil" viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text3);pointer-events:none;display:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-        <span id="evinfo-preview-mv" style="flex:1;font-size:12px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--text3)"></span>
+    <div id="mv-accordion" style="display:none;margin-top:8px;padding:10px 12px;background:var(--bg2);border-radius:10px">
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div id="mv-acc-content" style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px"></div>
+        <button onclick="mvOpenEventEdit()" style="flex-shrink:0;display:flex;align-items:center;gap:4px;padding:5px 10px;border:1px solid var(--accent);border-radius:8px;background:transparent;color:var(--accent);cursor:pointer;font-size:12px;font-weight:600">
+          <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          編集
+        </button>
       </div>
     </div>
-    <!-- 進行バー＋時刻 -->
     <div style="display:flex;align-items:center;gap:8px;margin-top:5px">
       <div class="mv-progress" style="flex:1;margin-top:0"><div class="mv-progress-bar" id="mv-bar" style="width:0%"></div></div>
       <span id="mv-clock" style="display:none;font-size:12px;font-weight:700;color:var(--text2);white-space:nowrap;flex-shrink:0"></span>
@@ -941,6 +920,7 @@ tbody tr:hover td{background:var(--bg2)}
     <button class="mv-tab on" id="mv-tab-s" onclick="mvSwitchTab('s')">シリアル</button>
     <button class="mv-tab" id="mv-tab-f" onclick="mvSwitchTab('f')">フリー</button>
     <button class="mv-tab" onclick="mvAddSession()" style="flex:none;padding:9px 14px;font-size:18px;color:var(--accent);font-weight:300">＋</button>
+    <button class="mv-tab" onclick="mvClearCurrent()" style="flex:none;padding:9px 12px;color:var(--text2);display:inline-flex;align-items:center;justify-content:center"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg></button>
   </div>
 
   <!-- セッションリスト -->
@@ -949,18 +929,13 @@ tbody tr:hover td{background:var(--bg2)}
   <!-- 下部ツールバー -->
   <div class="mv-toolbar" style="display:flex;align-items:stretch;padding:0 0 max(env(safe-area-inset-bottom),6px);border-top:1px solid var(--border);background:var(--bg)">
 
-    <!-- 新規 -->
-    <button class="mv-tbtn" onclick="newEV()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
-      <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">新規</span>
-    </button>
-    <!-- 保存 -->
-    <button class="mv-tbtn" onclick="quickSaveEV()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
-      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-      <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">保存</span>
+    <!-- 開く -->
+    <button class="mv-tbtn" onclick="openRoomPicker()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+      <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+      <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">開く</span>
     </button>
     <!-- AI生成 -->
-    <button class="mv-tbtn" onclick="openAI()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+    <button id="mv-btn-ai" class="mv-tbtn" onclick="openAI()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor" style="pointer-events:none"><path d="M12 2.5L13.4 9.6L20.5 9L13.4 10.4L12 17.5L10.6 10.4L3.5 9L10.6 9.6Z" fill="currentColor" stroke="none"/><path d="M19.5 1.5L20.3 4.2L23 5L20.3 5.8L19.5 8.5L18.7 5.8L16 5L18.7 4.2Z" fill="currentColor" stroke="none"/><circle cx="5" cy="16" r="1.3" fill="currentColor"/></svg>
       <span style="font-size:9px;color:var(--text2);pointer-events:none;line-height:1">AI生成</span>
     </button>
@@ -970,7 +945,7 @@ tbody tr:hover td{background:var(--bg2)}
       <span style="font-size:9px;color:var(--text2);pointer-events:none;line-height:1">時間調整</span>
     </button>
     <!-- 共有 -->
-    <button class="mv-tbtn" onclick="if(typeof fbShowRoom==='function')fbShowRoom()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+    <button class="mv-tbtn" onclick="openShareModal()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg>
       <span style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">共有</span>
     </button>
@@ -978,6 +953,11 @@ tbody tr:hover td{background:var(--bg2)}
     <button id="mv-live-btn" class="mv-tbtn" onclick="toggleLiveMode(!liveMode)" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
       <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" id="mv-live-btn-icon" style="pointer-events:none"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3" fill="currentColor"/></svg>
       <span id="mv-live-btn-label" style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">ライブ</span>
+    </button>
+    <!-- ロック -->
+    <button id="mv-lock-btn" class="mv-tbtn" onclick="toggleLock()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
+      <svg id="mv-lock-icon" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/></svg>
+      <span id="mv-lock-label" style="font-size:10px;color:var(--text2);pointer-events:none;line-height:1">ロック</span>
     </button>
     <!-- その他 -->
     <button class="mv-tbtn" onclick="mvOpenMore()" style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:6px 0">
@@ -1103,24 +1083,17 @@ tbody tr:hover td{background:var(--bg2)}
     </button>
 
 
-    <!-- 複数日切替（dayCount>1のときのみ表示） -->
-    <div id="mv-more-day-section" style="display:none;flex-direction:column;gap:6px">
-      <div style="font-size:11px;color:var(--text2);padding:0 4px">日程切替</div>
-      <div id="mv-more-day-btns" style="display:flex;flex-wrap:wrap;gap:6px"></div>
-      <button onclick="openMultiDayModal();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:10px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer;margin-top:4px">
-        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-        日程設定を編集
-      </button>
-
-    </div>
-    <button onclick="openEV();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>開く
-    </button>
     <button onclick="openExport();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
       <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>書き出し
     </button>
-    <button onclick="resetAll();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid #F7C1C1;border-radius:12px;background:#FEF2F2;color:#A32D2D;font-size:14px;cursor:pointer">
-      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>全削除
+    <button onclick="duplicateRoomBtn();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none;flex-shrink:0"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>このイベントを複製
+    </button>
+    <button onclick="resetAll();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/></svg>セッションを全削除
+    </button>
+    <button onclick="deleteRoom();mvCloseMore()" style="display:flex;align-items:center;gap:10px;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text);font-size:14px;cursor:pointer">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" style="pointer-events:none;flex-shrink:0"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>このイベントを削除
     </button>
     <button onclick="mvCloseMore()" style="display:flex;align-items:center;justify-content:center;padding:12px 14px;border:1px solid var(--border);border-radius:12px;background:var(--bg2);color:var(--text2);font-size:14px;cursor:pointer;width:100%">
       閉じる
@@ -1162,7 +1135,7 @@ tbody tr:hover td{background:var(--bg2)}
       </div>
       <div>
         <div class="mv-modal-label">メモ</div>
-        <textarea class="mv-modal-textarea" id="mv-sm-comment" maxlength="100" placeholder="メモ・注意事項など"></textarea>
+        <textarea class="mv-modal-textarea" id="mv-sm-comment" maxlength="300" placeholder="メモ・注意事項など"></textarea>
       </div>
     </div>
     <div class="mv-modal-footer">
@@ -1193,7 +1166,7 @@ tbody tr:hover td{background:var(--bg2)}
       </div>
       <div>
         <div class="mv-modal-label">メモ</div>
-        <textarea class="mv-modal-textarea" id="mv-fm-comment" maxlength="100" placeholder="メモ・注意事項など"></textarea>
+        <textarea class="mv-modal-textarea" id="mv-fm-comment" maxlength="300" placeholder="メモ・注意事項など"></textarea>
       </div>
     </div>
     <div class="mv-modal-footer">
@@ -1208,6 +1181,8 @@ tbody tr:hover td{background:var(--bg2)}
 // ================================================================
 // CONSTANTS
 // ================================================================
+// 新規アクセス判定（URLにroomパラメータがない）— autoLoad前に評価する必要があるため早期定義
+var _isNewVisit = !(new URLSearchParams(window.location.search).get('room'));
 const COLORS=['purple','teal','green','pink','coral','blue','amber','gray','white','navy'];
 const ICON_COLORS=['ic_check','ic_chat','ic_book','ic_coffee','ic_group','ic_pencil','ic_bulb','ic_star','ic_fork','ic_mic'];
 const ICON_SVG={
@@ -1423,6 +1398,87 @@ function updateEvInfoPreview(){
       val.style.cssText='overflow:hidden;white-space:nowrap;text-overflow:ellipsis;font-size:12px';
       mvP.appendChild(val);
     }
+  }
+  if(typeof mvAccordionOpen!=='undefined' && mvAccordionOpen && typeof mvRenderAccordion==='function') mvRenderAccordion();
+}
+
+// スマホ: ヘッダーのイベント概要アコーディオン
+var mvAccordionOpen=false;
+function mvToggleAccordion(){
+  mvAccordionOpen=!mvAccordionOpen;
+  const panel=document.getElementById('mv-accordion');
+  const chevron=document.getElementById('mv-acc-chevron');
+  if(!panel) return;
+  if(mvAccordionOpen){
+    mvRenderAccordion();
+    panel.style.display='block';
+    if(chevron) chevron.style.transform='rotate(180deg)';
+  } else {
+    panel.style.display='none';
+    if(chevron) chevron.style.transform='';
+  }
+}
+function mvRenderAccordion(){
+  const wrap=document.getElementById('mv-acc-content');
+  if(!wrap) return;
+  wrap.innerHTML='';
+  const ei=evInfo||{};
+  if(dayCount>1){
+    const daySec=document.createElement('div');
+    daySec.style.cssText='display:flex;flex-direction:column;gap:5px';
+    const dayLbl=document.createElement('div');
+    dayLbl.textContent='日程';
+    dayLbl.style.cssText='font-size:11px;color:var(--text3)';
+    daySec.appendChild(dayLbl);
+    const btns=document.createElement('div');
+    btns.style.cssText='display:flex;flex-wrap:wrap;gap:6px';
+    for(let d=1;d<=dayCount;d++){
+      const b=document.createElement('button');
+      b.textContent='DAY'+d;
+      const on=(d===currentDay);
+      b.style.cssText='padding:5px 12px;border-radius:8px;font-size:12px;cursor:pointer;border:1px solid '+(on?'var(--accent)':'var(--border)')+';background:'+(on?'var(--accent)':'transparent')+';color:'+(on?'#fff':'var(--text)');
+      b.onclick=(function(dd){return function(e){e.stopPropagation();switchDay(dd-currentDay);mvRenderAccordion();};})(d);
+      btns.appendChild(b);
+    }
+    daySec.appendChild(btns);
+    wrap.appendChild(daySec);
+  }
+  const fields=[
+    {label:'場所/ID', val:ei.location},
+    {label:'オーナー', val:ei.owner},
+    {label:'参加者', val:ei.members},
+    {label:'スライドURL', val:ei.slideUrl},
+    {label:'メモ', val:ei.memo}
+  ];
+  let hasAny=false;
+  fields.forEach(function(f){
+    if(!f.val) return;
+    hasAny=true;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;flex-direction:column;gap:1px';
+    const l=document.createElement('div');
+    l.textContent=f.label;
+    l.style.cssText='font-size:11px;color:var(--text3)';
+    row.appendChild(l);
+    if(/^https?:\/\//i.test(f.val)){
+      const a=document.createElement('a');
+      a.href=f.val;a.target='_blank';a.rel='noopener noreferrer';a.textContent=f.val;
+      a.style.cssText='font-size:14px;color:var(--acc,#5DCAA5);text-decoration:underline;word-break:break-all';
+      a.addEventListener('click',function(e){e.stopPropagation();});
+      row.appendChild(a);
+    } else {
+      const v=document.createElement('div');
+      v.textContent=f.val;
+      v.style.cssText='font-size:14px;color:var(--text);white-space:pre-wrap;word-break:break-all';
+      row.appendChild(v);
+    }
+    wrap.appendChild(row);
+  });
+  if(!hasAny && dayCount<=1){
+    const empty=document.createElement('div');
+    empty.textContent='概要は未入力です。編集から追加できます。';
+    empty.style.cssText='font-size:12px;color:var(--text3)';
+    wrap.appendChild(empty);
   }
 }
 
@@ -1738,16 +1794,18 @@ function autoLoad(){
       if(currentDay>dayCount) currentDay=1;
       const sel=document.getElementById('day-count-sel');
       if(sel) sel.value=String(dayCount);
-      // 現在のDAYのセッションを読み込む
-      const target=dayData[currentDay-1];
-      if(target){
-        sessions=JSON.parse(JSON.stringify(target.sessions||[]));
-        freeEvs=JSON.parse(JSON.stringify(target.freeEvs||[]));
-        nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
-        nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-        if(target.start) document.getElementById('evs').value=target.start;
-        if(target.end)   document.getElementById('eve').value=target.end;
-        if(target.date!==undefined) document.getElementById('evd').value=target.date;
+      // 複数日程のときだけ現在DAYのセッションで上書き。単日はdata.sessions/freeEvsを維持
+      if(dayCount>1){
+        const target=dayData[currentDay-1];
+        if(target){
+          sessions=JSON.parse(JSON.stringify(target.sessions||[]));
+          freeEvs=JSON.parse(JSON.stringify(target.freeEvs||[]));
+          nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
+          nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
+          if(target.start) document.getElementById('evs').value=target.start;
+          if(target.end)   document.getElementById('eve').value=target.end;
+          if(target.date!==undefined) document.getElementById('evd').value=target.date;
+        }
       }
     }
     try{
@@ -1779,14 +1837,34 @@ function autoLoad(){
 }
 
 function snap(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();setTimeout(autoSave,0);if(typeof fbPush==='function')fbPush();}
-function undo(){if(hi<=0)return;hi--;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
-function redo(){if(hi>=hist.length-1)return;hi++;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
+function undo(){if(typeof lockGuard==="function"&&lockGuard())return;if(hi<=0)return;hi--;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
+function redo(){if(typeof lockGuard==="function"&&lockGuard())return;if(hi>=hist.length-1)return;hi++;const d=JSON.parse(hist[hi]);sessions=d.sessions;freeEvs=d.freeEvs;render();uUR();}
 function uUR(){document.getElementById('bundo').disabled=hi<=0;document.getElementById('bredo').disabled=hi>=hist.length-1;}
 
 // ================================================================
 // TIME HELPERS
 // ================================================================
 function gSM(){const v=document.getElementById('evs').value||'13:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
+function onStartTimeChange(){
+  const el=document.getElementById('evs');
+  // フリーイベントが1つ以上あるときだけ確認
+  const hasFreeEvs = (typeof freeEvs!=='undefined') && freeEvs && freeEvs.length>0;
+  const hasSessions = (typeof sessions!=='undefined') && sessions && sessions.length>0;
+  if(hasFreeEvs || hasSessions){
+    if(!confirm('開始時間にあわせて、設定されているイベントの時間も変更されますがよろしいですか？')){
+      // キャンセル: 変更前の値に戻す
+      if(el.dataset.prev) el.value=el.dataset.prev;
+      return;
+    }
+  }
+  el.dataset.prev=el.value;
+  validateTimeRange('evs');
+  render();
+  autoSave();
+  if(typeof fbPush==='function')fbPush();
+  setTimeout(fitz,50);
+  updateTotalTime();
+}
 function gEM(){const v=document.getElementById('eve').value||'16:00';const[h,m]=v.split(':').map(Number);return h*60+m;}
 
 // ダークモード用セッション色
@@ -2204,9 +2282,99 @@ function renderMultiDayList(){
       '<input type="time" value="'+(d.start||'13:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-start"/>'+
       '<span style="font-size:11px;color:var(--text3)">〜</span>'+
       '<input type="time" value="'+(d.end||'17:00')+'" style="font-size:12px;padding:3px 6px;border:1px solid var(--border);border-radius:6px;background:var(--bg);color:var(--text);width:72px" data-day="'+i+'" class="mday-end"/>'+
+      (dayCount>1?'<button onclick="openDayMoveMenu('+i+')" title="このDAYの内容を移動／複製／交換" style="background:transparent;border:1px solid var(--border);cursor:pointer;color:var(--text2);padding:3px 8px;flex-shrink:0;display:inline-flex;align-items:center;gap:4px;border-radius:6px;font-size:11px"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>日程変更</button>':'')+
       (i>0?'<button onclick="removeMultiDayEntry('+i+')" style="background:none;border:none;cursor:pointer;color:var(--text3);padding:2px 4px;font-size:16px;flex-shrink:0">×</button>':'<span style="width:24px"></span>');
     list.appendChild(row);
   }
+}
+// DAYの内容を別の日へ移動／コピーするメニュー
+function openDayMoveMenu(fromIdx){
+  _syncModalToDayData();
+  if(dayData[currentDay-1]){
+    dayData[currentDay-1].sessions=JSON.parse(JSON.stringify(sessions));
+    dayData[currentDay-1].freeEvs=JSON.parse(JSON.stringify(freeEvs));
+  }
+  const others=[];
+  for(let i=0;i<dayCount;i++){ if(i!==fromIdx) others.push(i); }
+  if(others.length===0){ alert('対象となる日程がありません'); return; }
+  let ov=document.getElementById('day-op-overlay');
+  if(ov) ov.remove();
+  ov=document.createElement('div');
+  ov.id='day-op-overlay';
+  ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8300;display:flex;align-items:center;justify-content:center';
+  ov.onclick=function(e){ if(e.target===ov) ov.remove(); };
+  function dlabel(i){
+    const d=dayData[i]||{};
+    let s='DAY'+(i+1);
+    if(d.date){ const p=d.date.split('-'); if(p.length===3) s+='（'+parseInt(p[1])+'/'+parseInt(p[2])+'）'; }
+    return s;
+  }
+  const opts=others.map(i=>'<option value="'+i+'">'+dlabel(i)+'</option>').join('');
+  const box=document.createElement('div');
+  box.style.cssText='background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:18px;width:300px;max-width:90vw';
+  box.innerHTML=
+    '<div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:3px">'+dlabel(fromIdx)+' の内容を変更</div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:14px">相手の日程と操作を選んでください</div>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:5px">相手の日程</div>'+
+    '<select id="day-op-dest" style="width:100%;margin-bottom:14px;padding:7px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px">'+opts+'</select>'+
+    '<div style="font-size:11px;color:var(--text3);margin-bottom:5px">操作</div>'+
+    '<div style="display:flex;flex-direction:column;gap:8px">'+
+      '<button onclick="applyDayOpFromDialog('+fromIdx+',\'move\')" style="border:1px solid var(--border);background:transparent;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2)"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg><span><span style="font-weight:600">移動</span><br><span style="font-size:11px;color:var(--text3)">相手へ移す。元は空になる</span></span></button>'+
+      '<button onclick="applyDayOpFromDialog('+fromIdx+',\'copy\')" style="border:1px solid var(--border);background:transparent;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2)"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg><span><span style="font-weight:600">複製</span><br><span style="font-size:11px;color:var(--text3)">相手へコピー。元も残る</span></span></button>'+
+      '<button onclick="applyDayOpFromDialog('+fromIdx+',\'swap\')" style="border:1px solid var(--border);background:transparent;border-radius:8px;padding:10px 12px;font-size:13px;color:var(--text);display:flex;align-items:center;gap:10px;cursor:pointer;text-align:left"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;color:var(--text2)"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg><span><span style="font-weight:600">交換</span><br><span style="font-size:11px;color:var(--text3)">相手と内容を入れ替える</span></span></button>'+
+    '</div>'+
+    '<div style="display:flex;justify-content:flex-end;margin-top:14px"><button onclick="document.getElementById(\'day-op-overlay\').remove()" style="border:none;background:transparent;color:var(--text3);font-size:13px;cursor:pointer;padding:6px 10px">キャンセル</button></div>';
+  ov.appendChild(box);
+  document.body.appendChild(ov);
+}
+function applyDayOpFromDialog(fromIdx, op){
+  const sel=document.getElementById('day-op-dest');
+  if(!sel) return;
+  const destIdx=parseInt(sel.value);
+  if(isNaN(destIdx)) return;
+  if(op==='move'||op==='copy'){
+    const dd=dayData[destIdx]||{};
+    const has=((dd.sessions&&dd.sessions.length>0)||(dd.freeEvs&&dd.freeEvs.length>0));
+    if(has){
+      if(!confirm('DAY'+(destIdx+1)+' にはすでにセッションがあります。\n上書きすると DAY'+(destIdx+1)+' の既存内容は削除されます。\n\n続けてよろしいですか？')) return;
+    }
+  }
+  const ov=document.getElementById('day-op-overlay'); if(ov) ov.remove();
+  applyDayOp(fromIdx, destIdx, op);
+}
+function applyDayOp(fromIdx, destIdx, op){
+  const A=dayData[fromIdx]||{sessions:[],freeEvs:[],start:'13:00',end:'17:00',date:''};
+  const B=dayData[destIdx]||{sessions:[],freeEvs:[],start:'13:00',end:'17:00',date:''};
+  const aDate=A.date||'', bDate=B.date||'';
+  function clone(o){ return JSON.parse(JSON.stringify(o||[])); }
+  if(op==='swap'){
+    dayData[fromIdx]={ sessions:clone(B.sessions), freeEvs:clone(B.freeEvs), start:B.start||'13:00', end:B.end||'17:00', date:aDate };
+    dayData[destIdx]={ sessions:clone(A.sessions), freeEvs:clone(A.freeEvs), start:A.start||'13:00', end:A.end||'17:00', date:bDate };
+  } else {
+    dayData[destIdx]={ sessions:clone(A.sessions), freeEvs:clone(A.freeEvs), start:A.start||'13:00', end:A.end||'17:00', date:bDate };
+    if(op==='move'){
+      dayData[fromIdx]={ sessions:[], freeEvs:[], start:A.start||'13:00', end:A.end||'17:00', date:aDate };
+    }
+  }
+  if(currentDay-1===destIdx || currentDay-1===fromIdx){
+    const cur=dayData[currentDay-1];
+    sessions=JSON.parse(JSON.stringify(cur.sessions||[]));
+    freeEvs=JSON.parse(JSON.stringify(cur.freeEvs||[]));
+    const evsEl=document.getElementById('evs');
+    const eveEl=document.getElementById('eve');
+    const evdEl=document.getElementById('evd');
+    if(evsEl && cur.start) evsEl.value=cur.start;
+    if(eveEl && cur.end) eveEl.value=cur.end;
+    if(evdEl && cur.date!==undefined) evdEl.value=cur.date;
+    if(typeof updateDow==='function') updateDow();
+    if(typeof updateTotalTime==='function') updateTotalTime();
+    if(typeof updateTopDateLabel==='function') updateTopDateLabel();
+  }
+  renderMultiDayList();
+  snap();render();if(typeof mvRender==='function')mvRender();
+  const label={move:'移動',copy:'複製',swap:'交換'}[op]||'';
+  if(op==='swap') alert('DAY'+(fromIdx+1)+' と DAY'+(destIdx+1)+' の内容を交換しました');
+  else alert('DAY'+(fromIdx+1)+' の内容を DAY'+(destIdx+1)+' へ'+label+'しました');
 }
 
 function addMultiDayEntry(){
@@ -2248,20 +2416,20 @@ function _syncModalToDayData(){
 }
 
 function saveMultiDayModal(){
+  // 現在DAYのセッション内容を先に退避（start/end/dateはモーダルの設定を優先するため触らない）
+  const _curSessions=JSON.parse(JSON.stringify(sessions));
+  const _curFreeEvs=JSON.parse(JSON.stringify(freeEvs));
+  // モーダルの入力値（各DAYの日付・開始・終了）をdayDataに反映
   _syncModalToDayData();
-  // 現在のDAYのデータも先に保存
-  const _exd=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined?dayData[currentDay-1].date:document.getElementById('evd').value||'';
-  dayData[currentDay-1]={
-    sessions:JSON.parse(JSON.stringify(sessions)),
-    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
-    start:document.getElementById('evs').value||'13:00',
-    end:document.getElementById('eve').value||'17:00',
-    date:_exd
-  };
-  // DAY1の日付・時間をPC表示に反映
+  // 現在DAYのsessions/freeEvsだけ書き戻す（時刻・日付はモーダルで設定済みの値を維持）
+  if(dayData[currentDay-1]){
+    dayData[currentDay-1].sessions=_curSessions;
+    dayData[currentDay-1].freeEvs=_curFreeEvs;
+  }
+  // 現在DAYの日付・時間をPC表示に反映（モーダルで変更した値が画面に出るように）
   if(dayData[currentDay-1]){
     const d=dayData[currentDay-1];
-    if(d.date)  document.getElementById('evd').value=d.date;
+    if(d.date!==undefined) document.getElementById('evd').value=d.date;
     if(d.start) document.getElementById('evs').value=d.start;
     if(d.end)   document.getElementById('eve').value=d.end;
   }
@@ -2380,8 +2548,25 @@ function updateNowLine(){
     if(cdPC){cdPC.textContent=txt;cdPC.style.display='inline';}
     if(cdMV){cdMV.textContent=txt;cdMV.style.display='block';}
   } else {
-    if(cdPC){cdPC.textContent='';cdPC.style.display='none';}
-    if(cdMV){cdMV.textContent='';cdMV.style.display='none';}
+    // 進行中: 現在のシリアルセッションの残り時間を表示
+    let liveTxt='';
+    try{
+      const st2=gSt();
+      for(let i=0;i<sessions.length;i++){
+        const s2=sm2+st2[i], e2=s2+sessions[i].dur;
+        if(nowMin2>=s2&&nowMin2<e2){
+          liveTxt=`${sessions[i].name} あと${e2-nowMin2}分`;
+          break;
+        }
+      }
+    }catch(e){}
+    if(liveTxt){
+      if(cdPC){cdPC.textContent=liveTxt;cdPC.style.display='inline';}
+      if(cdMV){cdMV.textContent=liveTxt;cdMV.style.display='block';}
+    } else {
+      if(cdPC){cdPC.textContent='';cdPC.style.display='none';}
+      if(cdMV){cdMV.textContent='';cdMV.style.display='none';}
+    }
   }
 }
 
@@ -2396,6 +2581,7 @@ function updateNowLine(){
 // - ドラッグ中はDOM styleのみ更新（innerHTML書き換えなし）
 // ================================================================
 function startSResize(e,edge,sid,hel){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   const s=sessions.find(x=>x.id===sid);
   if(!s)return;
 
@@ -2434,7 +2620,7 @@ function startSResize(e,edge,sid,hel){
         el.style.top=(st[i]*PPM+2)+'px';
         el.style.height=Math.max(sess.dur*PPM-2,16)+'px';
         const tmEl=el.querySelector('.stm');
-        if(tmEl)tmEl.textContent=hm(gSM()+st[i]);
+        if(tmEl)tmEl.textContent=hmn(gSM()+st[i]);
         const drEl=el.querySelector('.sdr');
         if(drEl)drEl.textContent=sess.dur+'分';
       });
@@ -2446,7 +2632,7 @@ function startSResize(e,edge,sid,hel){
     const idx=sessions.findIndex(x=>x.id===capturedSid);
     if(idx>=0){
       sTT(ev.clientX,ev.clientY,
-        `${hm(gSM()+st2[idx])}〜${hm(gSM()+st2[idx]+target.dur)}（${target.dur}分）`);
+        `${hmn(gSM()+st2[idx])}〜${hmn(gSM()+st2[idx]+target.dur)}（${target.dur}分）`);
     }
   }
 
@@ -2467,6 +2653,7 @@ function startSResize(e,edge,sid,hel){
 // ================================================================
 let fR=null;
 function onFH(e,edge,id,hel){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   e.preventDefault();e.stopPropagation();
   const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
   hel.classList.add('act');
@@ -2486,7 +2673,7 @@ function onFRM(e){
   if(edge==='b'){ev.toMin=Math.max(origFrom+SN,origTo+sd);}
   else{ev.fromMin=Math.min(origTo-SN,Math.max(0,origFrom+sd));}
   rFR();
-  sTT(e.clientX,e.clientY,`${hm(gSM()+ev.fromMin)}〜${hm(gSM()+ev.toMin)}（${ev.toMin-ev.fromMin}分）`);
+  sTT(e.clientX,e.clientY,`${hmn(gSM()+ev.fromMin)}〜${hmn(gSM()+ev.toMin)}（${ev.toMin-ev.fromMin}分）`);
 }
 function onFRU(){
   hTT();
@@ -2640,8 +2827,8 @@ function renderTbl(){
       <td style="cursor:grab;color:var(--text3);font-size:13px;text-align:center;width:20px;padding:6px 2px">⠿</td>
       <td style="color:var(--text3);font-size:10px;width:20px;padding:6px 4px">${i+1}</td>
       <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 7px"><span style="cursor:pointer;font-weight:600;font-size:11px" onclick="openSM(${s.id})">${esc(s.name)}</span></td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+st[i])}</td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+st[i]+s.dur)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+st[i])}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+st[i]+s.dur)}</td>
       <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px"><span style="cursor:pointer" onclick="openSM(${s.id})">${s.dur}分</span></td>
       <td style="font-size:11px;color:var(--text2);padding:6px 7px;white-space:pre-wrap;word-break:break-all">${s.comment?escLink(s.comment):'<span style="opacity:.3">—</span>'}</td>
       <td style="width:20px;text-align:center;padding:6px 4px"><span style="cursor:pointer;opacity:.3;font-size:13px" onclick="delS(event,${s.id})">×</span></td>
@@ -2658,8 +2845,8 @@ function renderTbl(){
       <td style="width:20px;padding:6px 2px"></td>
       <td style="color:var(--text3);font-size:10px;width:20px;padding:6px 4px">${i+1}</td>
       <td style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;padding:6px 7px"><span style="cursor:pointer;font-weight:600;font-size:11px" onclick="openFE(${ev.id})">${esc(ev.name)}${badge}</span></td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+ev.fromMin)}</td>
-      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hm(sm+ev.toMin)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+ev.fromMin)}</td>
+      <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${hmn(sm+ev.toMin)}</td>
       <td style="font-size:11px;color:var(--text2);white-space:nowrap;padding:6px 7px">${dur}分</td>
       <td style="font-size:11px;color:var(--text2);padding:6px 7px;white-space:pre-wrap;word-break:break-all">${ev.comment?escLink(ev.comment):'<span style="opacity:.3">—</span>'}</td>
       <td style="width:20px;text-align:center;padding:6px 4px"><span style="cursor:pointer;opacity:.3;font-size:13px" onclick="delFid(${ev.id})">×</span></td>
@@ -2691,6 +2878,65 @@ function resetAll(){
   if(dcSel) dcSel.value='1';
   snap();render();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
 }
+// ブラウザタブのタイトルをイベント名に
+function updateDocTitle(){
+  const t=((document.getElementById('evt')||{}).value||'').trim();
+  document.title=t?(t+' | スマートタイムテーブル'):'スマートタイムテーブル';
+}
+// ================================================================
+// ロック機能（編集不可）— Firebase同期
+// ================================================================
+var isLocked=false;
+function toggleLock(){
+  setLocked(!isLocked, true);
+}
+function setLocked(locked, doSync){
+  isLocked=!!locked;
+  applyLockUI();
+  if(doSync && typeof fbPush==='function') fbPush();
+}
+function applyLockUI(){
+  const icon=document.getElementById('lock-icon');
+  const label=document.getElementById('lock-label');
+  const btn=document.getElementById('lock-btn');
+  if(icon){
+    if(isLocked){
+      icon.innerHTML='<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>';
+    } else {
+      icon.innerHTML='<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>';
+    }
+  }
+  if(label) label.textContent=isLocked?'ロック中':'ロック';
+  if(btn) btn.style.color=isLocked?'#E5A93E':'';
+  document.body.classList.toggle('stt-locked', isLocked);
+  const mvIcon=document.getElementById('mv-lock-icon');
+  if(mvIcon) mvIcon.innerHTML=isLocked?'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>':'<rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 9.9-1"/>';
+  const mvLbl=document.getElementById('mv-lock-label');
+  if(mvLbl){ mvLbl.textContent=isLocked?'ロック中':'ロック'; mvLbl.style.color=isLocked?'#E5A93E':'var(--text2)'; }
+  const mvIcon2=document.getElementById('mv-lock-icon');
+  if(mvIcon2) mvIcon2.style.stroke=isLocked?'#E5A93E':'currentColor';
+}
+function lockGuard(){
+  if(isLocked){
+    if(typeof showToast==='function') showToast('ロック中です。編集するには解除してください');
+    else { const b=document.getElementById('lock-btn'); if(b){b.style.transition='transform .1s';b.style.transform='scale(1.15)';setTimeout(()=>b.style.transform='',150);} }
+    return true;
+  }
+  return false;
+}
+
+function resetSerial(){
+  if(!sessions.length){ alert('シリアルセッションはありません'); return; }
+  if(!confirm('すべてのシリアルセッションをクリアしますか？'))return;
+  sessions=[];
+  snap();render();if(typeof mvRender==='function')mvRender();
+}
+function resetFree(){
+  if(!freeEvs.length){ alert('フリーエリアのセッションはありません'); return; }
+  if(!confirm('すべてのフリーエリアをクリアしますか？'))return;
+  freeEvs=[];
+  snap();render();if(typeof mvRender==='function')mvRender();
+}
 
 const TT=document.getElementById('tt');
 function sTT(x,y,t){TT.textContent=t;TT.style.display='block';TT.style.left=x+'px';TT.style.top=(y-26)+'px';}
@@ -2704,6 +2950,7 @@ let fBD={id:null,of:0,ot:0};
 
 function onMD(e,el){gSrc='menu';gN=el.dataset.n;gD=parseInt(el.dataset.d)||10;gC=el.dataset.c||'teal';e.dataTransfer.effectAllowed='copy';document.addEventListener('dragend',onGDE,{once:true});}
 function onSD(e,el){
+  if(typeof isLocked!=="undefined"&&isLocked){e.preventDefault&&e.preventDefault();return false;}
   gSrc='serial';sD.src='serial';sD.id=parseInt(el.dataset.id);
   const s=sessions.find(x=>x.id===sD.id);
   if(s){gN=s.name;gD=s.dur;gC=s.color;}
@@ -2757,6 +3004,7 @@ function onSCd(e){
 
 function frRY(e){const frs=document.getElementById('frs'),r=frs.getBoundingClientRect();const pt=parseInt(getComputedStyle(frs).paddingTop)||0;return e.clientY-r.top+frs.scrollTop-pt;}
 function onFD(e,id){
+  if(typeof isLocked!=="undefined"&&isLocked){e.preventDefault&&e.preventDefault();return false;}
   const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
   gSrc='fblock';fBD={id,of:ev.fromMin,ot:ev.toMin};
   e.dataTransfer.effectAllowed='move';
@@ -2769,13 +3017,13 @@ function onFRo(e){
     document.getElementById('fov').classList.add('act');
     const ry=frRY(e),fm=Math.max(0,Math.round(ry/PPM/SN)*SN);
     const _frsPT1=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(fm*PPM+_frsPT1)+'px';
-    sTT(e.clientX,e.clientY,`${hm(gSM()+fm)}〜${hm(gSM()+fm+gD)}`);
+    sTT(e.clientX,e.clientY,`${hmn(gSM()+fm)}〜${hmn(gSM()+fm+gD)}`);
     e.dataTransfer.dropEffect='copy';return;
   }
   if(gSrc==='fblock'&&fBD.id){
     const ry=frRY(e),dur=fBD.ot-fBD.of,nf=Math.max(0,Math.round((ry/PPM-dur/2)/SN)*SN);
     const _frsPT2=parseInt(getComputedStyle(document.getElementById('frs')).paddingTop)||0;const dl=document.getElementById('fdl');dl.style.display='block';dl.style.top=(nf*PPM+_frsPT2)+'px';
-    sTT(e.clientX,e.clientY,`${hm(gSM()+nf)}〜${hm(gSM()+nf+dur)}（${dur}分）`);
+    sTT(e.clientX,e.clientY,`${hmn(gSM()+nf)}〜${hmn(gSM()+nf+dur)}（${dur}分）`);
     e.dataTransfer.dropEffect='move';
   }
 }
@@ -2971,17 +3219,35 @@ function openSM(id){
   var _sc=document.getElementById('scolors');_sc.innerHTML='';_sc.appendChild(cp(smC,'ssSC'));
   document.getElementById('sdur').value=s.dur;
   document.getElementById('scmt').value=s.comment||'';
+  document.getElementById('scmt').scrollTop=0;
   document.getElementById('scc').textContent=(s.comment||'').length;
   document.getElementById('sdel').style.display='';
   document.getElementById('sm').style.display='flex';
-  document.getElementById('sname').focus();
+  applySMLock();
+  if(!isLocked) document.getElementById('sname').focus();
+}
+function applySMLock(){
+  const ro=!!isLocked;
+  ['sname','sdur','scmt'].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el){ el.readOnly=ro; el.style.opacity=ro?'0.7':''; }
+  });
+  const scolors=document.getElementById('scolors');
+  if(scolors) scolors.style.pointerEvents=ro?'none':'';
+  const sdel=document.getElementById('sdel');
+  if(sdel) sdel.style.display=ro?'none':'';
+  const ssave=document.getElementById('sm').querySelector('.btn.p');
+  if(ssave) ssave.style.display=ro?'none':'';
+  const sdupBtn=document.getElementById('sm').querySelector('[onclick*="dupSM"],[onclick*="dupSession"]');
+  if(sdupBtn) sdupBtn.style.display=ro?'none':'';
 }
 function closeSM(){document.getElementById('sm').style.display='none';smId=null;}
 function saveSM(){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   if(smId===null)return;const s=sessions.find(x=>x.id===smId);if(!s)return;
   const n=document.getElementById('sname').value.trim();if(n)s.name=n;
   const d=parseInt(document.getElementById('sdur').value);if(!isNaN(d)&&d>=1)s.dur=d;
-  s.color=smC;s.comment=document.getElementById('scmt').value.slice(0,100);
+  s.color=smC;s.comment=document.getElementById('scmt').value.trim().slice(0,300);
   closeSM();snap();rTL();if(cv==='tb')renderTbl();
 }
 function dupSM(){
@@ -3013,7 +3279,7 @@ function dupFM(){
   freeEvs.push(copy);
   closeFM();snap();rFR();if(cv==='tb')renderTbl();
 }
-function delSM(){if(smId===null)return;sessions=sessions.filter(s=>s.id!==smId);closeSM();snap();rTL();if(cv==='tb')renderTbl();}
+function delSM(){if(typeof isLocked!=="undefined"&&isLocked)return;if(smId===null)return;sessions=sessions.filter(s=>s.id!==smId);closeSM();snap();rTL();if(cv==='tb')renderTbl();}
 function delS(e,id){e.stopPropagation();sessions=sessions.filter(s=>s.id!==id);snap();rTL();if(cv==='tb')renderTbl();}
 document.getElementById('scmt').addEventListener('input',function(){document.getElementById('scc').textContent=this.value.length;});
 document.getElementById('sm').addEventListener('click',function(e){if(e.target===this)closeSM();});
@@ -3033,25 +3299,40 @@ function openFE(id){
   const sm=gSM();
   document.getElementById('ffrom').value=ev?hm(sm+ev.fromMin):hm(sm);
   document.getElementById('fto').value=ev?hm(sm+ev.toMin):hm(sm+30);
-  document.getElementById('fcmt').value=ev?ev.comment||'':'';
+  document.getElementById('fcmt').value=ev?ev.comment||'':'';document.getElementById('fcmt').scrollTop=0;
   document.getElementById('fcc').textContent=(ev?.comment||'').length;
   document.getElementById('fdel').style.display=ev?'':'none';
   document.getElementById('fm').style.display='flex';
-  setTimeout(()=>document.getElementById('fname').focus(),50);
+  applyFMLock();
+  if(!isLocked) setTimeout(()=>document.getElementById('fname').focus(),50);
+}
+function applyFMLock(){
+  const ro=!!isLocked;
+  ['fname','ffrom','fto','fcmt'].forEach(function(id){
+    const el=document.getElementById(id);
+    if(el){ el.readOnly=ro; el.style.opacity=ro?'0.7':''; }
+  });
+  const fcolors=document.getElementById('fcolors');
+  if(fcolors) fcolors.style.pointerEvents=ro?'none':'';
+  const fdel=document.getElementById('fdel');
+  if(fdel && ro) fdel.style.display='none';
+  const fsave=document.getElementById('fm').querySelector('.btn.p');
+  if(fsave) fsave.style.display=ro?'none':'';
 }
 function closeFM(){document.getElementById('fm').style.display='none';fmId=null;}
 function saveFM(){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   const name=document.getElementById('fname').value.trim()||'イベント';
   const fa=h2m(document.getElementById('ffrom').value),ta=h2m(document.getElementById('fto').value);
   const sm=gSM();let fm=fa-sm,to=ta-sm;if(to<=fm)to=fm+10;
-  const cmt=document.getElementById('fcmt').value.slice(0,100);
+  const cmt=document.getElementById('fcmt').value.trim().slice(0,300);
   let cnt=0;freeEvs.forEach(ev=>{if(ev.id!==fmId&&ev.fromMin<to&&ev.toMin>fm)cnt++;});
   if(cnt>=3){alert('同じ時間帯に4つ以上のイベントは配置できません。');return;}
   if(fmId===null){freeEvs.push({id:nfid++,name,color:fmC,comment:cmt,fromMin:fm,toMin:to});}
   else{const ev=freeEvs.find(x=>x.id===fmId);if(ev){ev.name=name;ev.color=fmC;ev.comment=cmt;ev.fromMin=fm;ev.toMin=to;}}
   closeFM();snap();rFR();if(cv==='tb')renderTbl();
 }
-function delFM(){if(fmId===null)return;freeEvs=freeEvs.filter(x=>x.id!==fmId);closeFM();snap();rFR();if(cv==='tb')renderTbl();}
+function delFM(){if(typeof isLocked!=="undefined"&&isLocked)return;if(fmId===null)return;freeEvs=freeEvs.filter(x=>x.id!==fmId);closeFM();snap();rFR();if(cv==='tb')renderTbl();}
 document.getElementById('fcmt').addEventListener('input',function(){document.getElementById('fcc').textContent=this.value.length;});
 document.getElementById('fm').addEventListener('click',function(e){if(e.target===this)closeFM();});
 
@@ -3171,6 +3452,7 @@ function stDD(e,i){e.preventDefault();document.querySelectorAll('.str').forEach(
 // ================================================================
 let aiFs=[],aiSs=[];
 function openAI(){
+  if(typeof lockGuard==="function"&&lockGuard())return;
   logEvent('ai_open');
   aiFs=[];aiSs=[];
   document.getElementById('aiprompt').value='';
@@ -3220,6 +3502,7 @@ function updateBtnTimeAdj(){
 }
 
 function openTimeAdj(){
+  if(typeof lockGuard==="function"&&lockGuard())return;
   const now=new Date();
   const nowMin=now.getHours()*60+now.getMinutes();
   const sm=gSM(), em=gEM();
@@ -4239,92 +4522,6 @@ async function extractPptxText(file){
 }
 
 // ================================================================
-// EVENT MANAGER
-// ================================================================
-function openEV(){restoreSavedEvs();document.getElementById('evname').value=document.getElementById('evt').value||'';renderEVL();document.getElementById('evm').style.display='flex';}
-function closeEV(){document.getElementById('evm').style.display='none';}
-document.getElementById('evm').addEventListener('click',function(e){if(e.target===this)closeEV();});
-function renderEVL(){document.getElementById('evlist').innerHTML=savedEvs.length===0?'<div style="font-size:11px;color:var(--text3)">保存されたイベントはありません</div>':savedEvs.map((ev,i)=>`<div class="eli"><span style="flex:1;font-size:11px">${esc(ev.name)}</span><span style="font-size:10px;color:var(--text2)">${ev.date||''}</span><button class="btn" style="padding:1px 6px;font-size:10px" onclick="loadEV(${i})">読込</button><span style="cursor:pointer;opacity:.35;font-size:11px" onclick="delEV(${i})">×</span></div>`).join('');}
-function saveEV(){const name=document.getElementById('evname').value.trim()||'イベント'+(savedEvs.length+1);const idx=savedEvs.findIndex(e=>e.name===name);// 現在のDAYを保存してからセーブ
-  if(dayCount>1){
-    const _exd=dayData[currentDay-1]&&dayData[currentDay-1].date!==undefined?dayData[currentDay-1].date:document.getElementById('evd').value||'';
-    dayData[currentDay-1]={sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs)),start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'17:00',date:_exd};
-  }
-  const d={name,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title:document.getElementById('evt').value,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs)),noDate:noDate,dayCount:dayCount,currentDay:currentDay,dayData:JSON.parse(JSON.stringify(dayData)),evInfo:JSON.parse(JSON.stringify(evInfo||{}))};if(idx>=0)savedEvs[idx]=d;else savedEvs.push(d);renderEVL();persistSavedEvs();alert(`「${name}」として保存しました`);}
-function loadEV(i){const ev=savedEvs[i];
-  document.getElementById('evt').value=ev.title||'';
-  document.getElementById('evd').value=ev.date||'';
-  document.getElementById('evs').value=ev.start||'13:00';
-  document.getElementById('eve').value=ev.end||'16:00';
-  sessions=JSON.parse(JSON.stringify(ev.sessions||[]));
-  freeEvs=JSON.parse(JSON.stringify(ev.freeEvs||[]));
-  if(ev.dayCount){dayCount=ev.dayCount;currentDay=ev.currentDay||1;dayData=ev.dayData||[];noDate=ev.noDate||false;const dcSel=document.getElementById('day-count-sel');if(dcSel)dcSel.value=String(dayCount);const ndChk=document.getElementById('no-date-chk');if(ndChk)ndChk.checked=noDate;const _t=dayData[currentDay-1];if(_t){sessions=JSON.parse(JSON.stringify(_t.sessions||[]));freeEvs=JSON.parse(JSON.stringify(_t.freeEvs||[]));if(_t.start)document.getElementById('evs').value=_t.start;if(_t.end)document.getElementById('eve').value=_t.end;if(_t.date)document.getElementById('evd').value=_t.date;}}
-  if(ev.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},ev.evInfo);loadEvInfoToWidget();}
-  closeEV();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();}
-function delEV(i){if(confirm('削除しますか？')){savedEvs.splice(i,1);renderEVL();persistSavedEvs();}}
-function quickSaveEV(){
-  logEvent('save');
-  const title=(document.getElementById('evt').value||'').trim();
-  if(!title){
-    alert('イベントタイトルを入力してください。');
-    document.getElementById('evt').focus();
-    return;
-  }
-  const idx=savedEvs.findIndex(e=>e.name===title);
-  const d={name:title,date:document.getElementById('evd').value,start:document.getElementById('evs').value,end:document.getElementById('eve').value,title,sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))};
-  if(idx>=0){savedEvs[idx]=d;persistSavedEvs();alert(`「${title}」を上書き保存しました`);}
-  else{savedEvs.push(d);persistSavedEvs();alert(`「${title}」として保存しました`);}
-}
-function duplicateEV(){
-  logEvent('duplicate');
-  const title=(document.getElementById('evt').value||'イベント')+' のコピー';
-  document.getElementById('evt').value=title;
-  // セッションはそのままコピー済み状態でIDだけ新しく振り直す
-  sessions=sessions.map(s=>({...s,id:nid++}));
-  freeEvs=freeEvs.map(e=>({...e,id:nfid++}));
-  snap();render();
-  if(typeof mvRender==='function') setTimeout(mvRender,50);
-  alert(`「${title}」として複製しました`);
-}
-
-function newEV(){
-  if(!confirm('現在のデータをリセットして新規イベントを作成しますか？'))return;
-  // Firebase受信を一時停止
-  _fbSyncing=true;
-  sessions=[];freeEvs=[];
-  // 複数日程をリセットして1日に戻す
-  dayCount=1;currentDay=1;dayData=[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}];
-  const dcSel=document.getElementById('day-count-sel');
-  if(dcSel) dcSel.value='1';
-  document.getElementById('evt').value='';
-  document.getElementById('evd').value='';
-  document.getElementById('evs').value='13:00';
-  document.getElementById('eve').value='16:00';
-  noDate=false;
-  liveMode=false;
-  const ndChk=document.getElementById('no-date-chk');
-  if(ndChk) ndChk.checked=false;
-  const lmChk=document.getElementById('live-mode-chk');
-  if(lmChk) lmChk.checked=false;
-  // evInfoもリセット
-  evInfo={location:'',owner:'',members:'',memo:'',slideUrl:''};
-  loadEvInfoToWidget();
-  // ローカルストレージをクリア
-  localStorage.removeItem('stt-autosave');
-  closeEV();
-  snap=function(){};// snap一時無効化
-  render();updateDow();updateTopDateLabel();
-  if(typeof updateMultiDayChk==='function') updateMultiDayChk();
-  if(typeof mvRender==='function')mvRender();
-  // Firebase側もクリア（新規データをプッシュ）
-  setTimeout(function(){
-    snap=function(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();setTimeout(autoSave,0);if(typeof fbPush==='function')fbPush();};
-    _fbSyncing=false;
-    if(typeof fbPush==='function') fbPush();
-  }, 300);
-}
-
-// ================================================================
 // CSV
 // ================================================================
 function openCSV(){document.getElementById('csvexp').value=buildCSV();document.getElementById('csvimp').value='';document.getElementById('csvm').style.display='flex';}
@@ -4337,6 +4534,55 @@ function impCSV(){const text=document.getElementById('csvimp').value.trim();if(!
 function pcsv(l){const res=[];let cur='',q=false;for(let i=0;i<l.length;i++){const c=l[i];if(c==='"'&&q&&l[i+1]==='"'){cur+='"';i++;}else if(c==='"'){q=!q;}else if(c===','&&!q){res.push(cur);cur='';}else cur+=c;}res.push(cur);return res;}
 
 function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');}
+// ================================================================
+// ルーム履歴（最近開いたルーム）
+// ================================================================
+function getRoomHistory(){
+  try{ return JSON.parse(localStorage.getItem('stt-room-history')||'[]'); }
+  catch(e){ return []; }
+}
+function saveRoomHistory(list){
+  try{ localStorage.setItem('stt-room-history', JSON.stringify(list)); }catch(e){}
+}
+function recordRoomHistory(roomId, name){
+  if(!roomId) return;
+  var list=getRoomHistory();
+  var idx=list.findIndex(function(r){return r.id===roomId;});
+  var nm = (typeof name==='string') ? name : (localStorage.getItem('stt-room-name-'+roomId)||'');
+  var entry={id:roomId, name:nm, ts:Date.now()};
+  if(idx>=0){
+    // 名前が空で渡された場合は既存名を保持
+    if(!entry.name && list[idx].name) entry.name=list[idx].name;
+    list[idx]=entry;
+  } else {
+    list.push(entry);
+  }
+  // 最終アクセス順（新しい順）にソート
+  list.sort(function(a,b){return (b.ts||0)-(a.ts||0);});
+  saveRoomHistory(list);
+}
+function updateRoomHistoryName(roomId, name){
+  if(!roomId) return;
+  var list=getRoomHistory();
+  var idx=list.findIndex(function(r){return r.id===roomId;});
+  if(idx>=0){ list[idx].name=name||''; saveRoomHistory(list); }
+}
+function removeRoomHistory(roomId){
+  var list=getRoomHistory().filter(function(r){return r.id!==roomId;});
+  saveRoomHistory(list);
+}
+function fmtHistoryTime(ts){
+  if(!ts) return '';
+  var d=new Date(ts), now=new Date();
+  var hm=d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+  var sameDay=d.toDateString()===now.toDateString();
+  var yest=new Date(now); yest.setDate(now.getDate()-1);
+  var isYest=d.toDateString()===yest.toDateString();
+  if(sameDay) return '今日 '+hm;
+  if(isYest) return '昨日 '+hm;
+  return (d.getMonth()+1)+'/'+d.getDate()+' '+hm;
+}
+
 function escLink(s){
   if(!s)return'';
   const escaped=esc(s);
@@ -4524,7 +4770,7 @@ function gcalBuildSessionList(){
     row.innerHTML='<input type="checkbox" data-id="'+s.id+'" data-type="serial" '+(checked?'checked':'')+'/>'+
       '<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[s.color]||CDot.teal)+';flex-shrink:0"></div>'+
       '<span style="flex:1">'+esc(s.name)+'</span>'+
-      '<span style="font-size:10px;color:var(--text2)">'+hm(sm+c)+'〜'+hm(sm+c+s.dur)+'</span>';
+      '<span style="font-size:10px;color:var(--text2)">'+hmn(sm+c)+'〜'+hmn(sm+c+s.dur)+'</span>';
     row.querySelector('input').onchange=gcalUpdateCount;
     list.appendChild(row);
     c+=s.dur;
@@ -4542,7 +4788,7 @@ function gcalBuildSessionList(){
       row.innerHTML='<input type="checkbox" data-id="'+ev.id+'" data-type="free" '+(checked?'checked':'')+'/>'+
         '<div style="width:7px;height:7px;border-radius:50%;background:'+(CDot[ev.color]||CDot.teal)+';flex-shrink:0"></div>'+
         '<span style="flex:1">'+esc(ev.name)+'</span>'+
-        '<span style="font-size:10px;color:var(--text2)">'+hm(sm+ev.fromMin)+'〜'+hm(sm+ev.toMin)+'</span>';
+        '<span style="font-size:10px;color:var(--text2)">'+hmn(sm+ev.fromMin)+'〜'+hmn(sm+ev.toMin)+'</span>';
       row.querySelector('input').onchange=gcalUpdateCount;
       list.appendChild(row);
     });
@@ -4718,7 +4964,7 @@ function loadSTTFile(e){
       }
       if(data.evInfo) evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},data.evInfo);
       loadEvInfoToWidget();
-      closeEV();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
+      if(typeof closeRoomPicker==='function')closeRoomPicker();snap();render();updateDow();updateTopDateLabel();if(typeof mvRender==='function')mvRender();
     }catch(err){alert('読み込みエラー: '+err.message);}
   };
   reader.readAsText(file);
@@ -4761,7 +5007,7 @@ function exportPDF(){
       <td class="bar-cell"><div class="bar"></div></td>
       <td class="num-cell">${i+1}</td>
       <td class="name-cell">${esc(s.name)}</td>
-      <td class="time-cell">${hm(sm+st2[i])}</td>
+      <td class="time-cell">${hmn(sm+st2[i])}</td>
       <td class="dur-cell">${s.dur}分</td>
       <td class="cmt-cell">${esc(s.comment||'')}</td>
     </tr>`;
@@ -4772,7 +5018,7 @@ function exportPDF(){
       frows+=`<tr>
       <td class="bar-cell"><div class="bar"></div></td>
       <td class="name-cell">${esc(ev.name)}</td>
-      <td class="time-cell">${hm(ev.fromMin)}〜${hm(ev.toMin)}</td>
+      <td class="time-cell">${hmn(ev.fromMin)}〜${hmn(ev.toMin)}</td>
       <td class="dur-cell">${ev.toMin-ev.fromMin}分</td>
       <td class="cmt-cell">${esc(ev.comment||'')}</td>
     </tr>`;
@@ -4805,7 +5051,7 @@ function exportPDF(){
   ${di>0?'<div style="page-break-before:always"></div>':''}
   <h1>${esc(title)}</h1>
   ${di===0?buildEvInfoHtml():''}
-  ${dayLabel?`<div class="meta">${dayLabel} ${hm(sm)}〜${hm(em)}</div>`:`<div class="meta">${hm(sm)}〜${hm(em)}</div>`}
+  ${dayLabel?`<div class="meta">${dayLabel} ${hmn(sm)}〜${hmn(em)}</div>`:`<div class="meta">${hmn(sm)}〜${hmn(em)}</div>`}
   <h2>シリアルセッション</h2>
   <table>
     <thead><tr>
@@ -5117,13 +5363,40 @@ document.getElementById('evs').addEventListener('change',render);
 document.getElementById('eve').addEventListener('change',render);
 // パスワード認証を一時停止（自動通過）
 sessionStorage.setItem('st-auth','1');
-setTimeout(function(){ if(typeof fbWaitAndInit==='function') fbWaitAndInit(); }, 300);
+setTimeout(function(){ if((typeof _isNewVisit!=='undefined' && _isNewVisit)) return; if(typeof fbWaitAndInit==='function') fbWaitAndInit(); }, 300);
 // 自動保存データを復元
 dayData=[{sessions:[],freeEvs:[]}];
-autoLoad();
+// 新規作成された空イベントの場合は前回データを読み込まない
+var _freshRoom=null;
+try{ _freshRoom=sessionStorage.getItem('stt-fresh-room'); }catch(e){}
+// fbGetRoomIdは後続の別scriptブロックで定義されるためここでは使えない。URLから直接取得する
+var _curRoom=null;
+try{ _curRoom=new URLSearchParams(window.location.search).get('room'); }catch(e){}
+var _isFresh=(_freshRoom && _curRoom && _freshRoom===_curRoom);
+if(_isFresh){
+  try{ sessionStorage.removeItem('stt-fresh-room'); localStorage.removeItem('stt-autosave'); }catch(e){}
+  sessions=[]; freeEvs=[];
+  dayCount=1; currentDay=1;
+  dayData=[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}];
+  noDate=false;
+  evInfo={location:'',owner:'',members:'',memo:'',slideUrl:''};
+  try{
+    const _evt=document.getElementById('evt'); if(_evt) _evt.value='';
+    const _evd=document.getElementById('evd'); if(_evd) _evd.value='';
+    const _evs=document.getElementById('evs'); if(_evs) _evs.value='13:00';
+    const _eve=document.getElementById('eve'); if(_eve) _eve.value='16:00';
+    const _nd=document.getElementById('no-date-chk'); if(_nd) _nd.checked=false;
+    const _evd2=document.getElementById('evd'); if(_evd2){ _evd2.disabled=false; _evd2.style.opacity='1'; }
+    const _md=document.getElementById('multi-day-chk'); if(_md) _md.checked=false;
+    const _dc=document.getElementById('day-count-sel'); if(_dc) _dc.value='1';
+    if(typeof loadEvInfoToWidget==='function') loadEvInfoToWidget();
+  }catch(e){}
+} else if(!(typeof _isNewVisit!=='undefined' && _isNewVisit)) {
+  autoLoad();
+}
 restoreSavedEvs();
 updateEvInfoPreview();
-uUR();sv('tl');render();setTimeout(fitz,0);setTimeout(initLiveMode,100);setTimeout(updateMultiDayChk,150);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
+uUR();sv('tl');render();if(typeof applyLockUI==='function')applyLockUI();if(typeof updateDocTitle==='function')updateDocTitle();setTimeout(fitz,0);setTimeout(initLiveMode,100);setTimeout(updateMultiDayChk,150);updateDow();updateTopDateLabel();updateTotalTime();const _fl=document.getElementById('from-label');if(_fl){const _dc=parseInt((document.getElementById('day-count-sel')||{}).value)||1;_fl.style.display=_dc>1?'':' none';}setTimeout(function(){fitz();},300);
 
 // ================================================================
 // MOBILE VIEW
@@ -5154,7 +5427,7 @@ function mvRender(){
   const metaEl=document.getElementById('mv-meta');
   if(metaEl){
     const dayPrefix=dayCount>1?`DAY${currentDay} `:'';
-    metaEl.textContent=`${dayPrefix}${dateStr} ${hm(sm)}〜${hm(em)}`;
+    metaEl.textContent=`${dayPrefix}${dateStr} ${hmn(sm)}〜${hmn(em)}`;
   }
 
   // 時計
@@ -5279,9 +5552,6 @@ function mvSwitchDayUI(){
   mvRender._scrolled=false;
 }
 
-function mvOpenShare(){
-  if(typeof fbShowRoom==='function') fbShowRoom();
-}
 function mvOpenMore(){
   // 日程数セレクト同期
   const mvDcSel=document.getElementById('mv-day-count-sel');
@@ -5359,7 +5629,12 @@ function mvRenderSerial(nowMin,sm){
 
     const chevronHtml=s.comment?('<svg class="mv-card-chevron" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" style="flex-shrink:0;pointer-events:none;transition:transform .2s;color:var(--text3);transform:'+(isActive?'rotate(90deg)':'')+'"><polyline points="9 18 15 12 9 6"/></svg>'):'';
     const remainHtml=isActive?('<div class="mv-card-remain">▶ 進行中 — あと'+(end-nowMin)+'分</div>'):'';
-    const commentHtml=s.comment?('<div class="mv-card-comment" style="display:'+(isActive?'block':'none')+';padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">'+esc(s.comment)+'</div>'):'';
+    const commentHtml=s.comment?('<div class="mv-card-comment" style="display:'+(isActive?'block':'none')+';padding-top:8px;margin-top:6px;border-top:1px solid var(--border)">'+
+      '<div style="display:flex;align-items:flex-start;gap:8px">'+
+        '<div style="flex:1;min-width:0;white-space:pre-wrap;word-break:break-all">'+esc(s.comment)+'</div>'+
+        '<button class="mv-memo-edit-btn" style="flex-shrink:0;display:flex;align-items:center;gap:4px;padding:4px 9px;border:1px solid var(--accent);border-radius:7px;background:transparent;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>編集</button>'+
+      '</div>'+
+    '</div>'):'';
     card.innerHTML=
       '<div class="mv-card-bar" style="background:'+(CD[s.color]||'#B4B2A9')+'"></div>'+
       '<div class="mv-card-body" style="min-width:0;padding:9px 8px 9px 10px">'+
@@ -5367,30 +5642,20 @@ function mvRenderSerial(nowMin,sm){
           iconHtml+
           '<div style="flex:1;min-width:0">'+
             '<div class="mv-card-name" style="'+(isPast?'opacity:0.5':'')+'">'+esc(s.name)+'</div>'+
-            '<div class="mv-card-time">'+hm(start)+'〜'+hm(end)+' ('+s.dur+'分)</div>'+
+            '<div class="mv-card-time">'+hmn(start)+'〜'+hmn(end)+' ('+s.dur+'分)</div>'+
           '</div>'+
           chevronHtml+
-          '<button class="mv-edit-icon-btn" style="background:none;border:none;padding:7px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:8px">'+
-            '<svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>'+
-          '</button>'+
         '</div>'+
         remainHtml+
         commentHtml+
       '</div>';
 
-    // 鉛筆ボタン → 編集モーダルを開く
-    const editBtn=card.querySelector('.mv-edit-icon-btn');
-    editBtn.addEventListener('touchstart',e=>{e.stopPropagation();editBtn.style.background='var(--bg3)';},{passive:true});
-    const resetBtnBg=()=>{editBtn.style.background='';};
-    editBtn.addEventListener('touchend',e=>{
-      e.stopPropagation();e.preventDefault();
-      resetBtnBg();
-      mvOpenSM(s.id);
-    },{passive:false});
-    editBtn.addEventListener('touchcancel',e=>{resetBtnBg();});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
+    const memoEditBtn=card.querySelector('.mv-memo-edit-btn');
+    if(memoEditBtn){
+      memoEditBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenSM(s.id);});
+      memoEditBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenSM(s.id);},{passive:false});
+    }
 
-    // タップ → メモアコーディオン展開
     let tapMoved=false,tapStartY=0,tapStartTime=0;
     card.addEventListener('touchstart',e=>{
       tapMoved=false;tapStartY=e.touches[0].clientY;tapStartTime=Date.now();
@@ -5406,12 +5671,16 @@ function mvRenderSerial(nowMin,sm){
       clearTimeout(mvLongPressTimer);
       if(mvDragId){mvEndDrag(e);return;}
       if(!tapMoved&&Date.now()-tapStartTime<500){
-        const commentEl=card.querySelector('.mv-card-comment');
-        const chevron=card.querySelector('.mv-card-chevron');
-        if(commentEl){
-          const open=commentEl.style.display==='none'||commentEl.style.display==='';
-          commentEl.style.display=open?'block':'none';
-          if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
+        if(s.comment){
+          const commentEl=card.querySelector('.mv-card-comment');
+          const chevron=card.querySelector('.mv-card-chevron');
+          if(commentEl){
+            const open=commentEl.style.display==='none'||commentEl.style.display==='';
+            commentEl.style.display=open?'block':'none';
+            if(chevron) chevron.style.transform=open?'rotate(90deg)':'';
+          }
+        } else {
+          mvOpenSM(s.id);
         }
       }
     });
@@ -5439,7 +5708,7 @@ function mvRenderFree(nowMin,sm){
   if(sf.length===0){body.innerHTML='<div style="text-align:center;color:var(--text3);padding:32px;font-size:13px">フリーエリアはありません</div>';return;}
   const dk=isDark();
   sf.forEach(ev=>{
-    const start=ev.fromMin,end=ev.toMin,dur=ev.toMin-ev.fromMin;
+    const start=sm+ev.fromMin,end=sm+ev.toMin,dur=ev.toMin-ev.fromMin;
     const isActive=nowMin>=start&&nowMin<end;
     const card=document.createElement('div');
     card.className='mv-card'+(isActive?' active':'');
@@ -5460,30 +5729,20 @@ function mvRenderFree(nowMin,sm){
           ${iconHtml}
           <div style="flex:1;min-width:0">
             <div class="mv-card-name">${esc(ev.name)}</div>
-            <div class="mv-card-time">${hm(start)}〜${hm(end)} (${dur}分)</div>
+            <div class="mv-card-time">${hmn(start)}〜${hmn(end)} (${dur}分)</div>
           </div>
           ${ev.comment?'<span class="mv-card-chevron" style="font-size:16px;color:var(--text3);transition:transform .2s;flex-shrink:0">›</span>':''}
-          <button class="mv-edit-icon-btn" title="編集" style="background:none;border:none;padding:6px;cursor:pointer;color:var(--text3);flex-shrink:0;min-width:36px;min-height:36px;display:flex;align-items:center;justify-content:center;border-radius:6px" >
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
-          </button>
         </div>
         ${isActive?`<div class="mv-card-remain" style="color:var(--accent);margin-top:4px">▶ 進行中</div>`:''}
-        ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)">${esc(ev.comment)}</div>`:''}
+        ${ev.comment?`<div class="mv-card-comment" style="margin-top:6px;padding-top:6px;border-top:1px solid var(--border);font-size:12px;color:var(--text2)"><div style="display:flex;align-items:flex-start;gap:8px"><div style="flex:1;min-width:0;white-space:pre-wrap;word-break:break-all">${esc(ev.comment)}</div><button class="mv-memo-edit-btn" style="flex-shrink:0;display:flex;align-items:center;gap:4px;padding:4px 9px;border:1px solid var(--accent);border-radius:7px;background:transparent;color:var(--accent);cursor:pointer;font-size:11px;font-weight:600"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="pointer-events:none"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>編集</button></div></div>`:''}
       </div>`;
 
-    // 鉛筆ボタン → 編集モーダルを開く
-    const editBtn=card.querySelector('.mv-edit-icon-btn');
-    editBtn.addEventListener('touchstart',e=>{e.stopPropagation();editBtn.style.background='var(--bg3)';},{passive:true});
-    const resetFBtnBg=()=>{editBtn.style.background='';};
-    editBtn.addEventListener('touchend',e=>{
-      e.stopPropagation();e.preventDefault();
-      resetFBtnBg();
-      mvOpenFM(ev.id);
-    },{passive:false});
-    editBtn.addEventListener('touchcancel',e=>{resetFBtnBg();});
-    editBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenFM(ev.id);});
+    const fMemoEditBtn=card.querySelector('.mv-memo-edit-btn');
+    if(fMemoEditBtn){
+      fMemoEditBtn.addEventListener('click',e=>{e.stopPropagation();mvOpenFM(ev.id);});
+      fMemoEditBtn.addEventListener('touchend',e=>{e.stopPropagation();e.preventDefault();mvOpenFM(ev.id);},{passive:false});
+    }
 
-    // タップ → メモ展開のみ
     let fTapMoved=false,fTapStart=0,fTapStartY=0;
     card.addEventListener('touchstart',e=>{fTapMoved=false;fTapStart=Date.now();fTapStartY=e.touches[0].clientY;},{passive:true});
     card.addEventListener('touchmove',e=>{if(Math.abs(e.touches[0].clientY-fTapStartY)>8)fTapMoved=true;},{passive:true});
@@ -5493,6 +5752,8 @@ function mvRenderFree(nowMin,sm){
           const open=card.classList.toggle('open');
           const chev=card.querySelector('.mv-card-chevron');
           if(chev)chev.style.transform=open?'rotate(90deg)':'';
+        } else {
+          mvOpenFM(ev.id);
         }
       }
     });
@@ -5502,6 +5763,7 @@ function mvRenderFree(nowMin,sm){
 
 
 function mvStartDrag(e,id,card){
+  if(typeof isLocked!=="undefined"&&isLocked)return;
   mvDragId=id;
   mvDragFromIdx=sessions.findIndex(s=>s.id===id);
   mvDragOverIdx=mvDragFromIdx;
@@ -5605,6 +5867,7 @@ function mvEndDrag(e){
 
 // ---- シリアルセッション編集モーダル ----
 function mvOpenSM(id){
+  if(typeof lockGuard==="function"&&lockGuard())return;
   const s=sessions.find(x=>x.id===id);if(!s)return;
   // 他のモーダルを全部閉じる
   ['mv-sm','mv-fm','mv-event-edit'].forEach(mid=>{
@@ -5615,7 +5878,7 @@ function mvOpenSM(id){
   document.getElementById('mv-sm-title').textContent=s.name;
   document.getElementById('mv-sm-name').value=s.name;
   document.getElementById('mv-sm-dur').textContent=s.dur;
-  document.getElementById('mv-sm-comment').value=s.comment||'';
+  document.getElementById('mv-sm-comment').value=s.comment||'';document.getElementById('mv-sm-comment').scrollTop=0;
   // 色・アイコン選択（PCのcp()と同仕様：1行目●色、2行目アイコン）
   const colorsEl=document.getElementById('mv-sm-colors');
   colorsEl.innerHTML='';
@@ -5698,7 +5961,7 @@ function mvSaveSM(){
   if(n)s.name=n;
   s.dur=mvDurVal;
   s.color=mvSelectedColor||s.color;
-  s.comment=document.getElementById('mv-sm-comment').value.slice(0,100);
+  s.comment=document.getElementById('mv-sm-comment').value.trim().slice(0,300);
   mvCloseSM();snap();render();mvRender();
 }
 function mvDeleteS(){
@@ -5710,6 +5973,7 @@ function mvDeleteS(){
 
 // ---- フリーエリア編集モーダル ----
 function mvOpenFM(id){
+  if(typeof lockGuard==="function"&&lockGuard())return;
   const ev=freeEvs.find(x=>x.id===id);if(!ev)return;
   mvEditId=id;
   const sm=gSM();
@@ -5717,7 +5981,7 @@ function mvOpenFM(id){
   document.getElementById('mv-fm-name').value=ev.name;
   document.getElementById('mv-fm-from').value=hm(sm+ev.fromMin);
   document.getElementById('mv-fm-to').value=hm(sm+ev.toMin);
-  document.getElementById('mv-fm-comment').value=ev.comment||'';
+  document.getElementById('mv-fm-comment').value=ev.comment||'';document.getElementById('mv-fm-comment').scrollTop=0;
   document.getElementById('mv-fm').style.display='flex';
 }
 function mvCloseFM(){document.getElementById('mv-fm').style.display='none';mvEditId=null;}
@@ -5728,7 +5992,7 @@ function mvSaveFM(){
   const sm=gSM();
   const fa=h2m(document.getElementById('mv-fm-from').value),ta=h2m(document.getElementById('mv-fm-to').value);
   ev.fromMin=fa-sm;ev.toMin=Math.max(fa-sm+5,ta-sm);
-  ev.comment=document.getElementById('mv-fm-comment').value.slice(0,100);
+  ev.comment=document.getElementById('mv-fm-comment').value.trim().slice(0,300);
   mvCloseFM();snap();render();mvRender();
 }
 function mvDeleteF(){
@@ -5754,6 +6018,10 @@ function mvAddSession(){
     snap();render();mvRender();
     setTimeout(()=>mvOpenFM(newEv.id),200);
   }
+}
+function mvClearCurrent(){
+  if(mvTab==='s'){ resetSerial(); }
+  else { resetFree(); }
 }
 function mvToggleEdit(){
   const area=document.getElementById('mv-edit-area');
@@ -5936,6 +6204,9 @@ function mvSaveEventInfoLive(){
   if(typeof isActuallyToday==='function'&&isActuallyToday()&&!liveMode){
     toggleLiveMode(true);
   }
+  // タイムラインを即時再描画（変更がすぐ反映されるように）
+  render();
+  if(typeof mvRender==='function') mvRender();
   autoSave();
   if(typeof fbPush==='function') fbPush();
 }
@@ -5972,6 +6243,12 @@ var _fbDB = null;
 var _fbRoomId = null;
 var _fbSyncing = false;
 var _fbLastPush = 0;
+var _fbLastDataTs = 0; // 最後にデータが更新された時刻（送信/受信の新しい方）
+function _fbFmtTs(ts){
+  if(!ts) return '';
+  const d=new Date(ts);
+  return d.getHours()+':'+String(d.getMinutes()).padStart(2,'0');
+}
 var _fbClientId = null;
 var _fbOnlineCount = 0;
 
@@ -6002,47 +6279,6 @@ function fbShowStatus(text, color){
   if(el){ el.textContent = text; el.style.color = color || '#27500A'; }
 }
 
-window.closeQR = function(){
-  document.getElementById('qr-modal').style.display='none';
-  document.getElementById('qr-code').innerHTML='';
-};
-window.copyQRUrl = function(){
-  var url = document.getElementById('qr-url').textContent;
-  navigator.clipboard.writeText(url).then(function(){
-    var btn = event.target;
-    btn.textContent='✅ コピー済み';
-    setTimeout(function(){btn.textContent='URLをコピー';},2000);
-  }).catch(function(){prompt('このURLをコピーしてください：',url);});
-};
-window.fbShowRoom = function(){
-  var url = window.location.href;
-  // QRモーダルを表示
-  var qrEl = document.getElementById('qr-code');
-  if(qrEl){
-    document.getElementById('qr-url').textContent = url;
-    qrEl.innerHTML = '';
-    function generateQR(){
-      try{
-        new QRCode(qrEl,{text:url,width:184,height:184,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-      }catch(e){qrEl.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px">QRコード生成失敗</div>';}
-    }
-    if(!window.QRCode){
-      var s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js';
-      s.onload=generateQR;
-      document.head.appendChild(s);
-    } else { generateQR(); }
-    document.getElementById('qr-modal').style.display='flex';
-  } else {
-    // QRモーダルがない場合はクリップボードコピー
-    if(navigator.clipboard){
-      navigator.clipboard.writeText(url).then(function(){alert('✅ 共有URLをコピーしました！\n\n' + url);});
-    } else {
-      prompt('このURLを共有してください：', url);
-    }
-  }
-};
-
 var _fbPushTimer = null;
 window.fbPush = function(){
   if(!_fbDB) return;
@@ -6053,7 +6289,19 @@ window.fbPush = function(){
   _fbPushTimer = setTimeout(function(){
     if(_fbSyncing) return;
     _fbLastPush = Date.now();
+    if(typeof fbUpdateStatus==='function') setTimeout(fbUpdateStatus,0);
   try{
+    // 複数日程時は現在DAYの編集内容をdayDataへ反映してから送信
+    // （autoSaveを経ない呼び出し経路でも受信側dayDataが古くならないように）
+    if(dayCount>1 && dayData[currentDay-1]){
+      dayData[currentDay-1]={
+        sessions:JSON.parse(JSON.stringify(sessions)),
+        freeEvs:JSON.parse(JSON.stringify(freeEvs)),
+        start:document.getElementById('evs').value||'13:00',
+        end:document.getElementById('eve').value||'17:00',
+        date:document.getElementById('evd').value||''
+      };
+    }
     var data = {
       title: document.getElementById('evt').value || '',
       date: document.getElementById('evd').value || '',
@@ -6063,7 +6311,7 @@ window.fbPush = function(){
       freeEvs: JSON.parse(JSON.stringify(freeEvs)),
       evInfo: JSON.parse(JSON.stringify(evInfo || {})),
       noDate: noDate||false,
-      liveMode: liveMode||false,
+      locked: isLocked||false,
       dayCount: dayCount||1,
       dayData: JSON.parse(JSON.stringify(dayData||[])),
       ts: _fbLastPush
@@ -6075,14 +6323,16 @@ window.fbPush = function(){
 };
 
 function fbUpdateStatus(){
+  var _last=Math.max(_fbLastPush||0,_fbLastDataTs||0);
+  var _upd=_last>0?(' ・更新 '+_fbFmtTs(_last)):'';
   var el = document.getElementById('fb-status');
-  if(el) el.textContent = _fbOnlineCount>=2 ? '🟢 同期中 '+_fbOnlineCount+'人' : '';
+  if(el) el.textContent = _fbOnlineCount>=2 ? '🟢 '+_fbOnlineCount+'人 同期中'+_upd : '';
 
   // インライン同期表示
   var inlineEl = document.getElementById('fb-status-inline');
   if(inlineEl){
     if(_fbOnlineCount >= 2){
-      inlineEl.textContent = '🟢 同期中 '+_fbOnlineCount+'人';
+      inlineEl.textContent = '🟢 '+_fbOnlineCount+'人 同期中'+_upd;
       inlineEl.style.color = '#27500A';
       inlineEl.style.display = 'inline';
     } else {
@@ -6091,17 +6341,11 @@ function fbUpdateStatus(){
     }
   }
 
-  // ルーム管理ボタン表示
-  var mgrBtn = document.getElementById('room-mgr-btn');
-  var nameLabel = document.getElementById('room-name-label');
+  // ルーム履歴に記録（タイトルはFirebase受信時に更新される）
   var roomId = typeof fbGetRoomId==='function' ? fbGetRoomId() : '';
   if(roomId){
-    if(mgrBtn) mgrBtn.style.display='inline-block';
-    var rName = localStorage.getItem('stt-room-name-'+roomId)||'';
-    if(nameLabel){
-      nameLabel.textContent = rName || '';
-      nameLabel.style.display = rName ? 'inline' : 'none';
-    }
+    var curTitle = (document.getElementById('evt')||{}).value || '';
+    if(typeof recordRoomHistory==='function') recordRoomHistory(roomId, curTitle);
   }
 }
 
@@ -6125,6 +6369,11 @@ function fbListen(){
     _fbSyncing = true;
     try{
       document.getElementById('evt').value = data.title || '';
+      if(typeof updateDocTitle==='function') updateDocTitle();
+      _fbLastDataTs = data.ts || Date.now();
+      if(typeof fbUpdateStatus==='function') setTimeout(fbUpdateStatus,0);
+      // ルーム履歴の名前をイベントタイトルで更新
+      if(typeof updateRoomHistoryName==='function') updateRoomHistoryName(roomId, data.title||'');
       document.getElementById('evd').value = data.date || '';
       document.getElementById('evs').value = data.start || '13:00';
       document.getElementById('eve').value = data.end || '16:00';
@@ -6138,25 +6387,31 @@ function fbListen(){
         const evd=document.getElementById('evd');
         if(evd){evd.disabled=noDate;evd.style.opacity=noDate?'0.4':'1';}
       }
-      if(data.liveMode!==undefined && data.liveMode!==liveMode){
-        toggleLiveMode(data.liveMode);
+      // ロック状態を同期（他端末でのロック/解除を反映）
+      if(data.locked!==undefined && !!data.locked!==isLocked){
+        setLocked(!!data.locked, false);
       }
+      // ライブモードは端末ごとに独立（同期しない）
       if(data.dayCount!==undefined){
         dayCount=data.dayCount||1;
         if(data.dayData&&data.dayData.length>0) dayData=JSON.parse(JSON.stringify(data.dayData));
         if(currentDay>dayCount) currentDay=1;
         const dcSel=document.getElementById('day-count-sel');
         if(dcSel) dcSel.value=String(dayCount);
-        // 現在のDAYのデータを反映
-        const _target=dayData[currentDay-1];
-        if(_target){
-          sessions=JSON.parse(JSON.stringify(_target.sessions||[]));
-          freeEvs=JSON.parse(JSON.stringify(_target.freeEvs||[]));
-          nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
-          nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-          if(_target.start) document.getElementById('evs').value=_target.start;
-          if(_target.end)   document.getElementById('eve').value=_target.end;
-          if(_target.date!==undefined) document.getElementById('evd').value=_target.date;
+        // 複数日程のときだけ、現在のDAYのデータでsessions/freeEvsを反映する。
+        // 単日(dayCount<=1)のときはトップレベルのdata.sessions/data.freeEvsを維持する
+        // （単日イベントでdayData[0]が空でも、上のdata.sessions反映を打ち消さないため）
+        if(dayCount>1){
+          const _target=dayData[currentDay-1];
+          if(_target){
+            sessions=JSON.parse(JSON.stringify(_target.sessions||[]));
+            freeEvs=JSON.parse(JSON.stringify(_target.freeEvs||[]));
+            nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
+            nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
+            if(_target.start) document.getElementById('evs').value=_target.start;
+            if(_target.end)   document.getElementById('eve').value=_target.end;
+            if(_target.date!==undefined) document.getElementById('evd').value=_target.date;
+          }
         }
       }
 
@@ -6237,6 +6492,8 @@ function fbWaitAndInit(){
 }
 
 function fbAutoStart(){
+  // 新規アクセス（URLにroomなし）の場合、ウェルカムモーダルでの選択を待つ
+  if(typeof _isNewVisit!=='undefined' && _isNewVisit) return;
   fbWaitAndInit();
 }
 
@@ -6247,35 +6504,157 @@ if(document.readyState === 'loading'){
 }
 
 
-// ============================================================
-// ルーム管理
-// ============================================================
-function openRoomManager(){
-  const modal = document.getElementById('room-mgr-modal');
-  if(!modal) return;
+function deleteRoom(){
   const roomId = fbGetRoomId();
+  if(!confirm('このイベントのデータを削除します。\nこの操作は取り消せません。よろしいですか？')) return;
+  if(_fbDB){
+    _fbDB.ref('rooms/'+roomId).remove().then(()=>{
+      localStorage.removeItem('stt-room-id');
+      localStorage.removeItem('stt-room-name-'+roomId);
+      alert('イベントを削除しました。新しいイベントを作成します。');
+      location.reload();
+    }).catch(e=>alert('削除に失敗しました: '+e.message));
+  }
+}
 
-  // ルームID表示
-  const idDisplay = document.getElementById('room-mgr-id-display');
-  if(idDisplay) idDisplay.textContent = 'ルームID: ' + roomId;
+function createNewRoom(){
+  if(!confirm('新しいイベントを作成します。\n現在のイベントとは別の新しいURLが発行されます。\nよろしいですか？')) return;
+  // 保留中の自動保存(fbPush)を止める。古いルームへの遅延書き込みを防ぐ
+  try{ if(typeof _fbPushTimer!=='undefined') clearTimeout(_fbPushTimer); }catch(e){}
+  const newRoomId='room-'+Math.random().toString(36).slice(2,8);
+  // 空イベントとして起動するフラグ（autoLoadで前回データを読まない）
+  try{ sessionStorage.setItem('stt-fresh-room', newRoomId); localStorage.removeItem('stt-autosave'); }catch(e){}
+  function go(){
+    localStorage.setItem('stt-room-id', newRoomId);
+    _fbRoomId=null;
+    const url=new URL(window.location.href);
+    url.searchParams.set('room', newRoomId);
+    window.location.href=url.toString();
+  }
+  // 新ルームのFirebaseを空データで初期化してから遷移（前イベントの混入を防ぐ）
+  if(_fbDB){
+    var emptyData={title:'',date:'',start:'13:00',end:'16:00',sessions:[],freeEvs:[],evInfo:{location:'',owner:'',members:'',memo:'',slideUrl:''},noDate:false,dayCount:1,dayData:[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}],ts:Date.now()};
+    _fbDB.ref('rooms/'+newRoomId+'/data').set(emptyData).then(go).catch(go);
+  } else {
+    go();
+  }
+}
 
-  // ルーム名入力欄
-  const nameInput = document.getElementById('room-name-input');
-  if(nameInput) nameInput.value = localStorage.getItem('stt-room-name-'+roomId)||'';
-
-  // URL表示
-  const url = window.location.origin + window.location.pathname + '?room=' + roomId;
-  const urlEl = document.getElementById('room-mgr-url');
-  if(urlEl) urlEl.textContent = url;
-
-  // QRコード生成
-  const qrEl = document.getElementById('room-mgr-qr');
+// ================================================================
+// ツールバー: 新ルーム運用ボタン
+// ================================================================
+// 新規ルーム（空のルームを作成）
+function newRoomBtn(){
+  createNewRoom();
+}
+// このルームを複製（現在の内容をコピーした新ルームを作成）
+function duplicateRoomBtn(){
+  if(!confirm('このイベントの内容をコピーして、新しいイベントを作成します。\nよろしいですか？')) return;
+  // 現在の状態をペイロード化（fbPushと同じ構造）
+  var payload={
+    title: (document.getElementById('evt').value||'')+' のコピー',
+    date: document.getElementById('evd').value||'',
+    start: document.getElementById('evs').value||'13:00',
+    end: document.getElementById('eve').value||'16:00',
+    sessions: JSON.parse(JSON.stringify(sessions)),
+    freeEvs: JSON.parse(JSON.stringify(freeEvs)),
+    evInfo: JSON.parse(JSON.stringify(evInfo||{})),
+    noDate: noDate||false,
+    dayCount: dayCount||1,
+    dayData: JSON.parse(JSON.stringify(dayData||[])),
+    ts: Date.now()
+  };
+  var newRoomId='room-'+Math.random().toString(36).slice(2,8);
+  if(_fbDB){
+    _fbDB.ref('rooms/'+newRoomId+'/data').set(payload).then(function(){
+      localStorage.setItem('stt-room-id', newRoomId);
+      _fbRoomId=null;
+      var url=new URL(window.location.href);
+      url.searchParams.set('room', newRoomId);
+      window.location.href=url.toString();
+    }).catch(function(e){ alert('複製に失敗しました: '+e.message); });
+  } else {
+    alert('Firebase未接続のため複製できません');
+  }
+}
+// ルームを開く（ピッカーモーダル）
+function openRoomPicker(){
+  var modal=document.getElementById('room-picker-modal');
+  if(!modal) return;
+  renderRoomPickerHistory();
+  var inp=document.getElementById('room-picker-join-input');
+  if(inp) inp.value='';
+  modal.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center';
+}
+function closeRoomPicker(){
+  var modal=document.getElementById('room-picker-modal');
+  if(modal) modal.style.display='none';
+}
+function renderRoomPickerHistory(){
+  var wrap=document.getElementById('room-picker-recent-wrap');
+  var listEl=document.getElementById('room-picker-recent-list');
+  if(!wrap||!listEl) return;
+  var curId=(typeof fbGetRoomId==='function')?fbGetRoomId():'';
+  var hist=getRoomHistory();
+  if(!hist.length){ wrap.style.display='none'; listEl.innerHTML=''; return; }
+  wrap.style.display='flex';
+  listEl.innerHTML='';
+  hist.forEach(function(r){
+    var isCur=r.id===curId;
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);'+(isCur?'':'cursor:pointer');
+    var nameTxt=r.name?esc(r.name):'<span style="color:var(--text2)">（無題）</span>';
+    var curBadge=isCur?' <span style="font-size:10px;color:var(--text3);font-weight:400">(編集中)</span>':'';
+    var nameColor=isCur?'var(--accent)':'var(--text)';
+    var xBtn=isCur?'':'<button class="rpk-recent-x" style="border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:15px;padding:0 4px;flex-shrink:0;line-height:1">×</button>';
+    row.innerHTML='<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden">'
+      +'<span style="font-size:13px;font-weight:600;color:'+nameColor+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nameTxt+curBadge+'</span>'
+      +'<span style="font-size:10px;color:var(--text2)">'+esc(r.id)+' ・ '+fmtHistoryTime(r.ts)+'</span>'
+      +'</span>'+xBtn;
+    if(!isCur){
+      row.addEventListener('click',function(e){
+        if(e.target.classList.contains('rpk-recent-x')) return;
+        welcomeGoToRoom(r.id);
+      });
+      var xb=row.querySelector('.rpk-recent-x');
+      if(xb) xb.addEventListener('click',function(e){
+        e.stopPropagation();
+        removeRoomHistory(r.id);
+        renderRoomPickerHistory();
+      });
+    }
+    listEl.appendChild(row);
+  });
+}
+function roomPickerJoin(){
+  var input=document.getElementById('room-picker-join-input');
+  if(!input) return;
+  var val=input.value.trim();
+  if(!val){ alert('共有URLまたはIDを入力してください'); return; }
+  if(val.includes('?')||val.includes('room=')){
+    try{
+      var u=new URL(val.startsWith('http')?val:'https://dummy.com/?'+val.split('?').pop());
+      var r=u.searchParams.get('room');
+      if(r) val=r;
+    }catch(e){}
+  }
+  if(!val.startsWith('room-')){ alert('URLまたはIDの形式が正しくありません'); return; }
+  welcomeGoToRoom(val);
+}
+// 共有モーダル
+function openShareModal(){
+  var modal=document.getElementById('share-modal');
+  if(!modal) return;
+  var roomId=fbGetRoomId();
+  var url=window.location.origin+window.location.pathname+'?room='+roomId;
+  var urlEl=document.getElementById('share-url');
+  if(urlEl) urlEl.textContent=url;
+  var qrEl=document.getElementById('share-qr');
   if(qrEl){
-    qrEl.innerHTML = '';
+    qrEl.innerHTML='';
     function genQR(){
-      try{
-        new QRCode(qrEl,{text:url,width:148,height:148,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M});
-      }catch(e){qrEl.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px">QRコード生成失敗</div>';}
+      try{ new QRCode(qrEl,{text:url,width:148,height:148,colorDark:'#000',colorLight:'#fff',correctLevel:QRCode.CorrectLevel.M}); }
+      catch(e){ qrEl.innerHTML='<div style="font-size:11px;color:#999;text-align:center;padding:20px">QRコード生成失敗</div>'; }
     }
     if(!window.QRCode){
       var s=document.createElement('script');
@@ -6283,91 +6662,145 @@ function openRoomManager(){
       s.onload=genQR; document.head.appendChild(s);
     } else { genQR(); }
   }
-
   modal.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center';
 }
-
-function closeRoomManager(){
-  const modal = document.getElementById('room-mgr-modal');
+function closeShareModal(){
+  var modal=document.getElementById('share-modal');
   if(modal) modal.style.display='none';
 }
-
-function saveRoomName(){
-  const roomId = fbGetRoomId();
-  const input = document.getElementById('room-name-input');
-  if(!input) return;
-  const name = input.value.trim();
-  if(name){
-    localStorage.setItem('stt-room-name-'+roomId, name);
-  } else {
-    localStorage.removeItem('stt-room-name-'+roomId);
-  }
-  // ラベル更新
-  const nameLabel = document.getElementById('room-name-label');
-  if(nameLabel){
-    nameLabel.textContent = name;
-    nameLabel.style.display = name ? 'inline' : 'none';
-  }
-  alert('ルーム名を保存しました');
-}
-
-function copyRoomMgrUrl(){
-  const roomId = fbGetRoomId();
-  const url = window.location.origin + window.location.pathname + '?room=' + roomId;
-  navigator.clipboard.writeText(url).then(()=>alert('URLをコピーしました')).catch(()=>{
-    const ta=document.createElement('textarea');
+function copyShareUrl(){
+  var roomId=fbGetRoomId();
+  var url=window.location.origin+window.location.pathname+'?room='+roomId;
+  navigator.clipboard.writeText(url).then(function(){alert('URLをコピーしました');}).catch(function(){
+    var ta=document.createElement('textarea');
     ta.value=url; document.body.appendChild(ta); ta.select();
     document.execCommand('copy'); document.body.removeChild(ta);
     alert('URLをコピーしました');
   });
 }
 
-function joinRoom(){
-  const input = document.getElementById('room-join-input');
-  if(!input) return;
-  let val = input.value.trim();
-  if(!val) return;
-  // URLからroomパラメータを抽出
-  if(val.includes('?') || val.includes('room=')){
-    try{
-      const u = new URL(val.startsWith('http') ? val : 'https://dummy.com/?' + val.split('?').pop());
-      const r = u.searchParams.get('room');
-      if(r) val = r;
-    }catch(e){}
-  }
-  if(!val.startsWith('room-')){
-    alert('ルームIDの形式が正しくありません（例: room-abc123）');
-    return;
-  }
-  if(!confirm('ルーム「'+val+'」に接続します。よろしいですか？')) return;
-  localStorage.setItem('stt-room-id', val);
-  const url = new URL(window.location.href);
-  url.searchParams.set('room', val);
+
+// ================================================================
+// _isNewVisit はメインscript冒頭で定義済み（autoLoadより前に評価するため）
+
+function showWelcomeModal(){
+  var modal = document.getElementById('welcome-modal');
+  if(!modal) return;
+  // 最近開いたルームのリストを描画
+  renderWelcomeRecent();
+  // 選択画面を表示・ID入力画面は隠す
+  welcomeBackToChoose();
+  modal.style.display = 'flex';
+}
+function renderWelcomeRecent(){
+  var wrap=document.getElementById('welcome-recent-wrap');
+  var listEl=document.getElementById('welcome-recent-list');
+  if(!wrap||!listEl) return;
+  var hist=getRoomHistory();
+  if(!hist.length){ wrap.style.display='none'; listEl.innerHTML=''; return; }
+  wrap.style.display='block';
+  listEl.innerHTML='';
+  hist.forEach(function(r){
+    var row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);cursor:pointer';
+    var nameTxt = r.name ? esc(r.name) : '<span style="color:var(--text2)">（無題）</span>';
+    row.innerHTML='<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5db4f0" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>'
+      +'<span style="flex:1;display:flex;flex-direction:column;gap:1px;min-width:0;overflow:hidden">'
+      +'<span style="font-size:13px;font-weight:600;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+nameTxt+'</span>'
+      +'<span style="font-size:10px;color:var(--text2)">'+esc(r.id)+' ・ '+fmtHistoryTime(r.ts)+'</span>'
+      +'</span>'
+      +'<button class="wel-recent-x" style="border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:16px;padding:0 4px;flex-shrink:0;line-height:1">×</button>';
+    // 行クリックで接続
+    row.addEventListener('click',function(e){
+      if(e.target.classList.contains('wel-recent-x')) return;
+      welcomeGoToRoom(r.id);
+    });
+    // ×で履歴から削除
+    row.querySelector('.wel-recent-x').addEventListener('click',function(e){
+      e.stopPropagation();
+      removeRoomHistory(r.id);
+      renderWelcomeRecent();
+    });
+    listEl.appendChild(row);
+  });
+}
+function closeWelcomeModal(){
+  var modal = document.getElementById('welcome-modal');
+  if(modal) modal.style.display = 'none';
+}
+function welcomeGoToRoom(roomId){
+  // 指定ルームIDでURLを付けて遷移（既存の接続ロジックに合流）
+  localStorage.setItem('stt-room-id', roomId);
+  var url = new URL(window.location.href);
+  url.searchParams.set('room', roomId);
   window.location.href = url.toString();
 }
+function welcomeCreateNew(){
+  var newRoomId = 'room-' + Math.random().toString(36).slice(2,8);
+  welcomeGoToRoom(newRoomId);
+}
+function welcomeShowIdInput(){
+  document.getElementById('welcome-choose').style.display = 'none';
+  document.getElementById('welcome-idinput').style.display = 'block';
+  setTimeout(function(){
+    var inp = document.getElementById('welcome-id-input');
+    if(inp){ inp.value=''; inp.focus(); }
+  }, 80);
+}
+function welcomeBackToChoose(){
+  var choose = document.getElementById('welcome-choose');
+  var idin = document.getElementById('welcome-idinput');
+  if(choose) choose.style.display = 'block';
+  if(idin) idin.style.display = 'none';
+}
+function welcomeConnectId(){
+  var inp = document.getElementById('welcome-id-input');
+  var id = inp ? inp.value.trim() : '';
+  if(!id){ alert('共有URLまたはIDを入力してください'); return; }
+  welcomeGoToRoom(id);
+}
 
-function deleteRoom(){
-  const roomId = fbGetRoomId();
-  if(!confirm('ルーム「'+roomId+'」のデータをFirebaseから削除します。\nこの操作は取り消せません。よろしいですか？')) return;
-  if(_fbDB){
-    _fbDB.ref('rooms/'+roomId).remove().then(()=>{
-      localStorage.removeItem('stt-room-id');
-      localStorage.removeItem('stt-room-name-'+roomId);
-      alert('ルームを削除しました。新しいルームを作成します。');
-      location.reload();
-    }).catch(e=>alert('削除に失敗しました: '+e.message));
+if(_isNewVisit){
+  if(document.readyState === 'loading'){
+    document.addEventListener('DOMContentLoaded', function(){ setTimeout(showWelcomeModal, 400); });
+  } else {
+    setTimeout(showWelcomeModal, 400);
   }
 }
 
-function createNewRoom(){
-  if(!confirm('新しいルームを作成します。\n現在のルームとの接続が切れ、新しいURLが発行されます。\nよろしいですか？')) return;
-  const newRoomId='room-'+Math.random().toString(36).slice(2,8);
-  localStorage.setItem('stt-room-id', newRoomId);
-  _fbRoomId=null;
-  const url=new URL(window.location.href);
-  url.searchParams.set('room', newRoomId);
-  window.location.href=url.toString();
-}
+// ツールチップ
+(function(){
+  const tip=document.createElement('div');
+  tip.id='stt-tooltip';
+  document.body.appendChild(tip);
+  let tid=null;
+  document.addEventListener('mouseover',function(e){
+    const el=e.target.closest('[data-tip]');
+    if(!el){return;}
+    clearTimeout(tid);
+    tid=setTimeout(function(){
+
+      const r=el.getBoundingClientRect();
+      tip.textContent=el.dataset.tip;
+      tip.style.opacity='0';
+      tip.style.display='block';
+      const tw=tip.offsetWidth;
+      let left=r.left+r.width/2-tw/2;
+      if(left<4)left=4;
+      if(left+tw>window.innerWidth-4)left=window.innerWidth-tw-4;
+      tip.style.left=left+'px';
+      const topPos=r.top-tip.offsetHeight-6;
+      tip.style.top=(topPos<0 ? r.bottom+6 : topPos)+'px';
+      tip.style.opacity='1';
+    },200);
+  });
+  document.addEventListener('mouseout',function(e){
+    const el=e.target.closest('[data-tip]');
+    if(!el){return;}
+    clearTimeout(tid);
+    tip.style.opacity='0';
+  });
+})();
 </script>
 
 <!-- ============================================================ -->
@@ -6436,57 +6869,104 @@ function createNewRoom(){
 </div>
 
 
-<!-- ルーム管理モーダル -->
-<div id="room-mgr-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center" onclick="if(event.target===this)closeRoomManager()">
+<!-- ルームを開く モーダル -->
+<div id="room-picker-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center" onclick="if(event.target===this)closeRoomPicker()">
   <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;width:90%;max-width:420px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
-    <div style="font-size:14px;font-weight:700;color:var(--text)">ルーム管理</div>
+    <div style="font-size:14px;font-weight:700;color:var(--text)">イベントを開く</div>
 
-    <!-- 現在のルームID -->
-    <div style="font-size:11px;color:var(--text3);padding:8px 10px;background:var(--bg2);border-radius:8px;font-family:monospace" id="room-mgr-id-display"></div>
+    <!-- 新規イベントを作成 -->
+    <button onclick="createNewRoom()" style="display:flex;align-items:center;gap:10px;padding:11px 14px;border:1px solid var(--accent);border-radius:10px;background:transparent;color:var(--accent);cursor:pointer;text-align:left;font-size:13px;font-weight:600">
+      <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+      新規イベントを作成
+    </button>
 
-    <!-- ルーム名編集 -->
+    <!-- 最近開いたルーム -->
+    <div id="room-picker-recent-wrap" style="display:none;flex-direction:column;gap:4px">
+      <label style="font-size:11px;color:var(--text2)">最近開いたイベント</label>
+      <div id="room-picker-recent-list" style="display:flex;flex-direction:column;gap:6px;max-height:220px;overflow-y:auto"></div>
+    </div>
+
+    <!-- 別のルームに接続 -->
     <div style="display:flex;flex-direction:column;gap:4px">
-      <label style="font-size:11px;color:var(--text2)">ルーム名</label>
+      <label style="font-size:11px;color:var(--text2)">別のイベントを開く（URLまたはID）</label>
       <div style="display:flex;gap:8px">
-        <input type="text" id="room-name-input" placeholder="ルーム名を入力" maxlength="30"
-          style="flex:1;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"/>
-        <button onclick="saveRoomName()" style="padding:6px 14px;font-size:12px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-weight:600">保存</button>
+        <input type="text" id="room-picker-join-input" placeholder="共有URL または ID"
+          style="flex:1;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"
+          onkeydown="if(event.key==='Enter')roomPickerJoin()"/>
+        <button onclick="roomPickerJoin()" style="padding:6px 14px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">接続</button>
       </div>
     </div>
 
-    <!-- ルームのQRコード共有 -->
-    <div style="display:flex;flex-direction:column;gap:6px">
-      <label style="font-size:11px;color:var(--text2)">QRコードで共有</label>
-      <div id="room-mgr-qr" style="width:160px;height:160px;background:#fff;padding:6px;border-radius:8px;border:1px solid var(--border)"></div>
-      <div style="font-size:10px;color:var(--text3);font-family:monospace;word-break:break-all" id="room-mgr-url"></div>
-      <button onclick="copyRoomMgrUrl()" style="align-self:flex-start;font-size:12px;padding:4px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">URLをコピー</button>
+    <!-- .sttファイルから開く -->
+    <div style="display:flex;flex-direction:column;gap:4px;border-top:1px solid var(--border);padding-top:12px">
+      <label style="font-size:11px;color:var(--text2)">ファイルから開く</label>
+      <label style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        .sttファイルを開く
+        <input type="file" accept=".stt,.json" style="display:none" onchange="loadSTTFile(event);closeRoomPicker();"/>
+      </label>
     </div>
 
-    <!-- ルームを変更 -->
-    <div style="display:flex;flex-direction:column;gap:4px">
-      <label style="font-size:11px;color:var(--text2)">別のルームに接続（URLまたはルームID）</label>
-      <div style="display:flex;gap:8px">
-        <input type="text" id="room-join-input" placeholder="room-xxxxxx または URL"
-          style="flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"/>
-        <button onclick="joinRoom()" style="padding:6px 14px;font-size:12px;border:none;border-radius:8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);cursor:pointer">接続</button>
+    <button onclick="closeRoomPicker()" style="align-self:flex-end;padding:6px 16px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);cursor:pointer">閉じる</button>
+  </div>
+</div>
+
+<!-- 共有 モーダル -->
+<div id="share-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center" onclick="if(event.target===this)closeShareModal()">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:20px 24px;width:90%;max-width:380px;display:flex;flex-direction:column;gap:14px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+    <div style="font-size:14px;font-weight:700;color:var(--text)">このイベントを共有</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.6">QRコードをスキャン、またはURLを共有すると、相手も同じイベントに参加して一緒に編集できます。</div>
+    <div style="display:flex;flex-direction:column;gap:8px;align-items:center">
+      <div id="share-qr" style="width:160px;height:160px;background:#fff;padding:6px;border-radius:8px;border:1px solid var(--border)"></div>
+      <div style="font-size:10px;color:var(--text3);font-family:monospace;word-break:break-all;width:100%" id="share-url"></div>
+      <button onclick="copyShareUrl()" style="align-self:stretch;font-size:13px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);cursor:pointer">URLをコピー</button>
+    </div>
+    <button onclick="closeShareModal()" style="align-self:flex-end;padding:6px 16px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);cursor:pointer">閉じる</button>
+  </div>
+</div>
+
+<div id="welcome-modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8500;align-items:center;justify-content:center">
+  <div style="background:var(--bg);border:1px solid var(--border);border-radius:14px;padding:24px 26px;width:90%;max-width:400px;display:flex;flex-direction:column;gap:16px;box-shadow:0 8px 32px rgba(0,0,0,.3)">
+
+    <!-- 選択画面 -->
+    <div id="welcome-choose">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
+        <div style="font-size:16px;font-weight:700;color:var(--text)">ようこそ</div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">イベントを選んで始めましょう。</div>
+      <div id="welcome-recent-wrap" style="display:none;margin-bottom:14px">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:600">最近開いたイベント</div>
+        <div id="welcome-recent-list" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto"></div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:9px">
+        <button onclick="welcomeCreateNew()" style="display:flex;align-items:center;gap:10px;padding:13px 15px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);cursor:pointer;text-align:left;font-size:13px;font-weight:600">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5db4f0" stroke-width="2" stroke-linecap="round" style="flex-shrink:0"><path d="M12 5v14M5 12h14"/></svg>
+          新しくイベントを作成
+        </button>
+        <button onclick="welcomeShowIdInput()" style="display:flex;align-items:center;gap:10px;padding:13px 15px;border:1px solid var(--border);border-radius:10px;background:var(--bg2);color:var(--text);cursor:pointer;text-align:left;font-size:13px;font-weight:600">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5db4f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          URL／IDを指定して開く
+        </button>
       </div>
     </div>
 
-    <!-- 区切り -->
-    <div style="border-top:1px solid var(--border);padding-top:10px;display:flex;flex-direction:column;gap:8px">
-      <!-- 新しいルームを作成 -->
-      <button onclick="createNewRoom()" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);font-size:13px;cursor:pointer">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-        新しいルームを作成
-      </button>
-      <!-- ルームを削除 -->
-      <button onclick="deleteRoom()" style="display:flex;align-items:center;gap:8px;padding:8px 12px;border:1px solid #F7C1C1;border-radius:8px;background:#FEF2F2;color:#A32D2D;font-size:13px;cursor:pointer">
-        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4h6v2"/></svg>
-        このルームを削除
-      </button>
+    <!-- ID入力画面 -->
+    <div id="welcome-idinput" style="display:none">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+        <svg width="24" height="24" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="7" fill="#0EA5E9"/><rect x="11" y="8" width="16" height="5" rx="2" fill="white" opacity=".9"/><rect x="11" y="15" width="11" height="4" rx="2" fill="#BAE6FD"/><rect x="11" y="21" width="13" height="5" rx="2" fill="#FEF08A"/></svg>
+        <div style="font-size:16px;font-weight:700;color:var(--text)">URL／IDを指定</div>
+      </div>
+      <div style="font-size:12px;color:var(--text2);line-height:1.6;margin-bottom:14px">共有されたURLまたはIDを入力してください。</div>
+      <input type="text" id="welcome-id-input" placeholder="共有URL または ID" maxlength="40"
+        style="width:100%;box-sizing:border-box;font-size:14px;padding:11px 13px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text);outline:none;margin-bottom:14px"
+        onkeydown="if(event.key==='Enter')welcomeConnectId()"/>
+      <div style="display:flex;gap:9px">
+        <button onclick="welcomeBackToChoose()" style="flex:0 0 auto;padding:11px 18px;border:1px solid var(--border);border-radius:9px;background:var(--bg2);color:var(--text2);cursor:pointer;font-size:13px">戻る</button>
+        <button onclick="welcomeConnectId()" style="flex:1;padding:11px 18px;border:none;border-radius:9px;background:var(--accent);color:#fff;cursor:pointer;font-size:13px;font-weight:600">このイベントを開く</button>
+      </div>
     </div>
 
-    <button onclick="closeRoomManager()" style="align-self:flex-end;padding:6px 16px;font-size:12px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text2);cursor:pointer">閉じる</button>
   </div>
 </div>
 </body>
