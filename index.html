@@ -6170,6 +6170,7 @@ function fbListen(){
       if(data.dayCount!==undefined){
         dayCount=data.dayCount||1;
         if(data.dayData&&data.dayData.length>0) dayData=JSON.parse(JSON.stringify(data.dayData));
+        if(_urlDayParam&&_urlDayParam<=dayCount){currentDay=_urlDayParam;_urlDayParam=null;}
         if(currentDay>dayCount) currentDay=1;
         const dcSel=document.getElementById('day-count-sel');
         if(dcSel) dcSel.value=String(dayCount);
