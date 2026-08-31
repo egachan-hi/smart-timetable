@@ -340,15 +340,15 @@ tbody tr:hover td{background:var(--bg2)}
         <div id="evinfo-panel" style="display:none;padding:6px 8px 8px;border-top:1px solid var(--border);flex-direction:column;gap:5px">
           <div style="display:flex;align-items:flex-start;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0;padding-top:3px">場所/ID</span>
-            <textarea id="evinfo-location" class="mi evinfo-field" rows="1" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.5;font-family:inherit" placeholder="開催場所・URL等" oninput="onEvInfoChange();this.style.height='auto';this.style.height=this.scrollHeight+'px';if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"></textarea>
+            <textarea id="evinfo-location" class="mi evinfo-field" rows="1" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.5;font-family:inherit;min-height:22px;box-sizing:border-box" placeholder="開催場所・URL等" oninput="onEvInfoChange();this.style.height='auto';this.style.height=Math.max(22,this.scrollHeight)+'px';if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"></textarea>
           </div>
           <div style="display:flex;align-items:flex-start;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0;padding-top:3px">オーナー</span>
-            <textarea id="evinfo-owner" class="mi evinfo-field" rows="1" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.5;font-family:inherit" placeholder="主催者・講師・組織名等" oninput="onEvInfoChange();this.style.height='auto';this.style.height=this.scrollHeight+'px';if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"></textarea>
+            <textarea id="evinfo-owner" class="mi evinfo-field" rows="1" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.5;font-family:inherit;min-height:22px;box-sizing:border-box" placeholder="主催者・講師・組織名等" oninput="onEvInfoChange();this.style.height='auto';this.style.height=Math.max(22,this.scrollHeight)+'px';if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"></textarea>
           </div>
           <div style="display:flex;align-items:flex-start;gap:6px">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0;padding-top:3px">参加者</span>
-            <textarea id="evinfo-members" class="mi evinfo-field" rows="1" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.5;font-family:inherit" placeholder="お名前・人数等" oninput="onEvInfoChange();this.style.height='auto';this.style.height=this.scrollHeight+'px';if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"></textarea>
+            <textarea id="evinfo-members" class="mi evinfo-field" rows="1" style="flex:1;font-size:11px;padding:2px 5px;border-color:transparent;background:transparent;resize:none;overflow:hidden;white-space:pre-wrap;word-break:break-all;line-height:1.5;font-family:inherit;min-height:22px;box-sizing:border-box" placeholder="お名前・人数等" oninput="onEvInfoChange();this.style.height='auto';this.style.height=Math.max(22,this.scrollHeight)+'px';if(typeof fbPush==='function')fbPush();" onfocus="evInfoFieldFocus(this)" onblur="evInfoFieldBlur(this)"></textarea>
           </div>
           <div class="ei-row">
             <span style="font-size:10px;color:var(--text2);width:52px;flex-shrink:0">スライドURL</span>
@@ -1659,9 +1659,10 @@ function loadEvInfoToWidget(){
   const own=document.getElementById('evinfo-owner');
   const mem=document.getElementById('evinfo-members');
   const mmo=document.getElementById('evinfo-memo');
-  if(loc){loc.value=evInfo.location||'';loc.style.height='auto';loc.style.height=loc.scrollHeight+'px';}
-  if(own){own.value=evInfo.owner||'';own.style.height='auto';own.style.height=own.scrollHeight+'px';}
-  if(mem){mem.value=evInfo.members||'';mem.style.height='auto';mem.style.height=mem.scrollHeight+'px';}
+  function _setTA(el,val){if(!el)return;el.value=val||'';el.style.height='auto';el.style.height=Math.max(22,el.scrollHeight)+'px';}
+  _setTA(loc,evInfo.location);
+  _setTA(own,evInfo.owner);
+  _setTA(mem,evInfo.members);
   const sld=document.getElementById('evinfo-slide-url');
   if(sld) sld.value=evInfo.slideUrl||'';
   evInfoInlineBlur('slide');
