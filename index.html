@@ -1433,6 +1433,13 @@ function toggleEvInfo(){
   const iconMv=document.getElementById('evinfo-toggle-icon-mv');
   if(evInfoOpen){
     panel.style.display='flex';
+    // パネル表示後にtextareaの高さを再計算（display:none中はscrollHeight=0のため）
+    setTimeout(function(){
+      ['evinfo-location','evinfo-owner','evinfo-members'].forEach(function(id){
+        var el=document.getElementById(id);
+        if(el){el.style.height='auto';el.style.height=Math.max(22,el.scrollHeight)+'px';}
+      });
+    },0);
     if(icon) icon.style.transform='rotate(180deg)';
     if(iconMv) iconMv.style.transform='rotate(180deg)';
     document.getElementById('evinfo-location').value=evInfo.location;
@@ -1735,6 +1742,11 @@ function autoLoad(){
     if(data.dayCount!==undefined){
       dayCount=data.dayCount||1;
       if(data.dayData&&data.dayData.length>0) dayData=data.dayData;
+      // URL ?day=N 指定があれば初回のみ適用
+      if(_urlDayParam&&_urlDayParam<=dayCount){
+        currentDay=_urlDayParam;
+        _urlDayParam=null; // 一度だけ適用
+      }
       // currentDayをdayCount内に収める
       if(currentDay>dayCount) currentDay=1;
       const sel=document.getElementById('day-count-sel');
@@ -5980,6 +5992,15 @@ var _fbLastPush = 0;
 var _fbClientId = null;
 var _fbOnlineCount = 0;
 
+// URLの?day=Nパラメータ（初回ロード時のみ適用）
+var _urlDayParam = (function(){
+  try{
+    var p = new URLSearchParams(window.location.search);
+    var d = parseInt(p.get('day'));
+    return (d>=1&&d<=7)?d:null;
+  }catch(e){ return null; }
+})();
+
 function fbGetRoomId(){
   if(_fbRoomId) return _fbRoomId;
   var p = new URLSearchParams(window.location.search);
@@ -6273,6 +6294,39 @@ function openRoomManager(){
   const urlEl = document.getElementById('room-mgr-url');
   if(urlEl) urlEl.textContent = url;
 
+  // DAYごとのURL（複数日程時のみ）
+  const dayUrlSection = document.getElementById('room-mgr-day-urls');
+  const dayUrlList = document.getElementById('room-mgr-day-url-list');
+  if(dayUrlSection && dayUrlList){
+    if(dayCount > 1){
+      dayUrlSection.style.display = 'flex';
+      dayUrlList.innerHTML = '';
+      for(let i=1; i<=dayCount; i++){
+        const dayUrl = url + '&day=' + i;
+        const row = document.createElement('div');
+        row.style.cssText = 'display:flex;align-items:center;gap:6px';
+        const label = document.createElement('span');
+        label.textContent = 'DAY'+i;
+        label.style.cssText = 'font-size:11px;font-weight:700;color:var(--accent);width:40px;flex-shrink:0';
+        const urlSpan = document.createElement('span');
+        urlSpan.textContent = dayUrl;
+        urlSpan.style.cssText = 'flex:1;font-size:9px;color:var(--text3);font-family:monospace;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+        const copyBtn = document.createElement('button');
+        copyBtn.textContent = 'コピー';
+        copyBtn.style.cssText = 'font-size:10px;padding:2px 8px;border:1px solid var(--border);border-radius:5px;background:var(--bg2);color:var(--text);cursor:pointer;flex-shrink:0';
+        copyBtn.onclick = (function(u){ return function(){
+          navigator.clipboard.writeText(u).then(()=>alert('DAY URLをコピーしました')).catch(()=>{
+            const ta=document.createElement('textarea');ta.value=u;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('DAY URLをコピーしました');
+          });
+        };})(dayUrl);
+        row.appendChild(label);row.appendChild(urlSpan);row.appendChild(copyBtn);
+        dayUrlList.appendChild(row);
+      }
+    } else {
+      dayUrlSection.style.display = 'none';
+    }
+  }
+
   // QRコード生成
   const qrEl = document.getElementById('room-mgr-qr');
   if(qrEl){
@@ -6457,6 +6511,12 @@ function createNewRoom(){
           style="flex:1;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"/>
         <button onclick="saveRoomName()" style="padding:6px 14px;font-size:12px;border:none;border-radius:8px;background:var(--accent);color:#fff;cursor:pointer;font-weight:600">保存</button>
       </div>
+    </div>
+
+    <!-- DAYごとのURL（複数日程時のみ） -->
+    <div id="room-mgr-day-urls" style="display:none;flex-direction:column;gap:4px">
+      <label style="font-size:11px;color:var(--text2)">DAYごとの参照URL</label>
+      <div id="room-mgr-day-url-list" style="display:flex;flex-direction:column;gap:4px"></div>
     </div>
 
     <!-- ルームのQRコード共有 -->
