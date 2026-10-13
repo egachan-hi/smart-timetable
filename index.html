@@ -1328,6 +1328,45 @@ function restoreSavedEvs(){
   } catch(e){ savedEvs=[]; }
 }
 
+// ================================================================
+// ルーム単位のローカル保存（他ルームのデータが混ざらないように）
+// ================================================================
+function _roomIdForStorage(){
+  try{
+    var p=new URLSearchParams(window.location.search);
+    return p.get('room')||localStorage.getItem('stt-room-id')||'default';
+  }catch(e){ return 'default'; }
+}
+function _autosaveKey(){ return 'stt-autosave-'+_roomIdForStorage(); }
+function _backupKey(){ return 'stt-backup-'+_roomIdForStorage(); }
+function _arr(x){ return Array.isArray(x)?x:(x&&typeof x==='object'?Object.values(x):[]); }
+function _countItems(d){
+  if(!d) return 0;
+  var n=_arr(d.sessions).length+_arr(d.freeEvs).length;
+  _arr(d.dayData).forEach(function(dd){ if(dd){ n+=_arr(dd.sessions).length+_arr(dd.freeEvs).length; } });
+  return n;
+}
+// URLの?day=Nパラメータ（初回ロード時のみ適用）※autoLoadより前に定義が必要
+var _urlDayParam=(function(){
+  try{ var d=parseInt(new URLSearchParams(window.location.search).get('day')); return (d>=1&&d<=7)?d:null; }
+  catch(e){ return null; }
+})();
+// 表示中のDAYの内容をdayDataへ反映（1日だけの場合も含めて常に同期）
+function syncCurDay(){
+  try{
+    var i=Math.max(0,(currentDay||1)-1);
+    var prev=dayData[i]||{};
+    var evdVal=document.getElementById('evd').value||'';
+    dayData[i]={
+      sessions:JSON.parse(JSON.stringify(sessions||[])),
+      freeEvs:JSON.parse(JSON.stringify(freeEvs||[])),
+      start:document.getElementById('evs').value||'13:00',
+      end:document.getElementById('eve').value||'17:00',
+      date:(dayCount>1&&prev.date)?prev.date:evdVal
+    };
+  }catch(e){ console.warn('syncCurDay error:', e); }
+}
+
 let cv='tl';
 let noDate=false;   // 日付を特定しない
 let liveMode=false; // ライブモード（日付に関わらず現在時刻で進行管理）
@@ -1685,15 +1724,9 @@ let hist=[s0()],hi=0;
 function s0(){return JSON.stringify({sessions:JSON.parse(JSON.stringify(sessions)),freeEvs:JSON.parse(JSON.stringify(freeEvs))});}
 function autoSave(){
   try{
-    // 複数日の場合は現在日のデータを保存
-    if(dayCount>1) dayData[currentDay-1]={
-    sessions:JSON.parse(JSON.stringify(sessions)),
-    freeEvs:JSON.parse(JSON.stringify(freeEvs)),
-    start:document.getElementById('evs').value||'13:00',
-    end:document.getElementById('eve').value||'17:00',
-    date:document.getElementById('evd').value||''
-  };
-    localStorage.setItem('stt-autosave', JSON.stringify({
+    syncCurDay();
+    const _state={
+      roomId: _roomIdForStorage(),
       title: document.getElementById('evt').value||'',
       date: document.getElementById('evd').value||'',
       start: document.getElementById('evs').value||'13:00',
@@ -1706,7 +1739,11 @@ function autoSave(){
       dayData: dayData,
       evInfo: evInfo,
       savedAt: Date.now()
-    }));
+    };
+    const _json=JSON.stringify(_state);
+    localStorage.setItem(_autosaveKey(), _json);
+    // 中身があるときだけバックアップを更新（空で上書きされても復元できるように）
+    if(_countItems(_state)>0) localStorage.setItem(_backupKey(), _json);
     const userTpls=savedTpls.filter(function(t){return !t._preset;});
     localStorage.setItem('stt-user-tpls',JSON.stringify(userTpls));
     const stnEl=document.getElementById('stname');
@@ -1714,55 +1751,7 @@ function autoSave(){
   }catch(e){ console.warn('autosave error:', e); }
 }
 
-function autoLoad(){
-  try{
-    const raw=localStorage.getItem('stt-autosave');
-    if(!raw) return false;
-    const data=JSON.parse(raw);
-    if(!data) return false;
-    document.getElementById('evt').value=data.title||'';
-    document.getElementById('evd').value=data.date||'';
-    document.getElementById('evs').value=data.start||'13:00';
-    document.getElementById('eve').value=data.end||'16:00';
-    if(data.sessions&&data.sessions.length>0){
-      sessions=data.sessions;
-      nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
-    }
-    if(data.freeEvs&&data.freeEvs.length>0){
-      freeEvs=data.freeEvs;
-      nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-    }
-    if(data.noDate){
-      noDate=true;
-      const chk=document.getElementById('no-date-chk');
-      if(chk) chk.checked=true;
-      const evd=document.getElementById('evd');
-      if(evd){evd.disabled=true;evd.style.opacity='0.4';}
-    }
-    if(data.dayCount!==undefined){
-      dayCount=data.dayCount||1;
-      if(data.dayData&&data.dayData.length>0) dayData=data.dayData;
-      // URL ?day=N 指定があれば初回のみ適用
-      if(_urlDayParam&&_urlDayParam<=dayCount){
-        currentDay=_urlDayParam;
-        _urlDayParam=null; // 一度だけ適用
-      }
-      // currentDayをdayCount内に収める
-      if(currentDay>dayCount) currentDay=1;
-      const sel=document.getElementById('day-count-sel');
-      if(sel) sel.value=String(dayCount);
-      // 現在のDAYのセッションを読み込む
-      const target=dayData[currentDay-1];
-      if(target){
-        sessions=JSON.parse(JSON.stringify(target.sessions||[]));
-        freeEvs=JSON.parse(JSON.stringify(target.freeEvs||[]));
-        nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
-        nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-        if(target.start) document.getElementById('evs').value=target.start;
-        if(target.end)   document.getElementById('eve').value=target.end;
-        if(target.date!==undefined) document.getElementById('evd').value=target.date;
-      }
-    }
+function _restoreUserTpls(){
     try{
       var rawTpls=localStorage.getItem('stt-user-tpls');
       if(rawTpls){
@@ -1784,8 +1773,68 @@ function autoLoad(){
         if(foundTpl){TYPES=JSON.parse(JSON.stringify(foundTpl.types));}
       }
     }catch(e){console.warn('tpl select restore err',e);}
-    if(data.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:''},data.evInfo);}    loadEvInfoToWidget();
+}
+function autoLoad(){
+  try{
+    _restoreUserTpls();
+    const _rid=_roomIdForStorage();
+    let _fresh=false;
+    try{ if(sessionStorage.getItem('stt-fresh-room')===_rid){ _fresh=true; sessionStorage.removeItem('stt-fresh-room'); } }catch(e){}
+    if(_fresh){
+      // 「新規」で作った新しいルーム：空の状態から開始
+      document.getElementById('evt').value='';
+      document.getElementById('evd').value='';
+      return false;
+    }
+    let raw=localStorage.getItem(_autosaveKey());
+    if(!raw){
+      // 旧形式（ルーム共通の自動保存）からの移行：前回使っていたルームと同じ場合のみ
+      const legacy=localStorage.getItem('stt-autosave');
+      const lastRoom=localStorage.getItem('stt-room-id');
+      if(legacy && (!lastRoom || lastRoom===_rid)) raw=legacy;
+    }
+    if(!raw) return false;
+    const data=JSON.parse(raw);
+    if(!data) return false;
+    document.getElementById('evt').value=data.title||'';
+    document.getElementById('evd').value=data.date||'';
+    document.getElementById('evs').value=data.start||'13:00';
+    document.getElementById('eve').value=data.end||'16:00';
+    sessions=JSON.parse(JSON.stringify(_arr(data.sessions)));
+    freeEvs=JSON.parse(JSON.stringify(_arr(data.freeEvs)));
+    if(data.noDate){
+      noDate=true;
+      const chk=document.getElementById('no-date-chk');
+      if(chk) chk.checked=true;
+      const evd=document.getElementById('evd');
+      if(evd){evd.disabled=true;evd.style.opacity='0.4';}
+    }
+    dayCount=data.dayCount||1;
+    dayData=JSON.parse(JSON.stringify(_arr(data.dayData)));
+    if(_urlDayParam&&_urlDayParam<=dayCount){ currentDay=_urlDayParam; _urlDayParam=null; }
+    if(currentDay>dayCount) currentDay=1;
+    const sel=document.getElementById('day-count-sel');
+    if(sel) sel.value=String(dayCount);
+    // 最上位のsessionsは「保存時に表示していたDAY」の内容。違うDAYを表示するときはdayDataから読む
+    const _useTop = dayCount<=1 || data.currentDay===currentDay;
+    if(!_useTop){
+      const target=dayData[currentDay-1];
+      sessions=JSON.parse(JSON.stringify(_arr(target&&target.sessions)));
+      freeEvs=JSON.parse(JSON.stringify(_arr(target&&target.freeEvs)));
+      if(target){
+        if(target.start) document.getElementById('evs').value=target.start;
+        if(target.end)   document.getElementById('eve').value=target.end;
+        if(target.date!==undefined) document.getElementById('evd').value=target.date;
+      }
+    }
+    nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
+    nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
+    syncCurDay();
+    if(data.evInfo){evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},data.evInfo);}
+    loadEvInfoToWidget();
     restoreSavedEvs();
+    // 中身があり、まだバックアップが無ければバックアップとして保持
+    try{ if(_countItems(data)>0 && !localStorage.getItem(_backupKey())) localStorage.setItem(_backupKey(), raw); }catch(e){}
     setTimeout(updateBtnTimeAdj,0);
     return true;
   }catch(e){ console.warn('autoload error:', e); return false; }
@@ -2287,12 +2336,12 @@ function saveMultiDayModal(){
   closeMultiDayModal();
 }
 
-function toggleLiveMode(forceVal){
+function toggleLiveMode(forceVal, fromSync){
   const chk=document.getElementById('live-mode-chk');
   const newVal = forceVal!==undefined ? forceVal : (chk?chk.checked:false);
 
   // 今日以外でONにしようとした場合は確認
-  if(newVal && !isActuallyToday()){
+  if(newVal && !isActuallyToday() && !fromSync){
     if(!confirm('今日はイベント当日ではありませんがライブモードに切り替えますか？')){
       if(chk) chk.checked=false;
       return;
@@ -2332,7 +2381,7 @@ function toggleLiveMode(forceVal){
   }
   if(typeof mvRender==='function') mvRender();
   autoSave();
-  if(typeof fbPush==='function') fbPush();
+  if(!fromSync && typeof fbPush==='function') fbPush();
 }
 
 function updateNowLine(){
@@ -2697,7 +2746,7 @@ function addAnyEvent(){sessions.push({id:nid++,name:ANY.name,dur:ANY.dur,color:A
 function addST(){const t=TYPES[0]||ANY;sessions.push({id:nid++,name:t.name,dur:t.dur,color:t.color,comment:''});snap();rTL();if(cv==='tb')renderTbl();}
 function delFid(id){freeEvs=freeEvs.filter(x=>x.id!==id);snap();rFR();if(cv==='tb')renderTbl();}
 function resetAll(){
-  if(!confirm('すべてのセッションを削除しますか？'))return;
+  if(!confirm('すべてのセッションを削除しますか？\n（共有ルームを見ている全員の画面からも消えます）'))return;
   sessions=[];freeEvs=[];
   dayCount=1;currentDay=1;dayData=[{sessions:[],freeEvs:[],start:document.getElementById('evs').value||'13:00',end:document.getElementById('eve').value||'16:00',date:document.getElementById('evd').value||''}];
   const dcSel=document.getElementById('day-count-sel');
@@ -4301,41 +4350,9 @@ function duplicateEV(){
 }
 
 function newEV(){
-  if(!confirm('現在のデータをリセットして新規イベントを作成しますか？'))return;
-  // Firebase受信を一時停止
-  _fbSyncing=true;
-  sessions=[];freeEvs=[];
-  // 複数日程をリセットして1日に戻す
-  dayCount=1;currentDay=1;dayData=[{sessions:[],freeEvs:[],start:'13:00',end:'16:00',date:''}];
-  const dcSel=document.getElementById('day-count-sel');
-  if(dcSel) dcSel.value='1';
-  document.getElementById('evt').value='';
-  document.getElementById('evd').value='';
-  document.getElementById('evs').value='13:00';
-  document.getElementById('eve').value='16:00';
-  noDate=false;
-  liveMode=false;
-  const ndChk=document.getElementById('no-date-chk');
-  if(ndChk) ndChk.checked=false;
-  const lmChk=document.getElementById('live-mode-chk');
-  if(lmChk) lmChk.checked=false;
-  // evInfoもリセット
-  evInfo={location:'',owner:'',members:'',memo:'',slideUrl:''};
-  loadEvInfoToWidget();
-  // ローカルストレージをクリア
-  localStorage.removeItem('stt-autosave');
-  closeEV();
-  snap=function(){};// snap一時無効化
-  render();updateDow();updateTopDateLabel();
-  if(typeof updateMultiDayChk==='function') updateMultiDayChk();
-  if(typeof mvRender==='function')mvRender();
-  // Firebase側もクリア（新規データをプッシュ）
-  setTimeout(function(){
-    snap=function(){const s=s0();hist=hist.slice(0,hi+1);hist.push(s);if(hist.length>80)hist.shift();hi=hist.length-1;uUR();setTimeout(autoSave,0);if(typeof fbPush==='function')fbPush();};
-    _fbSyncing=false;
-    if(typeof fbPush==='function') fbPush();
-  }, 300);
-}
+    if(!confirm('新しいイベントを「新しいルーム（新しい共有URL）」で作成します。\n\n今のタイムテーブルは現在のURLにそのまま残ります。\nよろしいですか？'))return;
+    _startFreshRoom();
+  }
 
 // ================================================================
 // CSV
@@ -5992,14 +6009,7 @@ var _fbLastPush = 0;
 var _fbClientId = null;
 var _fbOnlineCount = 0;
 
-// URLの?day=Nパラメータ（初回ロード時のみ適用）
-var _urlDayParam = (function(){
-  try{
-    var p = new URLSearchParams(window.location.search);
-    var d = parseInt(p.get('day'));
-    return (d>=1&&d<=7)?d:null;
-  }catch(e){ return null; }
-})();
+var _fbFirstRecvDone = false;
 
 function fbGetRoomId(){
   if(_fbRoomId) return _fbRoomId;
@@ -6080,6 +6090,7 @@ window.fbPush = function(){
     if(_fbSyncing) return;
     _fbLastPush = Date.now();
   try{
+    syncCurDay();
     var data = {
       title: document.getElementById('evt').value || '',
       date: document.getElementById('evd').value || '',
@@ -6091,6 +6102,7 @@ window.fbPush = function(){
       noDate: noDate||false,
       liveMode: liveMode||false,
       dayCount: dayCount||1,
+      currentDay: currentDay||1,
       dayData: JSON.parse(JSON.stringify(dayData||[])),
       ts: _fbLastPush
     };
@@ -6145,46 +6157,64 @@ function fbListen(){
   // データ受信
   _fbDB.ref('rooms/' + roomId + '/data').on('value', function(snap){
     var data = snap.val();
+    var _first = !_fbFirstRecvDone;
+    _fbFirstRecvDone = true;
     if(!data) return;
     if(data.ts && data.ts === _fbLastPush) return;
     if(_fbSyncing) return;
+
+    // 安全装置：開いた直後に共有データが空で、この端末にはデータが残っている場合は確認する
+    if(_first && _countItems(data)===0){
+      syncCurDay();
+      var _localCnt=_countItems({sessions:sessions,freeEvs:freeEvs,dayData:dayData});
+      if(_localCnt>0){
+        var _lt=document.getElementById('evt').value||'タイムテーブル';
+        if(confirm('共有ルームのタイムテーブルが空になっています。\n\nこの端末に残っている「'+_lt+'」で共有ルームを復元しますか？\n（キャンセルすると空の状態を表示します）')){
+          if(typeof fbPush==='function') fbPush();
+          return;
+        }
+      }
+    }
+
     _fbSyncing = true;
     try{
-      document.getElementById('evt').value = data.title || '';
-      document.getElementById('evd').value = data.date || '';
-      document.getElementById('evs').value = data.start || '13:00';
-      document.getElementById('eve').value = data.end || '16:00';
-      if(data.sessions && data.sessions.length > 0){ sessions = data.sessions; nid = Math.max(nid, Math.max.apply(null, sessions.map(function(s){return s.id+1;})), 30); }
-      if(data.freeEvs && data.freeEvs.length > 0){ freeEvs = data.freeEvs; nfid = Math.max(nfid, Math.max.apply(null, freeEvs.map(function(e){return e.id+1;})), 100); }
+      var _ds=function(id,v){ var el=document.getElementById(id); if(el) el.value=v; };
+      _ds('evt', data.title || '');
       if(data.evInfo){ evInfo = Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''}, data.evInfo); loadEvInfoToWidget(); }
       if(data.noDate!==undefined && data.noDate!==noDate){
         noDate=data.noDate;
-        const ndChk=document.getElementById('no-date-chk');
+        var ndChk=document.getElementById('no-date-chk');
         if(ndChk) ndChk.checked=noDate;
-        const evd=document.getElementById('evd');
-        if(evd){evd.disabled=noDate;evd.style.opacity=noDate?'0.4':'1';}
+        var evdEl=document.getElementById('evd');
+        if(evdEl){evdEl.disabled=noDate;evdEl.style.opacity=noDate?'0.4':'1';}
       }
+      dayCount = data.dayCount||1;
+      dayData = JSON.parse(JSON.stringify(_arr(data.dayData)));
+      if(_urlDayParam&&_urlDayParam<=dayCount){currentDay=_urlDayParam;_urlDayParam=null;}
+      if(currentDay>dayCount) currentDay=1;
+      var dcSel=document.getElementById('day-count-sel');
+      if(dcSel) dcSel.value=String(dayCount);
+      // 送信側が同じDAYを表示中（または1日だけ）なら最上位のデータが最新
+      var _useTop = dayCount<=1 || data.currentDay===currentDay;
+      if(_useTop){
+        sessions=JSON.parse(JSON.stringify(_arr(data.sessions)));
+        freeEvs=JSON.parse(JSON.stringify(_arr(data.freeEvs)));
+        _ds('evd', data.date||'');
+        _ds('evs', data.start||'13:00');
+        _ds('eve', data.end||'16:00');
+      } else {
+        var _tg=dayData[currentDay-1]||{};
+        sessions=JSON.parse(JSON.stringify(_arr(_tg.sessions)));
+        freeEvs=JSON.parse(JSON.stringify(_arr(_tg.freeEvs)));
+        _ds('evd', _tg.date!==undefined?_tg.date:(data.date||''));
+        _ds('evs', _tg.start||data.start||'13:00');
+        _ds('eve', _tg.end||data.end||'16:00');
+      }
+      nid=Math.max(nid,...sessions.map(function(s){return s.id+1;}),30);
+      nfid=Math.max(nfid,...freeEvs.map(function(e){return e.id+1;}),100);
+      syncCurDay();
       if(data.liveMode!==undefined && data.liveMode!==liveMode){
-        toggleLiveMode(data.liveMode);
-      }
-      if(data.dayCount!==undefined){
-        dayCount=data.dayCount||1;
-        if(data.dayData&&data.dayData.length>0) dayData=JSON.parse(JSON.stringify(data.dayData));
-        if(_urlDayParam&&_urlDayParam<=dayCount){currentDay=_urlDayParam;_urlDayParam=null;}
-        if(currentDay>dayCount) currentDay=1;
-        const dcSel=document.getElementById('day-count-sel');
-        if(dcSel) dcSel.value=String(dayCount);
-        // 現在のDAYのデータを反映
-        const _target=dayData[currentDay-1];
-        if(_target){
-          sessions=JSON.parse(JSON.stringify(_target.sessions||[]));
-          freeEvs=JSON.parse(JSON.stringify(_target.freeEvs||[]));
-          nid=Math.max(nid,...sessions.map(s=>s.id+1),30);
-          nfid=Math.max(nfid,...freeEvs.map(e=>e.id+1),100);
-          if(_target.start) document.getElementById('evs').value=_target.start;
-          if(_target.end)   document.getElementById('eve').value=_target.end;
-          if(_target.date!==undefined) document.getElementById('evd').value=_target.date;
-        }
+        toggleLiveMode(data.liveMode, true);
       }
 
       render(); updateDow(); updateTopDateLabel();
@@ -6192,6 +6222,7 @@ function fbListen(){
       if(typeof mvRender==='function'){
         try{ mvRender(); }catch(mvErr){ console.error('mvRender error:',mvErr); }
       }
+      autoSave();
     }catch(e){ console.warn(e); }
     finally{ setTimeout(function(){ _fbSyncing = false; }, 200); }
   });
@@ -6290,6 +6321,9 @@ function openRoomManager(){
   const nameInput = document.getElementById('room-name-input');
   if(nameInput) nameInput.value = localStorage.getItem('stt-room-name-'+roomId)||'';
 
+  // この端末のバックアップ一覧
+  if(typeof _renderBackupList==='function') _renderBackupList();
+
   // URL表示
   const url = window.location.origin + window.location.pathname + '?room=' + roomId;
   const urlEl = document.getElementById('room-mgr-url');
@@ -6345,6 +6379,99 @@ function openRoomManager(){
   }
 
   modal.style.cssText='display:flex;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:8200;align-items:center;justify-content:center';
+}
+
+
+// ============================================================
+// この端末のバックアップから復元
+// ============================================================
+function _listLocalBackups(){
+  const out=[]; const seen={};
+  const cands=[
+    {key:_backupKey(), label:'このルームの最終バックアップ'},
+    {key:_autosaveKey(), label:'このルームの自動保存'},
+    {key:'stt-autosave', label:'旧バージョンの自動保存'}
+  ];
+  cands.forEach(function(c){
+    try{
+      const raw=localStorage.getItem(c.key);
+      if(!raw||seen[raw]) return;
+      const d=JSON.parse(raw);
+      if(!d||_countItems(d)===0) return;
+      seen[raw]=1;
+      out.push({key:c.key,label:c.label,data:d});
+    }catch(e){}
+  });
+  return out;
+}
+function _renderBackupList(){
+  const box=document.getElementById('room-mgr-backup-list');
+  if(!box) return;
+  box.innerHTML='';
+  const list=_listLocalBackups();
+  if(list.length===0){
+    const p=document.createElement('div');
+    p.textContent='この端末に復元できるデータはありません';
+    p.style.cssText='font-size:11px;color:var(--text3)';
+    box.appendChild(p); return;
+  }
+  list.forEach(function(b){
+    const d=b.data;
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;align-items:center;gap:8px;padding:6px 8px;border:1px solid var(--border);border-radius:8px;background:var(--bg2)';
+    const info=document.createElement('div');
+    info.style.cssText='flex:1;min-width:0;font-size:11px;color:var(--text);line-height:1.5';
+    const when=d.savedAt?new Date(d.savedAt).toLocaleString('ja-JP',{month:'numeric',day:'numeric',hour:'2-digit',minute:'2-digit'}):'';
+    const t1=document.createElement('div');
+    var _sc=(d.dayCount>1)?_arr(d.dayData).reduce(function(n,x){return n+_arr(x&&x.sessions).length;},0):_arr(d.sessions).length;
+    t1.textContent='「'+(d.title||'無題')+'」 '+(d.dayCount>1?d.dayCount+'DAYS':'1DAY')+' / セッション'+_sc+'件';
+    t1.style.cssText='font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap';
+    const t2=document.createElement('div');
+    t2.textContent=b.label+(when?'（'+when+'）':'');
+    t2.style.cssText='color:var(--text3);font-size:10px';
+    info.appendChild(t1); info.appendChild(t2);
+    const btn=document.createElement('button');
+    btn.textContent='復元';
+    btn.style.cssText='font-size:11px;padding:4px 10px;border:none;border-radius:6px;background:var(--accent);color:#fff;cursor:pointer;flex-shrink:0';
+    btn.onclick=function(){ restoreLocalBackup(b.key); };
+    row.appendChild(info); row.appendChild(btn);
+    box.appendChild(row);
+  });
+}
+function _applySavedState(d){
+  document.getElementById('evt').value=d.title||'';
+  noDate=!!d.noDate;
+  const ndChk=document.getElementById('no-date-chk'); if(ndChk) ndChk.checked=noDate;
+  const evdEl=document.getElementById('evd'); if(evdEl){evdEl.disabled=noDate;evdEl.style.opacity=noDate?'0.4':'1';}
+  dayCount=d.dayCount||1;
+  dayData=JSON.parse(JSON.stringify(_arr(d.dayData)));
+  let cd=d.currentDay||1; if(cd>dayCount) cd=1;
+  currentDay=cd;
+  sessions=JSON.parse(JSON.stringify(_arr(d.sessions)));
+  freeEvs=JSON.parse(JSON.stringify(_arr(d.freeEvs)));
+  document.getElementById('evd').value=d.date||'';
+  document.getElementById('evs').value=d.start||'13:00';
+  document.getElementById('eve').value=d.end||'16:00';
+  const sel=document.getElementById('day-count-sel'); if(sel) sel.value=String(dayCount);
+  nid=Math.max(nid,...sessions.map(function(s){return s.id+1;}),30);
+  nfid=Math.max(nfid,...freeEvs.map(function(e){return e.id+1;}),100);
+  if(d.evInfo){ evInfo=Object.assign({location:'',owner:'',members:'',memo:'',slideUrl:''},d.evInfo); loadEvInfoToWidget(); }
+  syncCurDay();
+  if(typeof updateMultiDayChk==='function') updateMultiDayChk();
+  render(); updateDow(); updateTopDateLabel();
+  if(typeof mvRender==='function') mvRender();
+  snap(); // ローカル保存＋共有ルームへ送信
+}
+function restoreLocalBackup(key){
+  try{
+    const raw=localStorage.getItem(key);
+    if(!raw){ alert('バックアップが見つかりません'); return; }
+    const d=JSON.parse(raw);
+    if(!confirm('「'+(d.title||'無題')+'」でこのルームを上書き復元します。\n共有ルームを見ている全員の画面に反映されます。よろしいですか？')) return;
+    _applySavedState(d);
+    closeRoomManager();
+    alert('復元しました');
+  }catch(e){ alert('復元に失敗しました: '+e.message); }
 }
 
 function closeRoomManager(){
@@ -6411,22 +6538,31 @@ function deleteRoom(){
   if(!confirm('ルーム「'+roomId+'」のデータをFirebaseから削除します。\nこの操作は取り消せません。よろしいですか？')) return;
   if(_fbDB){
     _fbDB.ref('rooms/'+roomId).remove().then(()=>{
-      localStorage.removeItem('stt-room-id');
-      localStorage.removeItem('stt-room-name-'+roomId);
+      try{
+        localStorage.removeItem('stt-room-name-'+roomId);
+        localStorage.removeItem('stt-autosave-'+roomId);
+      }catch(e){}
       alert('ルームを削除しました。新しいルームを作成します。');
-      location.reload();
+      _startFreshRoom();
     }).catch(e=>alert('削除に失敗しました: '+e.message));
   }
 }
 
-function createNewRoom(){
-  if(!confirm('新しいルームを作成します。\n現在のルームとの接続が切れ、新しいURLが発行されます。\nよろしいですか？')) return;
+function _startFreshRoom(){
+  // 現在のタイムテーブルを確実に保存してから、新しい空のルームへ移動
+  try{ autoSave(); }catch(e){}
   const newRoomId='room-'+Math.random().toString(36).slice(2,8);
-  localStorage.setItem('stt-room-id', newRoomId);
-  _fbRoomId=null;
+  try{ localStorage.setItem('stt-room-id', newRoomId); }catch(e){}
+  try{ sessionStorage.setItem('stt-fresh-room', newRoomId); }catch(e){}
+  if(typeof _fbRoomId!=='undefined') _fbRoomId=null;
   const url=new URL(window.location.href);
   url.searchParams.set('room', newRoomId);
+  url.searchParams.delete('day');
   window.location.href=url.toString();
+}
+function createNewRoom(){
+  if(!confirm('新しい空のルームを作成します。\n新しい共有URLが発行され、今のタイムテーブルは現在のURLにそのまま残ります。\nよろしいですか？')) return;
+  _startFreshRoom();
 }
 </script>
 
@@ -6536,6 +6672,12 @@ function createNewRoom(){
           style="flex:1;font-size:12px;padding:6px 10px;border:1px solid var(--border);border-radius:8px;background:var(--bg2);color:var(--text);outline:none"/>
         <button onclick="joinRoom()" style="padding:6px 14px;font-size:12px;border:none;border-radius:8px;background:var(--bg2);color:var(--text);border:1px solid var(--border);cursor:pointer">接続</button>
       </div>
+    </div>
+
+    <!-- この端末のバックアップから復元 -->
+    <div style="display:flex;flex-direction:column;gap:4px">
+      <label style="font-size:11px;color:var(--text2)">この端末のバックアップから復元</label>
+      <div id="room-mgr-backup-list" style="display:flex;flex-direction:column;gap:4px"></div>
     </div>
 
     <!-- 区切り -->
