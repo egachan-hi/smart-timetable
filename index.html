@@ -656,8 +656,8 @@ tbody tr:hover td{background:var(--bg2)}
           <span>📎 ファイルアップロード（任意）</span>
           <span style="font-size:9px;background:#FEF9C3;color:#713F12;padding:1px 6px;border-radius:3px">生成後に自動削除</span>
         </div>
-        <div style="font-size:10px;color:var(--text2);margin-bottom:5px">PDF・画像・Word・PPT・音声ファイル対応。75MB超の場合は分割してください。</div>
-        <div class="aidz" onclick="document.getElementById('aifile').click()">ここをクリックまたはドラッグ&amp;ドロップ<input type="file" id="aifile" multiple accept=".pdf,.png,.jpg,.jpeg,.ppt,.pptx,.doc,.docx,.txt,.mp3,.m4a,.wav,.aac,.ogg,.webm" style="display:none" onchange="aiFC(event)"/></div>
+        <div style="font-size:10px;color:var(--text2);margin-bottom:5px">PDF・画像・Word(.docx)・PowerPoint(.pptx)・Excel(.xlsx)・テキスト(.txt/.md/.csv)・音声ファイル対応。75MB超の場合は分割してください。</div>
+        <div class="aidz" onclick="document.getElementById('aifile').click()" ondragover="event.preventDefault();this.style.borderColor='#7F77DD'" ondragleave="this.style.borderColor=''" ondrop="aiDrop(event,this)">ここをクリックまたはドラッグ&amp;ドロップ<input type="file" id="aifile" multiple accept=".pdf,.png,.jpg,.jpeg,.gif,.webp,.pptx,.docx,.xlsx,.txt,.md,.csv,.mp3,.m4a,.wav,.aac,.ogg,.webm" style="display:none" onchange="aiFC(event)"/></div>
         <div id="aifl"></div>
       </div>
 
@@ -4051,12 +4051,47 @@ function aiKeyInput(){
   const key=document.getElementById('ai-apikey').value.trim();
   if(key) localStorage.setItem('ai-key-'+p,key);
 }
-function aiFC(e){
-  aiFs=[...aiFs,...Array.from(e.target.files)];
-  document.getElementById('aifl').innerHTML=aiFs.map((f,i)=>`<div class="aifi"><span style="flex:1">${f.name}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`).join('');
+// 添付ファイルの種類判定
+function aiFileKind(f){
+  const n=(f.name||'').toLowerCase();
+  const t=f.type||'';
+  if(['.mp3','.m4a','.wav','.aac','.ogg','.webm'].some(x=>n.endsWith(x))) return 'audio';
+  if(t.startsWith('image/')||/\.(png|jpe?g|gif|webp)$/.test(n)) return 'image';
+  if(n.endsWith('.pdf')) return 'pdf';
+  if(/\.(txt|md|csv)$/.test(n)) return 'text';
+  if(n.endsWith('.docx')) return 'docx';
+  if(n.endsWith('.pptx')) return 'pptx';
+  if(n.endsWith('.xlsx')) return 'xlsx';
+  return 'unsupported';
+}
+function aiFileNote(f){
+  const k=aiFileKind(f);
+  if(k==='unsupported'){
+    const n=(f.name||'').toLowerCase();
+    if(n.endsWith('.doc')) return '✕ 読み込めません（.docxで保存し直してください）';
+    if(n.endsWith('.ppt')) return '✕ 読み込めません（.pptxで保存し直してください）';
+    if(n.endsWith('.xls')) return '✕ 読み込めません（.xlsxで保存し直してください）';
+    return '✕ 非対応の形式です';
+  }
+  return {audio:'音声',image:'画像',pdf:'PDF',text:'テキスト',docx:'Word',pptx:'PowerPoint',xlsx:'Excel'}[k];
+}
+function aiRenderFileList(){
+  const el=document.getElementById('aifl');
+  if(!el) return;
+  el.innerHTML=aiFs.map((f,i)=>{
+    const note=aiFileNote(f);
+    const bad=note.startsWith('✕');
+    return `<div class="aifi"><span style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(f.name)}</span><span style="font-size:10px;margin:0 6px;color:${bad?'#E24B4A':'var(--text3)'};white-space:nowrap">${esc(note)}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`;
+  }).join('');
+}
+function aiAddFiles(list){
+  const add=Array.from(list||[]);
+  if(!add.length) return;
+  // 同じファイルの二重追加を防ぐ
+  add.forEach(f=>{ if(!aiFs.some(x=>x.name===f.name&&x.size===f.size)) aiFs.push(f); });
+  aiRenderFileList();
   // 音声ファイルがあればaudioモードを自動選択・録音時間推定
-  const audioExts=['.mp3','.m4a','.wav','.aac','.ogg','.webm'];
-  const audioFile=aiFs.find(f=>audioExts.some(ext=>f.name.toLowerCase().endsWith(ext)));
+  const audioFile=aiFs.find(f=>aiFileKind(f)==='audio');
   const audioEl=document.querySelector('input[name="ai-mode"][value="audio"]');
   if(audioFile&&audioEl&&!audioEl.disabled){
     audioEl.checked=true;
@@ -4073,7 +4108,83 @@ function aiFC(e){
   }
   aiModeChange();
 }
-function aiRF(i){aiFs.splice(i,1);document.getElementById('aifl').innerHTML=aiFs.map((f,i)=>`<div class="aifi"><span style="flex:1">${f.name}</span><span style="cursor:pointer;opacity:.5" onclick="aiRF(${i})">×</span></div>`).join('');}
+function aiFC(e){
+  aiAddFiles(e.target.files);
+  e.target.value=''; // 同じファイルを選び直しても反応するように
+}
+function aiDrop(e,el){
+  e.preventDefault(); e.stopPropagation();
+  if(el) el.style.borderColor='';
+  aiAddFiles(e.dataTransfer&&e.dataTransfer.files);
+}
+function aiRF(i){aiFs.splice(i,1);aiRenderFileList();}
+async function extractXlsxText(file){
+  if(!window.JSZip){
+    await new Promise((resolve,reject)=>{
+      const s=document.createElement('script');
+      s.src='https://unpkg.com/jszip@3.10.1/dist/jszip.min.js';
+      s.onload=resolve;s.onerror=()=>reject(new Error('JSZip読み込み失敗'));
+      document.head.appendChild(s);
+    });
+  }
+  const zip=await JSZip.loadAsync(await _fileAB(file));
+  const dec=s=>s.replace(/&lt;/g,'<').replace(/&gt;/g,'>').replace(/&quot;/g,'"').replace(/&apos;/g,"'").replace(/&amp;/g,'&');
+  const shared=[];
+  if(zip.files['xl/sharedStrings.xml']){
+    const xml=await zip.files['xl/sharedStrings.xml'].async('string');
+    (xml.match(/<si>[\s\S]*?<\/si>/g)||[]).forEach(si=>{ shared.push(dec((si.match(/<t[^>]*>([^<]*)<\/t>/g)||[]).map(t=>t.replace(/<[^>]+>/g,'')).join(''))); });
+  }
+  const sheets=Object.keys(zip.files).filter(n=>/^xl\/worksheets\/sheet\d+\.xml$/.test(n)).sort((a,b)=>parseInt(a.match(/(\d+)\.xml/)[1])-parseInt(b.match(/(\d+)\.xml/)[1]));
+  const out=[];
+  for(const sn of sheets){
+    const xml=await zip.files[sn].async('string');
+    const rows=[];
+    (xml.match(/<row[^>]*>[\s\S]*?<\/row>/g)||[]).forEach(r=>{
+      const cells=[];
+      (r.match(/<c [^>]*?(?:\/>|>[\s\S]*?<\/c>)/g)||[]).forEach(cx=>{
+        const t=(cx.match(/\bt="([^"]+)"/)||[])[1];
+        let v=(cx.match(/<v>([\s\S]*?)<\/v>/)||[])[1];
+        if(t==='inlineStr') v=(cx.match(/<t[^>]*>([\s\S]*?)<\/t>/)||[])[1];
+        if(v===undefined) return;
+        if(t==='s') v=shared[parseInt(v)]||'';
+        cells.push(dec(String(v)));
+      });
+      if(cells.some(x=>x.trim())) rows.push(cells.join('\t'));
+    });
+    if(rows.length) out.push('[シート'+sn.match(/(\d+)\.xml/)[1]+']\n'+rows.join('\n'));
+  }
+  return out.join('\n\n');
+}
+// 添付ファイルをAIに渡せる形に変換（読めなかったファイルも記録）
+async function aiBuildAttachments(){
+  const blocks=[]; const texts=[]; const used=[]; const failed=[];
+  const LIMIT=20000;
+  for(const f of aiFs){
+    const k=aiFileKind(f);
+    try{
+      if(k==='image'){
+        const mt=f.type&&f.type.startsWith('image/')?f.type:('image/'+(f.name.toLowerCase().match(/\.(png|gif|webp)$/)?f.name.toLowerCase().split('.').pop():'jpeg'));
+        blocks.push({type:'image',source:{type:'base64',media_type:mt,data:await toB64(f)}}); used.push(f.name);
+      } else if(k==='pdf'){
+        blocks.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:await toB64(f)}}); used.push(f.name);
+      } else if(k==='text'||k==='docx'||k==='pptx'||k==='xlsx'){
+        let t='';
+        if(k==='text') t=await _fileText(f);
+        else if(k==='docx') t=await extractWordText(f);
+        else if(k==='pptx') t=await extractPptxText(f);
+        else t=await extractXlsxText(f);
+        if(!t||!t.trim()){ failed.push(f.name+'（文字が見つかりません）'); continue; }
+        const cut=t.length>LIMIT;
+        texts.push(`【添付ファイル「${f.name}」の内容${cut?'（先頭'+LIMIT+'文字）':''}】\n${t.slice(0,LIMIT)}`); used.push(f.name);
+      } else if(k==='audio'){
+        failed.push(f.name+'（音声は「音声から作成」モードで使ってください）');
+      } else {
+        failed.push(f.name+'（'+aiFileNote(f).replace('✕ ','')+'）');
+      }
+    }catch(e){ failed.push(f.name+'（読み込みエラー: '+e.message+'）'); }
+  }
+  return {blocks,texts,used,failed};
+}
 function aiCatChange(){
   document.querySelectorAll('#ai-cat-options .ai-radio-row').forEach(el=>{
     el.style.background=el.querySelector('input:checked')?'var(--bg-info)':'';
@@ -4414,31 +4525,31 @@ JSON配列のみで回答（説明文・コードブロック不要）:
       promptText=`あなたはタイムライン設計のプロフェッショナルです。添付されたファイルやテキストの内容を深く分析し、最適なタイムテーブルを設計してください。\n${prompt?'追加指示: '+prompt:''}\n\n【分析・設計の手順】\n① 資料の全体構成・ページ数・セクション数・内容の重さを把握する\n② PPTXの場合: スライド数と内容から1スライドあたり1〜3分を目安に発表時間を逆算する\n③ 内容の難易度・情報量に応じてセッションの長さを調整する（重い内容は長め）\n④ 60〜90分に1回は5〜15分の休憩を挿入し、参加者の集中力を維持する\n⑤ 関連する複数のスライドやトピックはひとつのセッションにまとめてよい\n\n【出力の品質基準】\n- セッションの粒度: ${AI_GRAN_PROMPTS[(parseInt(document.getElementById('ai-granularity').value)||3)-1]}\n- durは1以上の整数。5分単位を基本とする\n- セッション名は15文字以内で内容が伝わるものに\n- commentには「このセッションで何を扱うか・なぜこの時間か・参加者にとっての意味」を40〜60文字で具体的に記載\n- colorは内容で使い分ける（導入:purple 講義:blue ワーク:teal 休憩:gray まとめ:green 食事:amber ディスカッション:pink）\n\nJSON配列のみで回答（説明文・コードブロック不要）:\n[{"name":"セッション名","dur":分数,"color":"カラー名","comment":"具体的な内容と意図の説明"}]\n最初の文字は[、最後の文字は]にしてください。`;
     }
     if(categoryContext) promptText += categoryContext;
-    let uc=[{type:'text',text:promptText}];
-    for(const f of aiFs){
-      const fname=f.name.toLowerCase();
-      const mt=f.type||'application/octet-stream';
-      if(mt.startsWith('image/')){
-        const b=await toB64(f);uc.push({type:'image',source:{type:'base64',media_type:mt,data:b}});
-      } else if(fname.endsWith('.pdf')){
-        const b=await toB64(f);uc.push({type:'document',source:{type:'base64',media_type:'application/pdf',data:b}});
-      } else if(fname.endsWith('.txt')){
-        const text=await f.text();uc[0].text+=`\n\n【ファイル「${f.name}」の内容】\n${text.slice(0,8000)}`;
-      } else if(fname.endsWith('.docx')||fname.endsWith('.doc')){
-        try{const text=await extractWordText(f);uc[0].text+=`\n\n【Word「${f.name}」から抽出】\n${text.slice(0,8000)}`;}
-        catch(e){uc[0].text+=`\n\n【Word「${f.name}」テキスト抽出失敗: ${e.message}】`;}
-      } else if(fname.endsWith('.pptx')||fname.endsWith('.ppt')){
-        try{const text=await extractPptxText(f);uc[0].text+=`\n\n【PPT「${f.name}」から抽出】\n${text.slice(0,8000)}`;}
-        catch(e){uc[0].text+=`\n\n【PPT「${f.name}」テキスト抽出失敗: ${e.message}】`;}
-      } else {
-        uc[0].text+=`\n\n添付ファイル「${f.name}」（${Math.round(f.size/1024)}KB）も参照してください。`;
+    // ── 添付ファイル ──
+    const att=await aiBuildAttachments();
+    if(aiFs.length>0 && att.used.length===0){
+      throw new Error('添付ファイルを読み込めませんでした。\n'+att.failed.join('\n')+'\n\n対応形式: PDF・画像・.docx・.pptx・.xlsx・.txt・.md・.csv');
+    }
+    if(att.failed.length>0){
+      if(!confirm('次のファイルは読み込めませんでした。\n'+att.failed.join('\n')+'\n\n読み込めたファイルだけで生成を続けますか？')){
+        btn.disabled=false;btn.textContent='🚀 生成';return;
       }
     }
+    let header='';
+    if(att.used.length>0){
+      header='【最重要】このメッセージには資料が添付されています（'+att.used.join('、')+'）。\n'
+        +'資料に書かれたプログラム構成・セッション名・順序・時間配分を最優先で忠実に反映してください。\n'
+        +'資料に時間配分の記載がある場合はそれに従い、資料にないセッションを勝手に追加しないでください（休憩など必要な調整を除く）。\n\n';
+      if(att.texts.length>0) header+=att.texts.join('\n\n')+'\n\n';
+      header+='────────────────\n以下が作成の指示です。\n\n';
+    }
+    // 資料（PDF・画像）→ 説明テキストの順に並べる（資料を先に置くと参照されやすい）
+    let uc=[...att.blocks,{type:'text',text:header+promptText}];
     let resp;
     if(provider==='gemini'){
       const geminiParts=uc.map(item=>{
         if(item.type==='text') return {text:item.text};
-        if(item.type==='image') return {inlineData:{mimeType:item.source.media_type,data:item.source.data}};
+        if(item.type==='image'||item.type==='document') return {inlineData:{mimeType:item.source.media_type,data:item.source.data}};
         return null;
       }).filter(Boolean);
       resp=await fetch(
@@ -4464,12 +4575,10 @@ JSON配列のみで回答（説明文・コードブロック不要）:
     else{text=(data.content||[]).filter(b=>b.type==='text').map(b=>b.text).join('');}
     if(!text) throw new Error('AIからの応答が空でした。もう一度お試しください。');
     aiSs=extractJsonSessions(text,'');
-    document.getElementById('aisp').innerHTML=aiSs.map((s,i)=>`<div class="aisi"><input type="checkbox" id="aic${i}" checked/><div style="width:8px;height:8px;border-radius:50%;background:${CDot[s.color]||CDot.teal};flex-shrink:0"></div><span style="flex:1">${esc(s.name)}</span><span style="font-size:10px;color:var(--text2)">${s.dur}分</span></div>`).join('');
+    document.getElementById('aisp').innerHTML=(att.used.length?`<div style="font-size:11px;color:var(--text2);padding:4px 2px 8px">参照した資料: ${esc(att.used.join('、'))}</div>`:'')+aiSs.map((s,i)=>`<div class="aisi"><input type="checkbox" id="aic${i}" checked/><div style="width:8px;height:8px;border-radius:50%;background:${CDot[s.color]||CDot.teal};flex-shrink:0"></div><span style="flex:1">${esc(s.name)}</span><span style="font-size:10px;color:var(--text2)">${s.dur}分</span></div>`).join('');
     document.getElementById('airw').style.display='';document.getElementById('aiimport').style.display='';
   }catch(err){alert('AIの生成に失敗しました: '+err.message);}
-  aiFs=[];
   document.getElementById('aifile').value='';
-  document.getElementById('aifl').innerHTML='';
   btn.disabled=false;btn.textContent='🚀 生成';
 }
 function aiConfirmClose(){
@@ -4533,6 +4642,8 @@ function aiImportWithConfirm(){
     function(){ importAI(true); }    // 末尾に追加
   );
 }
+function _fileText(f){return new Promise((r,e)=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>e(new Error('read'));fr.readAsText(f);});}
+function _fileAB(f){return new Promise((r,e)=>{const fr=new FileReader();fr.onload=()=>r(fr.result);fr.onerror=()=>e(new Error('read'));fr.readAsArrayBuffer(f);});}
 function toB64(f){return new Promise((r,e)=>{const fr=new FileReader();fr.onload=()=>r(fr.result.split(',')[1]);fr.onerror=()=>e(new Error('read'));fr.readAsDataURL(f);});}
 
 async function extractWordText(file){
@@ -4544,7 +4655,7 @@ async function extractWordText(file){
       document.head.appendChild(s);
     });
   }
-  const ab=await file.arrayBuffer();
+  const ab=await _fileAB(file);
   const result=await mammoth.extractRawText({arrayBuffer:ab});
   return result.value||'';
 }
@@ -4558,7 +4669,7 @@ async function extractPptxText(file){
       document.head.appendChild(s);
     });
   }
-  const ab=await file.arrayBuffer();
+  const ab=await _fileAB(file);
   const zip=await JSZip.loadAsync(ab);
   const texts=[];
   const slideFiles=Object.keys(zip.files)
